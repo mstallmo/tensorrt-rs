@@ -1,0 +1,11 @@
+[package]
+name = "tensorrt"
+version = "0.1.0"
+authors = ["Mason Stallmo <masonstallmo@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+#tensorrt-sys = {version = "0.1.0", path="../tensorrt-sys"}
+tensorrt-sys = {version = "0.1.0", git="https://github.com/mstallmo/tensorrt-rs"}

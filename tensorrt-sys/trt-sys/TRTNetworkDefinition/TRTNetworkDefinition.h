@@ -5,11 +5,19 @@
 #ifndef LIBTRT_TRTNETWORKDEFINITION_H
 #define LIBTRT_TRTNETWORKDEFINITION_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct Network {
     void* internal_network;
 };
 typedef struct Network Network_t;
 
 void destroy_network(Network_t *network);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //LIBTRT_TRTNETWORKDEFINITION_H

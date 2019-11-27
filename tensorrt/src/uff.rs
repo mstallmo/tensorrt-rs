@@ -1,6 +1,9 @@
 use crate::network::Network;
 use std::ffi::CString;
-use tensorrt_sys::{uffparser_create_uff_parser, uffparser_destroy_uff_parser, uffparser_parse};
+use tensorrt_sys::{
+    uffparser_create_uff_parser, uffparser_destroy_uff_parser, uffparser_parse,
+    uffparser_register_input, uffparser_register_output, Dims,
+};
 
 pub struct UffParser {
     internal_uffparser: *mut tensorrt_sys::UffParser_t,
@@ -14,7 +17,33 @@ impl UffParser {
         }
     }
 
-    pub fn parse(self, file_path: &str, network: &Network) {
+    pub fn register_input(&self, input_name: &str) {
+        let mut d_vec = vec![3, 256, 256];
+        let mut type_vec = vec![1, 0, 0];
+        let dims = Dims {
+            nbDims: 3,
+            d: d_vec.as_mut_ptr(),
+            type_: type_vec.as_mut_ptr(),
+        };
+        unsafe {
+            uffparser_register_input(
+                self.internal_uffparser,
+                CString::new(input_name).unwrap().as_ptr(),
+                dims,
+            )
+        };
+    }
+
+    pub fn register_output(&self, output_name: &str) {
+        unsafe {
+            uffparser_register_output(
+                self.internal_uffparser,
+                CString::new(output_name).unwrap().as_ptr(),
+            )
+        };
+    }
+
+    pub fn parse(&self, file_path: &str, network: &Network) {
         unsafe {
             uffparser_parse(
                 self.internal_uffparser,

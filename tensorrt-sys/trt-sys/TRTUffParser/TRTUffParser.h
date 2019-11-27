@@ -23,7 +23,7 @@ void uffparser_destroy_uff_parser(UffParser_t* uff_parser);
 bool uffparser_register_input(const UffParser_t* uff_parser, const char* input_name, struct Dims input_dims);
 bool uffparser_register_output(const UffParser_t* uff_parser, const char* output_name);
 
-bool uffparser_parse(const UffParser_t* uff_parser, const char* file, Network_t* network);
+bool uffparser_parse(const UffParser_t* uff_parser, const char* file, const Network_t* network);
 
 #ifdef __cplusplus
 };

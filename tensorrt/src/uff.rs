@@ -1,5 +1,7 @@
 use crate::network::Network;
 use std::ffi::CString;
+use std::io::{Error, ErrorKind};
+use std::path::Path;
 use tensorrt_sys::{
     uffparser_create_uff_parser, uffparser_destroy_uff_parser, uffparser_parse,
     uffparser_register_input, uffparser_register_output, Dims,
@@ -43,14 +45,19 @@ impl UffParser {
         };
     }
 
-    pub fn parse(&self, file_path: &str, network: &Network) {
+    pub fn parse(&self, file_path: &Path, network: &Network) -> Result<(), std::io::Error> {
+        if !file_path.exists() {
+            return Err(Error::new(ErrorKind::NotFound, "UFF file does not exist"));
+        }
+
         unsafe {
             uffparser_parse(
                 self.internal_uffparser,
-                CString::new(file_path).unwrap().as_ptr(),
+                CString::new(file_path.to_str().unwrap()).unwrap().as_ptr(),
                 network.internal_network,
             )
         };
+        Ok(())
     }
 }
 

@@ -10,7 +10,7 @@
 class TRTLogger : nvinfer1::ILogger
 {
 public:
-    TRTLogger(nvinfer1::ILogger::Severity severity = nvinfer1::ILogger::Severity::kWARNING)
+    explicit TRTLogger(nvinfer1::ILogger::Severity severity = nvinfer1::ILogger::Severity::kWARNING)
             : mReportableSeverity(severity)
     {
     }
@@ -18,7 +18,7 @@ public:
 
     void log(nvinfer1::ILogger::Severity severity, const char* msg) override
     {
-        if (severity >= mReportableSeverity)
+        if (severity <= mReportableSeverity)
             printf("%s\n", msg);
     }
 private:

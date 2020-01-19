@@ -9,8 +9,8 @@ mod tests {
     use crate::{
         context_get_name, context_set_name, create_infer_runtime, create_logger, delete_logger,
         deserialize_cuda_engine, destroy_cuda_engine, destroy_excecution_context,
-        destroy_infer_runtime, engine_create_execution_context, get_binding_index,
-        get_binding_name, get_tensorrt_version, uffparser_create_uff_parser,
+        destroy_infer_runtime, engine_create_execution_context, engine_seralize, get_binding_index,
+        get_binding_name, get_tensorrt_version, host_memory_get_size, uffparser_create_uff_parser,
         uffparser_destroy_uff_parser, uffparser_register_input, uffparser_register_output,
     };
     use std::ffi::CStr;
@@ -18,11 +18,6 @@ mod tests {
     use std::fs::File;
     use std::io::prelude::*;
     use std::os::raw::{c_char, c_void};
-
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
 
     #[test]
     fn tensorrt_version() {
@@ -76,6 +71,27 @@ mod tests {
             destroy_infer_runtime(runtime);
             delete_logger(logger);
         }
+    }
+
+    #[test]
+    fn host_memory() {
+        let logger = unsafe { create_logger() };
+        let runtime = unsafe { create_infer_runtime(logger) };
+
+        let mut f = File::open("resnet34-unet-Aug25-07-25-16-best.engine").unwrap();
+        let mut buffer = Vec::new();
+        f.read_to_end(&mut buffer).unwrap();
+        let engine = unsafe {
+            deserialize_cuda_engine(
+                runtime,
+                buffer.as_ptr() as *const c_void,
+                buffer.len() as u64,
+            )
+        };
+
+        let host_memory = unsafe { engine_seralize(engine) };
+        let memory_sise = unsafe { host_memory_get_size(host_memory) };
+        println!("Host Memory Size of Engine: {}", memory_sise);
     }
 
     #[test]

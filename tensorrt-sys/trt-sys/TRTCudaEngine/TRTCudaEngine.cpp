@@ -2,6 +2,7 @@
 // Created by mason on 8/26/19.
 //
 #include <cstdlib>
+
 #include "NvInfer.h"
 #include "TRTCudaEngine.h"
 
@@ -56,4 +57,13 @@ Context_t* engine_create_execution_context(Engine_t* engine) {
     auto en = static_cast<nvinfer1::ICudaEngine *>(engine->internal_engine);
     nvinfer1::IExecutionContext *context = en->createExecutionContext();
     return create_execution_context(context);
+}
+
+HostMemory_t* engine_seralize(Engine_t* engine) {
+    if (engine == nullptr)
+        return nullptr;
+
+    auto en = static_cast<nvinfer1::ICudaEngine *>(engine->internal_engine);
+    nvinfer1::IHostMemory* hostMemory = en->serialize();
+    return create_host_memory(hostMemory);
 }

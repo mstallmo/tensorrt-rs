@@ -19,6 +19,8 @@ file(GLOB source_files
         "TRTBuilder/*.cpp"
         "TRTNetworkDefinition/*.h"
         "TRTNetworkDefinition/*.cpp"
+        "TRTHostMemory/*.h"
+        "TRTHostMemory/*.cpp"
         "*.h"
         )
 

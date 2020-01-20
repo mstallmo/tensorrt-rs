@@ -5,9 +5,11 @@ use crate::runtime::Runtime;
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_void;
+use std::slice;
 use tensorrt_sys::{
     deserialize_cuda_engine, destroy_cuda_engine, engine_create_execution_context,
-    get_binding_index, get_binding_name, get_nb_bindings,
+    engine_serialize, get_binding_index, get_binding_name, get_nb_bindings, host_memory_get_data,
+    host_memory_get_size,
 };
 
 pub struct Engine {
@@ -76,11 +78,28 @@ impl Engine {
             _engine: &self,
         }
     }
+
+    pub fn serialize(&self) -> HostMemory {
+        let memory = unsafe { engine_serialize(self.internal_engine) };
+        HostMemory { memory }
+    }
 }
 
 impl Drop for Engine {
     fn drop(&mut self) {
         unsafe { destroy_cuda_engine(self.internal_engine) };
+    }
+}
+
+pub struct HostMemory {
+    pub(crate) memory: *mut tensorrt_sys::HostMemory_t,
+}
+
+impl HostMemory {
+    pub fn data(&self) -> &[u8] {
+        let ptr = unsafe { host_memory_get_data(self.memory) };
+        let size = unsafe { host_memory_get_size(self.memory) };
+        unsafe { slice::from_raw_parts(ptr as *const u8, size) }
     }
 }
 
@@ -135,5 +154,12 @@ mod tests {
         let engine = setup_engine_test();
 
         assert_eq!(None, engine.get_binding_index("not_valid"));
+    }
+
+    #[test]
+    fn serialize_engine_to_slice() {
+        let engine = setup_engine_test();
+
+        assert_eq!(true, true);
     }
 }

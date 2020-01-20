@@ -167,7 +167,7 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn engine_seralize(engine: *mut Engine_t) -> *mut HostMemory_t;
+    pub fn engine_serialize(engine: *mut Engine_t) -> *mut HostMemory_t;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

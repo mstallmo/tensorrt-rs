@@ -59,7 +59,7 @@ Context_t* engine_create_execution_context(Engine_t* engine) {
     return create_execution_context(context);
 }
 
-HostMemory_t* engine_seralize(Engine_t* engine) {
+HostMemory_t* engine_serialize(Engine_t* engine) {
     if (engine == nullptr)
         return nullptr;
 

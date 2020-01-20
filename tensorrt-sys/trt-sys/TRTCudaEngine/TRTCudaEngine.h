@@ -24,7 +24,7 @@ int get_nb_bindings(Engine_t* engine);
 const char* get_binding_name(Engine_t* engine, int binding_index);
 int get_binding_index(Engine_t *engine, const char* op_name);
 
-HostMemory_t* engine_seralize(Engine_t* engine);
+HostMemory_t* engine_serialize(Engine_t* engine);
 
 #ifdef __cplusplus
 };

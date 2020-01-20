@@ -123,6 +123,21 @@ extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct HostMemory {
+    _unused: [u8; 0],
+}
+pub type HostMemory_t = HostMemory;
+extern "C" {
+    pub fn create_host_memory(host_memory: *mut ::std::os::raw::c_void) -> *mut HostMemory_t;
+}
+extern "C" {
+    pub fn host_memory_get_data(host_memory: *mut HostMemory_t) -> *mut ::std::os::raw::c_void;
+}
+extern "C" {
+    pub fn host_memory_get_size(host_memory: *mut HostMemory_t) -> usize;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct Engine {
     _unused: [u8; 0],
 }
@@ -150,6 +165,9 @@ extern "C" {
         engine: *mut Engine_t,
         op_name: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn engine_serialize(engine: *mut Engine_t) -> *mut HostMemory_t;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -276,7 +294,7 @@ extern "C" {
     pub fn uffparser_parse(
         uff_parser: *const UffParser_t,
         file: *const ::std::os::raw::c_char,
-        network: *mut Network_t,
+        network: *const Network_t,
     ) -> bool;
 }
 #[repr(C)]

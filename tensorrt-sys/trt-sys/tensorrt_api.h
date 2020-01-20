@@ -13,5 +13,6 @@
 #include "TRTDims/TRTDims.h"
 #include "TRTBuilder/TRTBuilder.h"
 #include "TRTNetworkDefinition/TRTNetworkDefinition.h"
+#include "TRTHostMemory/TRTHostMemory.h"
 
 #endif //TENSRORT_SYS_TENSORRT_API_H

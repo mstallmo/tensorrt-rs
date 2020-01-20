@@ -10,4 +10,4 @@ edition = "2018"
 # Uncomment when working locally
 #tensorrt-sys = {version = "0.1", path="../tensorrt-sys"}
 
-tensorrt-sys = {version = "0.1.0", git="https://github.com/mstallmo/tensorrt-rs"}
+tensorrt-sys = {version = "0.1.1", git="https://github.com/mstallmo/tensorrt-rs"}

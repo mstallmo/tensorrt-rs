@@ -1,41 +1,40 @@
 //
 // Created by mason on 11/22/19.
 //
-#include <cstdlib>
 #include <cstring>
+#include <memory>
 
 #include "NvUffParser.h"
 
 #include "TRTUffParser.h"
+#include "../TRTNetworkDefinition/TRTNetworkDefinitionInternal.hpp"
 
 struct UffParser {
-    void* internal_uffParser;
+    nvuffparser::IUffParser *internal_uffParser;
+
+    explicit UffParser(nvuffparser::IUffParser* uffParser) : internal_uffParser(uffParser) {};
+
+    ~UffParser() {
+        internal_uffParser->destroy();
+    }
 };
 
-UffParser_t* uffparser_create_uff_parser() {
-    UffParser_t* u;
-
-    u = (typeof(u))malloc(sizeof(u));
-    u->internal_uffParser = nvuffparser::createUffParser();
-
-    return u;
+UffParser_t *uffparser_create_uff_parser() {
+    return new UffParser(nvuffparser::createUffParser());
 }
 
-void uffparser_destroy_uff_parser(UffParser_t* uff_parser) {
+void uffparser_destroy_uff_parser(UffParser_t *uff_parser) {
     if (uff_parser == nullptr)
         return;
 
-    auto uffParser = static_cast<nvuffparser::IUffParser*>(uff_parser->internal_uffParser);
-    uffParser->destroy();
-
-    free(uff_parser);
+    delete uff_parser;
 }
 
-bool uffparser_register_input(const UffParser_t* uff_parser, const char* input_name, const struct Dims input_dims) {
+bool uffparser_register_input(const UffParser_t *uff_parser, const char *input_name, const struct Dims input_dims) {
     if (uff_parser == nullptr)
         return false;
 
-    auto uffParser = static_cast<nvuffparser::IUffParser*>(uff_parser->internal_uffParser);
+    nvuffparser::IUffParser *uffParser = uff_parser->internal_uffParser;
 
     nvinfer1::Dims nvDims = {};
     nvDims.nbDims = input_dims.nbDims;
@@ -45,22 +44,21 @@ bool uffparser_register_input(const UffParser_t* uff_parser, const char* input_n
     return uffParser->registerInput(input_name, nvDims, nvuffparser::UffInputOrder::kNCHW);
 }
 
-bool uffparser_register_output(const UffParser_t* uff_parser, const char* output_name) {
+bool uffparser_register_output(const UffParser_t *uff_parser, const char *output_name) {
     if (uff_parser == nullptr)
         return false;
 
-    auto uffParser = static_cast<nvuffparser::IUffParser *>(uff_parser->internal_uffParser);
+    nvuffparser::IUffParser *uffParser = uff_parser->internal_uffParser;
 
     return uffParser->registerOutput(output_name);
 }
 
-bool uffparser_parse(const UffParser_t* uff_parser, const char* file, const Network_t* network)
-{
+bool uffparser_parse(const UffParser_t *uff_parser, const char *file, const Network_t *network) {
     if (uff_parser == nullptr)
         return false;
 
-    auto uffParser = static_cast<nvuffparser::IUffParser*>(uff_parser->internal_uffParser);
-    auto networkDefinition = static_cast<nvinfer1::INetworkDefinition*>(network->internal_network);
+    nvuffparser::IUffParser *uffParser = uff_parser->internal_uffParser;
+    auto networkDefinition = getNetworkDefinition(network);
 
     return uffParser->parse(file, *networkDefinition, nvinfer1::DataType::kFLOAT);
 }

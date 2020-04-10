@@ -236,30 +236,7 @@ fn bindgen_test_layout_Dims() {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Network {
-    pub internal_network: *mut ::std::os::raw::c_void,
-}
-#[test]
-fn bindgen_test_layout_Network() {
-    assert_eq!(
-        ::std::mem::size_of::<Network>(),
-        8usize,
-        concat!("Size of: ", stringify!(Network))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<Network>(),
-        8usize,
-        concat!("Alignment of ", stringify!(Network))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<Network>())).internal_network as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(Network),
-            "::",
-            stringify!(internal_network)
-        )
-    );
+    _unused: [u8; 0],
 }
 pub type Network_t = Network;
 extern "C" {

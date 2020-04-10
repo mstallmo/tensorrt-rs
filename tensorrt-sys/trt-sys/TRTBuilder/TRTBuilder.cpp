@@ -5,6 +5,7 @@
 #include <NvInfer.h>
 
 #include "TRTBuilder.h"
+#include "../TRTNetworkDefinition/TRTNetworkDefinitionInternal.hpp"
 
 #define MAX_WORKSPACE (1 << 30)
 
@@ -36,21 +37,14 @@ void destroy_builder(Builder_t* builder)
 
 Network_t* create_network(Builder_t *builder)
 {
-    Network_t* n;
-    nvinfer1::INetworkDefinition* networkDefinition;
     auto b = static_cast<nvinfer1::IBuilder*>(builder->internal_builder);
-
-    networkDefinition = b->createNetwork();
-    n = (typeof(n))malloc(sizeof(n));
-    n->internal_network = networkDefinition;
-    return n;
+    return createNetwork(b->createNetwork());
 }
 
 Engine_t *build_cuda_engine(Builder_t *builder, Network_t *network)
 {
-    auto n = static_cast<nvinfer1::INetworkDefinition*>(network->internal_network);
     auto b = static_cast<nvinfer1::IBuilder*>(builder->internal_builder);
 
-    auto engine = b->buildCudaEngine(*n);
+    auto engine = b->buildCudaEngine(*getNetworkDefinition(network));
     return create_engine(engine);
 }

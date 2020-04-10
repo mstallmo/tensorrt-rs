@@ -9,9 +9,7 @@
 extern "C" {
 #endif
 
-struct Network {
-    void* internal_network;
-};
+struct Network;
 typedef struct Network Network_t;
 
 void destroy_network(Network_t *network);

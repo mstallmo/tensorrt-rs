@@ -3,6 +3,8 @@ project(LibTRT LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -Wno-unknown-pragmas")
+
 file(GLOB source_files
         "TRTLogger/*.h"
         "TRTLogger/*.cpp"

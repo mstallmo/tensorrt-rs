@@ -9,14 +9,12 @@
 #include "../TRTNetworkDefinition/TRTNetworkDefinition.h"
 #include "../TRTCudaEngine/TRTCudaEngine.h"
 
-struct Builder {
-    void *internal_builder;
-};
-typedef struct Builder Builder_t;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct Builder;
+typedef struct Builder Builder_t;
 
 Builder_t *create_infer_builder(Logger_t *logger);
 void destroy_builder(Builder_t* builder);

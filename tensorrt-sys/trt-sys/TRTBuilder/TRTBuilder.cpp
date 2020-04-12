@@ -1,50 +1,45 @@
 //
 // Created by mason on 11/27/19.
 //
-#include <cstdlib>
+#include <memory>
 #include <NvInfer.h>
 
 #include "TRTBuilder.h"
 #include "../TRTNetworkDefinition/TRTNetworkDefinitionInternal.hpp"
+#include "../TRTLogger/TRTLoggerInternal.hpp"
+#include "../TRTUtils.hpp"
 
 #define MAX_WORKSPACE (1 << 30)
 
-Builder_t* create_infer_builder(Logger_t* logger)
-{
-    Builder_t* b;
-    nvinfer1::IBuilder* builder;
-    auto l = static_cast<nvinfer1::ILogger*>(logger->internal_logger);
+struct Builder {
+    using IBuilderPtr = std::unique_ptr<nvinfer1::IBuilder, TRTDeleter<nvinfer1::IBuilder>>;
+    IBuilderPtr internal_builder;
 
-    builder = nvinfer1::createInferBuilder(*l);
-    builder->setMaxWorkspaceSize(MAX_WORKSPACE);
-    builder->setMaxBatchSize(1);
-    b = (typeof(b))malloc(sizeof(*b));
-    b->internal_builder = builder;
+    explicit Builder(nvinfer1::ILogger& logger) {
+        internal_builder = IBuilderPtr(nvinfer1::createInferBuilder(logger));
+        internal_builder->setMaxBatchSize(1);
+        internal_builder->setMaxWorkspaceSize(MAX_WORKSPACE);
+    };
+};
 
-    return b;
+Builder_t *create_infer_builder(Logger_t *logger) {
+    return new Builder(logger->getLogger());
 }
 
-void destroy_builder(Builder_t* builder)
-{
-    if(builder == nullptr)
+void destroy_builder(Builder_t *builder) {
+    if (builder == nullptr)
         return;
 
-    auto b = static_cast<nvinfer1::IBuilder*>(builder->internal_builder);
-
-    b->destroy();
-    free(builder);
+    delete builder;
 }
 
-Network_t* create_network(Builder_t *builder)
-{
-    auto b = static_cast<nvinfer1::IBuilder*>(builder->internal_builder);
-    return createNetwork(b->createNetwork());
+Network_t *create_network(Builder_t *builder) {
+    return new Network(builder->internal_builder->createNetwork());
 }
 
-Engine_t *build_cuda_engine(Builder_t *builder, Network_t *network)
-{
-    auto b = static_cast<nvinfer1::IBuilder*>(builder->internal_builder);
+Engine_t *build_cuda_engine(Builder_t *builder, Network_t *network) {
+    auto& b = builder->internal_builder;
 
-    auto engine = b->buildCudaEngine(*getNetworkDefinition(network));
+    auto engine = b->buildCudaEngine(network->getNetworkDefinition());
     return create_engine(engine);
 }

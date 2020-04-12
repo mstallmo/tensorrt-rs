@@ -9,9 +9,7 @@
 extern "C" {
 #endif
 
-struct Logger {
-    void* internal_logger;
-};
+struct Logger;
 typedef struct Logger Logger_t;
 
 void get_tensorrt_version(char* string);

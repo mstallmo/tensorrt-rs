@@ -6,30 +6,7 @@ pub const __bool_true_false_are_defined: u32 = 1;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Logger {
-    pub internal_logger: *mut ::std::os::raw::c_void,
-}
-#[test]
-fn bindgen_test_layout_Logger() {
-    assert_eq!(
-        ::std::mem::size_of::<Logger>(),
-        8usize,
-        concat!("Size of: ", stringify!(Logger))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<Logger>(),
-        8usize,
-        concat!("Alignment of ", stringify!(Logger))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<Logger>())).internal_logger as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(Logger),
-            "::",
-            stringify!(internal_logger)
-        )
-    );
+    _unused: [u8; 0],
 }
 pub type Logger_t = Logger;
 extern "C" {
@@ -277,30 +254,7 @@ extern "C" {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Builder {
-    pub internal_builder: *mut ::std::os::raw::c_void,
-}
-#[test]
-fn bindgen_test_layout_Builder() {
-    assert_eq!(
-        ::std::mem::size_of::<Builder>(),
-        8usize,
-        concat!("Size of: ", stringify!(Builder))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<Builder>(),
-        8usize,
-        concat!("Alignment of ", stringify!(Builder))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<Builder>())).internal_builder as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(Builder),
-            "::",
-            stringify!(internal_builder)
-        )
-    );
+    _unused: [u8; 0],
 }
 pub type Builder_t = Builder;
 extern "C" {

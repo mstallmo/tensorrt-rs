@@ -5,9 +5,18 @@
 #ifndef LIBTRT_TRTNETWORKDEFINITIONINTERNAL_HPP
 #define LIBTRT_TRTNETWORKDEFINITIONINTERNAL_HPP
 
-#include "TRTNetworkDefinition.h"
+#include <memory>
 
-Network_t* createNetwork(nvinfer1::INetworkDefinition* networkDefinition);
-nvinfer1::INetworkDefinition* getNetworkDefinition(const Network_t* network);
+#include "TRTNetworkDefinition.h"
+#include "../TRTUtils.hpp"
+
+struct Network {
+    using INetworkDefinitionPtr = std::unique_ptr<nvinfer1::INetworkDefinition, TRTDeleter<nvinfer1::INetworkDefinition>>;
+    INetworkDefinitionPtr internal_network;
+
+    explicit Network(nvinfer1::INetworkDefinition* networkDefinition) : internal_network(networkDefinition) {};
+    [[nodiscard]] nvinfer1::INetworkDefinition& getNetworkDefinition() const;
+};
+
 
 #endif //LIBTRT_TRTNETWORKDEFINITIONINTERNAL_HPP

@@ -1,10 +1,11 @@
-use crate::builder::Builder;
 use crate::context::Context;
-use crate::network::Network;
 use crate::runtime::Runtime;
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
+use std::fs::File;
+use std::io::prelude::*;
 use std::os::raw::c_void;
+use std::path::Path;
 use std::slice;
 use tensorrt_sys::{
     deserialize_cuda_engine, destroy_cuda_engine, engine_create_execution_context,
@@ -12,6 +13,7 @@ use tensorrt_sys::{
     host_memory_get_size,
 };
 
+#[derive(Debug)]
 pub struct Engine {
     pub(crate) internal_engine: *mut tensorrt_sys::Engine_t,
 }
@@ -26,13 +28,6 @@ impl Engine {
             )
         };
 
-        Engine {
-            internal_engine: engine,
-        }
-    }
-
-    pub fn from_builder(builder: &Builder, network: &Network) -> Engine {
-        let engine = builder.build_cuda_engine(network);
         Engine {
             internal_engine: engine,
         }
@@ -64,11 +59,11 @@ impl Engine {
             )
         };
 
-        if binding_index == -1 {
-            return None;
+        return if binding_index == -1 {
+            None
         } else {
-            return Some(binding_index);
-        }
+            Some(binding_index)
+        };
     }
 
     pub fn create_execution_context(&self) -> Context {
@@ -85,9 +80,22 @@ impl Engine {
     }
 }
 
+unsafe impl Send for Engine {}
+
 impl Drop for Engine {
     fn drop(&mut self) {
         unsafe { destroy_cuda_engine(self.internal_engine) };
+    }
+}
+
+//TODO: Rethink this impl. HostMemory needs to be destroyed after being used and is owned by the nvinfer library.
+// Not sure if this impl is possible given the constraints.
+impl AsRef<[u8]> for Engine {
+    fn as_ref(&self) -> &[u8] {
+        let memory = unsafe { engine_serialize(self.internal_engine) };
+        let ptr = unsafe { host_memory_get_data(memory) };
+        let size = unsafe { host_memory_get_size(memory) };
+        unsafe { slice::from_raw_parts(ptr as *const u8, size) }
     }
 }
 
@@ -103,63 +111,130 @@ impl HostMemory {
     }
 }
 
+impl AsRef<[u8]> for HostMemory {
+    fn as_ref(&self) -> &[u8] {
+        self.data()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::builder::Builder;
     use crate::runtime::{Logger, Runtime};
-    use std::fs::File;
+    use crate::uff::{UffFile, UffParser};
+    use lazy_static::lazy_static;
+    use std::fs::{remove_file, write, File};
     use std::io::prelude::*;
+    use std::path::Path;
+    use std::sync::Mutex;
 
-    fn setup_engine_test() -> Engine {
+    lazy_static! {
+        static ref ENGINE: Mutex<Engine> = Mutex::new(setup_engine_test_uff());
+    }
+
+    fn setup_engine_test_uff() -> Engine {
         let logger = Logger::new();
-        let runtime = Runtime::new(&logger);
+        let builder = Builder::new(&logger);
 
-        let mut f = File::open("fix-me.engine").unwrap();
-        let mut buffer = Vec::new();
-        f.read_to_end(&mut buffer).unwrap();
+        let uff_parser = UffParser::new();
+        uff_parser.register_input("in").unwrap();
+        uff_parser.register_output("out").unwrap();
+        let uff_file = UffFile::new(Path::new("../lenet5.uff")).unwrap();
+        uff_parser.parse(&uff_file, builder.get_network()).unwrap();
 
-        Engine::new(runtime, buffer)
+        builder.build_cuda_engine()
     }
 
     #[test]
     fn get_nb_bindings() {
-        let engine = setup_engine_test();
+        let engine = ENGINE.lock().unwrap();
 
         assert_eq!(2, engine.get_nb_bindings());
     }
 
     #[test]
     fn get_engine_binding_name() {
-        let engine = setup_engine_test();
-
-        assert_eq!("data", engine.get_binding_name(0).unwrap());
+        let engine = ENGINE.lock().unwrap();
+        assert_eq!("in", engine.get_binding_name(0).unwrap());
     }
 
     #[test]
     fn get_invalid_engine_binding() {
-        let engine = setup_engine_test();
-
-        assert_eq!(None, engine.get_binding_name(2));
+        let engine = ENGINE.lock().unwrap();
+        assert_eq!(None, engine.get_binding_name(3));
     }
 
     #[test]
     fn get_binding_index() {
-        let engine = setup_engine_test();
+        let engine = ENGINE.lock().unwrap();
 
-        assert_eq!(Some(0), engine.get_binding_index("data"));
+        assert_eq!(Some(0), engine.get_binding_index("in"));
     }
 
     #[test]
-    fn get_invalid_binding_index() {
-        let engine = setup_engine_test();
+    fn write_and_read_engine() {
+        let uff_engine: &Engine = &*ENGINE.lock().unwrap();
+        let seralized_path = Path::new("../lenet5.engine");
+        write(seralized_path, uff_engine);
 
-        assert_eq!(None, engine.get_binding_index("not_valid"));
+        assert!(seralized_path.exists());
+
+        let logger = Logger::new();
+        let runtime = Runtime::new(&logger);
+
+        let mut f = File::open(seralized_path).unwrap();
+        let mut buffer = Vec::new();
+        f.read_to_end(&mut buffer).unwrap();
+
+        let seralized_engine = Engine::new(runtime, buffer);
+        assert_eq!(
+            uff_engine.get_nb_bindings(),
+            seralized_engine.get_nb_bindings()
+        );
+
+        remove_file(seralized_path).unwrap();
     }
 
-    #[test]
-    fn serialize_engine_to_slice() {
-        let engine = setup_engine_test();
-
-        assert_eq!(true, true);
-    }
+    // #[test]
+    // fn get_nb_bindings() {
+    //     let engine = setup_engine_test_seralized();
+    //
+    //     assert_eq!(2, engine.get_nb_bindings());
+    // }
+    //
+    // #[test]
+    // fn get_engine_binding_name() {
+    //     let engine = setup_engine_test_seralized();
+    //
+    //     assert_eq!("data", engine.get_binding_name(0).unwrap());
+    // }
+    //
+    // #[test]
+    // fn get_invalid_engine_binding() {
+    //     let engine = setup_engine_test_seralized();
+    //
+    //     assert_eq!(None, engine.get_binding_name(2));
+    // }
+    //
+    // #[test]
+    // fn get_binding_index() {
+    //     let engine = setup_engine_test_seralized();
+    //
+    //     assert_eq!(Some(0), engine.get_binding_index("data"));
+    // }
+    //
+    // #[test]
+    // fn get_invalid_binding_index() {
+    //     let engine = setup_engine_test_seralized();
+    //
+    //     assert_eq!(None, engine.get_binding_index("not_valid"));
+    // }
+    //
+    // #[test]
+    // fn serialize_engine_to_slice() {
+    //     let engine = setup_engine_test_seralized();
+    //
+    //     assert_eq!(true, true);
+    // }
 }

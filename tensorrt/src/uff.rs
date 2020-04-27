@@ -3,11 +3,37 @@ use std::error;
 use std::ffi::CString;
 use std::fmt::Formatter;
 use std::io;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use tensorrt_sys::{
     uffparser_create_uff_parser, uffparser_destroy_uff_parser, uffparser_parse,
     uffparser_register_input, uffparser_register_output, Dims,
 };
+
+pub struct UffFile(PathBuf);
+
+impl UffFile {
+    pub fn new(file_name: &Path) -> Result<UffFile, io::Error> {
+        if !file_name.exists() {
+            return Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "UFF file does not exist",
+            ));
+        }
+
+        if file_name.extension().unwrap() != "uff" {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "Invalid UFF file. UFF files should have a .uff ending",
+            ));
+        }
+
+        Ok(UffFile(file_name.to_path_buf()))
+    }
+
+    pub fn path(&self) -> CString {
+        CString::new(self.0.to_str().unwrap()).unwrap()
+    }
+}
 
 pub struct UffParser {
     internal_uffparser: *mut tensorrt_sys::UffParser_t,
@@ -22,7 +48,7 @@ impl UffParser {
     }
 
     pub fn register_input(&self, input_name: &str) -> Result<(), UFFRegistrationError> {
-        let mut d_vec = vec![3, 256, 256];
+        let mut d_vec = vec![1, 28, 28];
 
         // Could be a better way to model this in Rust and pass it to C.
         // Value represents what type each of dimensions above are which is not well communicated
@@ -63,22 +89,20 @@ impl UffParser {
         }
     }
 
-    pub fn parse(&self, file_path: &Path, network: &Network) -> Result<(), std::io::Error> {
-        if !file_path.exists() {
-            return Err(io::Error::new(
-                io::ErrorKind::NotFound,
-                "UFF file does not exist",
-            ));
-        }
-
-        unsafe {
+    pub fn parse(&self, uff_file: &UffFile, network: &Network) -> Result<(), UFFParseError> {
+        let res = unsafe {
             uffparser_parse(
                 self.internal_uffparser,
-                CString::new(file_path.to_str().unwrap()).unwrap().as_ptr(),
+                uff_file.path().as_ptr(),
                 network.internal_network,
             )
         };
-        Ok(())
+
+        if res {
+            Ok(())
+        } else {
+            Err(UFFParseError::new("Error parsing UFF file"))
+        }
     }
 }
 
@@ -108,3 +132,24 @@ impl std::fmt::Display for UFFRegistrationError {
 }
 
 impl error::Error for UFFRegistrationError {}
+
+#[derive(Debug, Clone)]
+pub struct UFFParseError {
+    message: String,
+}
+
+impl UFFParseError {
+    pub fn new(message: &str) -> Self {
+        UFFParseError {
+            message: message.to_string(),
+        }
+    }
+}
+
+impl std::fmt::Display for UFFParseError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
+impl error::Error for UFFParseError {}

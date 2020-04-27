@@ -8,6 +8,9 @@ edition = "2018"
 
 [dependencies]
 # Uncomment when working locally
-#tensorrt-sys = {version = "0.1", path="../tensorrt-sys"}
+tensorrt-sys = {version = "0.1", path="../tensorrt-sys"}
 
-tensorrt-sys = {version = "0.1.1", git="https://github.com/mstallmo/tensorrt-rs"}
+#tensorrt-sys = {version = "0.1.1", git="https://github.com/mstallmo/tensorrt-rs"}
+
+[dev-dependencies]
+lazy_static = "1.4.0"

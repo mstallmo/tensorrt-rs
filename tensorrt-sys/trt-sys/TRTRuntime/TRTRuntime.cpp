@@ -5,6 +5,7 @@
 #include "TRTRuntime.h"
 
 #include "../TRTLogger/TRTLoggerInternal.hpp"
+#include "../TRTCudaEngine/TRTCudaEngineInternal.hpp"
 #include "../TRTUtils.hpp"
 
 struct Runtime {
@@ -20,15 +21,16 @@ Runtime_t* create_infer_runtime(Logger_t* logger) {
     return new Runtime(logger->getLogger());
 }
 
-Engine_t* deserialize_cuda_engine(Runtime_t* runtime, const void* blob, unsigned long long size) {
-    nvinfer1::ICudaEngine* engine = runtime->internal_runtime->deserializeCudaEngine(blob, size, nullptr);
-
-    return create_engine(engine);
-}
-
 void destroy_infer_runtime(Runtime_t* runtime) {
     if (runtime == nullptr)
         return;
 
     delete runtime;
 }
+
+Engine_t* deserialize_cuda_engine(Runtime_t* runtime, const void* blob, unsigned long long size) {
+    nvinfer1::ICudaEngine* engine = runtime->internal_runtime->deserializeCudaEngine(blob, size, nullptr);
+
+    return create_engine(engine);
+}
+

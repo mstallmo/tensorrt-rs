@@ -1,61 +1,59 @@
 //
 // Created by mason on 8/26/19.
 //
-#include <cstdlib>
+#include <memory>
 
-#include "NvInfer.h"
-#include "TRTCudaEngine.h"
+#include "../TRTHostMemory/TRTHostMemoryInternal.hpp"
+#include "../TRTContext/TRTContextInternal.hpp"
+#include "../TRTUtils.hpp"
+#include "TRTCudaEngineInternal.hpp"
 
 struct Engine {
-    void* internal_engine;
+    using ICudaEnginePtr = std::unique_ptr<nvinfer1::ICudaEngine, TRTDeleter<nvinfer1::ICudaEngine>>;
+    ICudaEnginePtr internal_engine;
+
+    explicit Engine (nvinfer1::ICudaEngine* engine) {
+        internal_engine = ICudaEnginePtr(engine);
+    }
 };
 
-Engine_t* create_engine(void* engine) {
-    Engine_t* e;
-    e = (typeof(e))malloc(sizeof(e));
-    e->internal_engine = engine;
-    return e;
+Engine_t* create_engine(nvinfer1::ICudaEngine* engine) {
+    return new Engine(engine);
 }
 
 void destroy_cuda_engine(Engine_t* engine) {
     if (engine == nullptr)
         return;
 
-    auto en = static_cast<nvinfer1::ICudaEngine* >(engine->internal_engine);
-    en->destroy();
-    free(engine);
+    delete engine;
 }
 
 int get_nb_bindings(Engine_t* engine) {
     if (engine == nullptr)
         return -1;
 
-    auto en = static_cast<nvinfer1::ICudaEngine* >(engine->internal_engine);
-    return en->getNbBindings();
+    return engine->internal_engine->getNbBindings();
 }
 
 const char* get_binding_name(Engine_t* engine, int binding_index) {
     if (engine == nullptr)
         return "";
 
-    auto en = static_cast<nvinfer1::ICudaEngine* >(engine->internal_engine);
-    return en->getBindingName(binding_index);
+    return engine->internal_engine->getBindingName(binding_index);
 }
 
 int get_binding_index(Engine_t* engine, const char* op_name) {
     if (engine == nullptr)
         return -1;
 
-    auto en = static_cast<nvinfer1::ICudaEngine *>(engine->internal_engine);
-    return en->getBindingIndex(op_name);
+    return engine->internal_engine->getBindingIndex(op_name);
 }
 
 Context_t* engine_create_execution_context(Engine_t* engine) {
     if (engine == nullptr)
         return nullptr;
 
-    auto en = static_cast<nvinfer1::ICudaEngine *>(engine->internal_engine);
-    nvinfer1::IExecutionContext *context = en->createExecutionContext();
+    nvinfer1::IExecutionContext *context = engine->internal_engine->createExecutionContext();
     return create_execution_context(context);
 }
 
@@ -63,7 +61,5 @@ HostMemory_t* engine_serialize(Engine_t* engine) {
     if (engine == nullptr)
         return nullptr;
 
-    auto en = static_cast<nvinfer1::ICudaEngine *>(engine->internal_engine);
-    nvinfer1::IHostMemory* hostMemory = en->serialize();
-    return create_host_memory(hostMemory);
+    return create_host_memory(engine->internal_engine->serialize());
 }

@@ -16,7 +16,6 @@ extern "C" {
 struct Context;
 typedef struct Context Context_t;
 
-Context_t* create_execution_context(void* execution_context);
 void destroy_excecution_context(Context_t* execution_context);
 
 void context_set_name(Context_t* execution_context, const char *name);

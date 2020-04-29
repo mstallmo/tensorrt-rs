@@ -7,6 +7,7 @@
 #include "TRTBuilder.h"
 #include "../TRTNetworkDefinition/TRTNetworkDefinitionInternal.hpp"
 #include "../TRTLogger/TRTLoggerInternal.hpp"
+#include "../TRTCudaEngine/TRTCudaEngineInternal.hpp"
 #include "../TRTUtils.hpp"
 
 #define MAX_WORKSPACE (1 << 30)
@@ -34,10 +35,16 @@ void destroy_builder(Builder_t *builder) {
 }
 
 Network_t *create_network(Builder_t *builder) {
+    if (builder == nullptr)
+        return nullptr;
+
     return new Network(builder->internal_builder->createNetwork());
 }
 
 Engine_t *build_cuda_engine(Builder_t *builder, Network_t *network) {
+    if (builder == nullptr || network == nullptr)
+        return nullptr;
+
     auto& b = builder->internal_builder;
 
     auto engine = b->buildCudaEngine(network->getNetworkDefinition());

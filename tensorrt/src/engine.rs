@@ -8,9 +8,9 @@ use std::os::raw::c_void;
 use std::path::Path;
 use std::slice;
 use tensorrt_sys::{
-    deserialize_cuda_engine, destroy_cuda_engine, engine_create_execution_context,
-    engine_serialize, get_binding_index, get_binding_name, get_nb_bindings, host_memory_get_data,
-    host_memory_get_size,
+    deserialize_cuda_engine, destroy_cuda_engine, destroy_host_memory,
+    engine_create_execution_context, engine_serialize, get_binding_index, get_binding_name,
+    get_nb_bindings, host_memory_get_data, host_memory_get_size,
 };
 
 #[derive(Debug)]
@@ -88,17 +88,6 @@ impl Drop for Engine {
     }
 }
 
-//TODO: Rethink this impl. HostMemory needs to be destroyed after being used and is owned by the nvinfer library.
-// Not sure if this impl is possible given the constraints.
-impl AsRef<[u8]> for Engine {
-    fn as_ref(&self) -> &[u8] {
-        let memory = unsafe { engine_serialize(self.internal_engine) };
-        let ptr = unsafe { host_memory_get_data(memory) };
-        let size = unsafe { host_memory_get_size(memory) };
-        unsafe { slice::from_raw_parts(ptr as *const u8, size) }
-    }
-}
-
 pub struct HostMemory {
     pub(crate) memory: *mut tensorrt_sys::HostMemory_t,
 }
@@ -114,6 +103,14 @@ impl HostMemory {
 impl AsRef<[u8]> for HostMemory {
     fn as_ref(&self) -> &[u8] {
         self.data()
+    }
+}
+
+impl Drop for HostMemory {
+    fn drop(&mut self) {
+        unsafe {
+            destroy_host_memory(self.memory);
+        }
     }
 }
 
@@ -176,7 +173,7 @@ mod tests {
     fn write_and_read_engine() {
         let uff_engine: &Engine = &*ENGINE.lock().unwrap();
         let seralized_path = Path::new("../lenet5.engine");
-        write(seralized_path, uff_engine);
+        write(seralized_path, uff_engine.serialize());
 
         assert!(seralized_path.exists());
 
@@ -188,10 +185,22 @@ mod tests {
         f.read_to_end(&mut buffer).unwrap();
 
         let seralized_engine = Engine::new(runtime, buffer);
+
         assert_eq!(
             uff_engine.get_nb_bindings(),
             seralized_engine.get_nb_bindings()
         );
+
+        for i in 0..uff_engine.get_nb_bindings() {
+            assert_eq!(
+                uff_engine.get_binding_name(i),
+                seralized_engine.get_binding_name(i)
+            );
+            assert_eq!(
+                uff_engine.get_binding_name(i),
+                seralized_engine.get_binding_name(i)
+            );
+        }
 
         remove_file(seralized_path).unwrap();
     }

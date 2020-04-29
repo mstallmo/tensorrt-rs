@@ -15,7 +15,6 @@ extern "C" {
 struct Engine;
 typedef struct Engine Engine_t;
 
-Engine_t* create_engine(void* engine);
 void destroy_cuda_engine(Engine_t* engine);
 
 Context_t* engine_create_execution_context(Engine_t* engine);

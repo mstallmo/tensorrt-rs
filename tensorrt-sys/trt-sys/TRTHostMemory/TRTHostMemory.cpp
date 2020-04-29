@@ -1,44 +1,42 @@
 //
 // Created by mason on 1/19/20.
 //
-#include <cstdlib>
+#include <memory>
 #include <NvInfer.h>
 
-#include "TRTHostMemory.h"
+#include "../TRTUtils.hpp"
+#include "TRTHostMemoryInternal.hpp"
 
-//TODO: Update this struct to use c++ new and delete. See TRTBuilder for example
 struct HostMemory {
-    void* memory;
+    using IHostMemoryPtr = std::unique_ptr<nvinfer1::IHostMemory, TRTDeleter<nvinfer1::IHostMemory>>;
+    IHostMemoryPtr internal_host_memory;
+
+    explicit HostMemory(nvinfer1::IHostMemory* hostMemory) {
+        internal_host_memory = IHostMemoryPtr(hostMemory);
+    }
 };
 
-HostMemory_t* create_host_memory(void* host_memory) {
-    HostMemory_t* h;
-    h = (typeof(h))malloc(sizeof(h));
-    h->memory = host_memory;
-    return h;
+HostMemory_t* create_host_memory(nvinfer1::IHostMemory* host_memory) {
+    return new HostMemory(host_memory);
 }
 
 void destroy_host_memory(HostMemory_t* host_memory) {
     if (host_memory == nullptr)
         return;
 
-    auto hostMemory = static_cast<nvinfer1::IHostMemory*>(host_memory->memory);
-    hostMemory->destroy();
-    free(host_memory);
+    delete host_memory;
 }
 
 void* host_memory_get_data(HostMemory_t* host_memory) {
     if (host_memory == nullptr)
         return nullptr;
 
-    auto hostMemory = static_cast<nvinfer1::IHostMemory*>(host_memory->memory);
-    return hostMemory->data();
+    return host_memory->internal_host_memory->data();
 }
 
 size_t host_memory_get_size(HostMemory_t* host_memory) {
     if (host_memory == nullptr)
         return -1;
 
-    auto hostMemory = static_cast<nvinfer1::IHostMemory*>(host_memory->memory);
-    return hostMemory->size();
+    return host_memory->internal_host_memory->size();
 }

@@ -74,11 +74,6 @@ pub struct Context {
 }
 pub type Context_t = Context;
 extern "C" {
-    pub fn create_execution_context(
-        execution_context: *mut ::std::os::raw::c_void,
-    ) -> *mut Context_t;
-}
-extern "C" {
     pub fn destroy_excecution_context(execution_context: *mut Context_t);
 }
 extern "C" {
@@ -105,9 +100,6 @@ pub struct HostMemory {
 }
 pub type HostMemory_t = HostMemory;
 extern "C" {
-    pub fn create_host_memory(host_memory: *mut ::std::os::raw::c_void) -> *mut HostMemory_t;
-}
-extern "C" {
     pub fn destroy_host_memory(host_memory: *mut HostMemory_t);
 }
 extern "C" {
@@ -122,9 +114,6 @@ pub struct Engine {
     _unused: [u8; 0],
 }
 pub type Engine_t = Engine;
-extern "C" {
-    pub fn create_engine(engine: *mut ::std::os::raw::c_void) -> *mut Engine_t;
-}
 extern "C" {
     pub fn destroy_cuda_engine(engine: *mut Engine_t);
 }

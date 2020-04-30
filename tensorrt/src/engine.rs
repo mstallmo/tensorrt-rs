@@ -2,10 +2,7 @@ use crate::context::Context;
 use crate::runtime::Runtime;
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
-use std::fs::File;
-use std::io::prelude::*;
 use std::os::raw::c_void;
-use std::path::Path;
 use std::slice;
 use tensorrt_sys::{
     deserialize_cuda_engine, destroy_cuda_engine, destroy_host_memory,
@@ -118,6 +115,7 @@ impl Drop for HostMemory {
 mod tests {
     use super::*;
     use crate::builder::Builder;
+    use crate::dims::{DimensionType, Dims};
     use crate::runtime::{Logger, Runtime};
     use crate::uff::{UffFile, UffParser};
     use lazy_static::lazy_static;
@@ -135,7 +133,18 @@ mod tests {
         let builder = Builder::new(&logger);
 
         let uff_parser = UffParser::new();
-        uff_parser.register_input("in").unwrap();
+        let dim = Dims::new(
+            3,
+            vec![1, 28, 28],
+            vec![
+                DimensionType::Channel,
+                DimensionType::Spacial,
+                DimensionType::Spacial,
+            ],
+        )
+        .unwrap();
+
+        uff_parser.register_input("in", dim);
         uff_parser.register_output("out").unwrap();
         let uff_file = UffFile::new(Path::new("../lenet5.uff")).unwrap();
         uff_parser.parse(&uff_file, builder.get_network()).unwrap();

@@ -1,3 +1,4 @@
+use crate::dims::IsDim;
 use crate::network::Network;
 use std::error;
 use std::ffi::CString;
@@ -6,8 +7,15 @@ use std::io;
 use std::path::{Path, PathBuf};
 use tensorrt_sys::{
     uffparser_create_uff_parser, uffparser_destroy_uff_parser, uffparser_parse,
-    uffparser_register_input, uffparser_register_output, Dims,
+    uffparser_register_input, uffparser_register_output,
 };
+
+#[repr(C)]
+pub enum UffInputOrder {
+    Nchw,
+    Nhwc,
+    Nc,
+}
 
 pub struct UffFile(PathBuf);
 
@@ -47,23 +55,18 @@ impl UffParser {
         }
     }
 
-    pub fn register_input(&self, input_name: &str) -> Result<(), UFFRegistrationError> {
-        let mut d_vec = vec![1, 28, 28];
-
-        // Could be a better way to model this in Rust and pass it to C.
-        // Value represents what type each of dimensions above are which is not well communicated
-        // by the [1, 0, 0] that currently exists.
-        let mut type_vec = vec![1, 0, 0];
-        let dims = Dims {
-            nbDims: 3,
-            d: d_vec.as_mut_ptr(),
-            type_: type_vec.as_mut_ptr(),
-        };
+    pub fn register_input(
+        &self,
+        input_name: &str,
+        dims: impl IsDim,
+        input_order: UffInputOrder,
+    ) -> Result<(), UFFRegistrationError> {
         let res = unsafe {
             uffparser_register_input(
                 self.internal_uffparser,
                 CString::new(input_name).unwrap().as_ptr(),
-                dims,
+                dims.internal_dims(),
+                input_order as i32,
             )
         };
 

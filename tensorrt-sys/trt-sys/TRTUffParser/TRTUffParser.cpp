@@ -8,6 +8,7 @@
 
 #include "TRTUffParser.h"
 #include "../TRTNetworkDefinition/TRTNetworkDefinitionInternal.hpp"
+#include "../TRTDims/TRTDimsInternal.hpp"
 #include "../TRTUtils.hpp"
 
 struct UffParser {
@@ -28,27 +29,23 @@ void uffparser_destroy_uff_parser(UffParser_t *uff_parser) {
     delete uff_parser;
 }
 
-bool uffparser_register_input(const UffParser_t *uff_parser, const char *input_name, const struct Dims input_dims) {
-    if (uff_parser == nullptr)
+bool uffparser_register_input(const UffParser_t *uff_parser, const char *input_name, const Dims_t* dims, int input_order) {
+    if (uff_parser == nullptr || input_name == nullptr || dims == nullptr)
         return false;
 
-    nvinfer1::Dims nvDims = {};
-    nvDims.nbDims = input_dims.nbDims;
-    memcpy(nvDims.d, input_dims.d, input_dims.nbDims * sizeof(int));
-    memcpy(nvDims.type, input_dims.type, input_dims.nbDims * sizeof(int));
-
-    return uff_parser->internal_uffParser->registerInput(input_name, nvDims, nvuffparser::UffInputOrder::kNCHW);
+    auto inputOrder = static_cast<nvuffparser::UffInputOrder>(input_order);
+    return uff_parser->internal_uffParser->registerInput(input_name, dims_get(dims), inputOrder);
 }
 
 bool uffparser_register_output(const UffParser_t *uff_parser, const char *output_name) {
-    if (uff_parser == nullptr)
+    if (uff_parser == nullptr || output_name == nullptr)
         return false;
 
     return uff_parser->internal_uffParser->registerOutput(output_name);
 }
 
 bool uffparser_parse(const UffParser_t *uff_parser, const char *file, const Network_t *network) {
-    if (uff_parser == nullptr)
+    if (uff_parser == nullptr || file == nullptr || network == nullptr)
         return false;
 
     auto &networkDefinition = network->getNetworkDefinition();

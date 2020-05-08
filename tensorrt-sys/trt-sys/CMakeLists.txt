@@ -17,6 +17,7 @@ file(GLOB source_files
         "TRTUffParser/*.h"
         "TRTUffParser/*.cpp"
         "TRTDims/*.h"
+        "TRTDims/*.cpp"
         "TRTBuilder/*.h"
         "TRTBuilder/*.cpp"
         "TRTNetworkDefinition/*.h"

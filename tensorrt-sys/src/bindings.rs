@@ -74,11 +74,6 @@ pub struct Context {
 }
 pub type Context_t = Context;
 extern "C" {
-    pub fn create_execution_context(
-        execution_context: *mut ::std::os::raw::c_void,
-    ) -> *mut Context_t;
-}
-extern "C" {
     pub fn destroy_excecution_context(execution_context: *mut Context_t);
 }
 extern "C" {
@@ -105,7 +100,7 @@ pub struct HostMemory {
 }
 pub type HostMemory_t = HostMemory;
 extern "C" {
-    pub fn create_host_memory(host_memory: *mut ::std::os::raw::c_void) -> *mut HostMemory_t;
+    pub fn destroy_host_memory(host_memory: *mut HostMemory_t);
 }
 extern "C" {
     pub fn host_memory_get_data(host_memory: *mut HostMemory_t) -> *mut ::std::os::raw::c_void;
@@ -119,9 +114,6 @@ pub struct Engine {
     _unused: [u8; 0],
 }
 pub type Engine_t = Engine;
-extern "C" {
-    pub fn create_engine(engine: *mut ::std::os::raw::c_void) -> *mut Engine_t;
-}
 extern "C" {
     pub fn destroy_cuda_engine(engine: *mut Engine_t);
 }
@@ -168,46 +160,116 @@ extern "C" {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Dims {
-    pub nbDims: ::std::os::raw::c_int,
-    pub d: *mut ::std::os::raw::c_int,
-    pub type_: *mut ::std::os::raw::c_int,
+    _unused: [u8; 0],
 }
-#[test]
-fn bindgen_test_layout_Dims() {
-    assert_eq!(
-        ::std::mem::size_of::<Dims>(),
-        24usize,
-        concat!("Size of: ", stringify!(Dims))
+pub type Dims_t = Dims;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Dims2 {
+    _unused: [u8; 0],
+}
+pub type Dims2_t = Dims2;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Dims3 {
+    _unused: [u8; 0],
+}
+pub type Dims3_t = Dims3;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Dims4 {
+    _unused: [u8; 0],
+}
+pub type Dims4_t = Dims4;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DimsHW {
+    _unused: [u8; 0],
+}
+pub type DimsHW_t = DimsHW;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DimsCHW {
+    _unused: [u8; 0],
+}
+pub type DimsCHW_t = DimsCHW;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DimsNCHW {
+    _unused: [u8; 0],
+}
+pub type DimsNCHW_t = DimsNCHW;
+extern "C" {
+    pub fn create_dims(
+        nb_dims: ::std::os::raw::c_int,
+        d: *const ::std::os::raw::c_int,
+        dimension_types: *const ::std::os::raw::c_int,
+    ) -> *mut Dims_t;
+}
+extern "C" {
+    pub fn create_dims2(dim1: ::std::os::raw::c_int, dim2: ::std::os::raw::c_int) -> *mut Dims_t;
+}
+extern "C" {
+    pub fn create_dims3(
+        dim1: ::std::os::raw::c_int,
+        dim2: ::std::os::raw::c_int,
+        dim3: ::std::os::raw::c_int,
+    ) -> *mut Dims_t;
+}
+extern "C" {
+    pub fn create_dims4(
+        dim1: ::std::os::raw::c_int,
+        dim2: ::std::os::raw::c_int,
+        dim3: ::std::os::raw::c_int,
+        dim4: ::std::os::raw::c_int,
+    ) -> *mut Dims_t;
+}
+extern "C" {
+    pub fn create_dimsHW(
+        height: ::std::os::raw::c_int,
+        width: ::std::os::raw::c_int,
+    ) -> *mut Dims_t;
+}
+extern "C" {
+    pub fn create_dimsCHW(
+        channel: ::std::os::raw::c_int,
+        height: ::std::os::raw::c_int,
+        width: ::std::os::raw::c_int,
+    ) -> *mut Dims_t;
+}
+extern "C" {
+    pub fn create_dimsNCHW(
+        index: ::std::os::raw::c_int,
+        channel: ::std::os::raw::c_int,
+        height: ::std::os::raw::c_int,
+        width: ::std::os::raw::c_int,
+    ) -> *mut Dims_t;
+}
+extern "C" {
+    pub fn destroy_dims(dims: *mut Dims_t);
+}
+extern "C" {
+    pub fn dims2_set_dimension_types(
+        dims2: *mut Dims_t,
+        type1: ::std::os::raw::c_int,
+        type2: ::std::os::raw::c_int,
     );
-    assert_eq!(
-        ::std::mem::align_of::<Dims>(),
-        8usize,
-        concat!("Alignment of ", stringify!(Dims))
+}
+extern "C" {
+    pub fn dims3_set_dimension_types(
+        dims3: *mut Dims_t,
+        type1: ::std::os::raw::c_int,
+        type2: ::std::os::raw::c_int,
+        type3: ::std::os::raw::c_int,
     );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<Dims>())).nbDims as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(Dims),
-            "::",
-            stringify!(nbDims)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<Dims>())).d as *const _ as usize },
-        8usize,
-        concat!("Offset of field: ", stringify!(Dims), "::", stringify!(d))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<Dims>())).type_ as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(Dims),
-            "::",
-            stringify!(type_)
-        )
+}
+extern "C" {
+    pub fn dims4_set_dimension_types(
+        dims4: *mut Dims_t,
+        type1: ::std::os::raw::c_int,
+        type2: ::std::os::raw::c_int,
+        type3: ::std::os::raw::c_int,
+        type4: ::std::os::raw::c_int,
     );
 }
 #[repr(C)]
@@ -235,7 +297,8 @@ extern "C" {
     pub fn uffparser_register_input(
         uff_parser: *const UffParser_t,
         input_name: *const ::std::os::raw::c_char,
-        input_dims: Dims,
+        dims: *const Dims_t,
+        input_order: ::std::os::raw::c_int,
     ) -> bool;
 }
 extern "C" {

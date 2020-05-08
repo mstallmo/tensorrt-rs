@@ -18,7 +18,7 @@ mod tests {
     use std::ffi::CString;
     use std::fs::File;
     use std::io::prelude::*;
-    use std::os::raw::{c_char, c_void};
+    use std::os::raw::{c_char, c_int, c_void};
 
     #[test]
     fn tensorrt_version() {
@@ -100,10 +100,12 @@ mod tests {
         let parser = unsafe { uffparser_create_uff_parser() };
         let mut d_vec = vec![3, 256, 256];
         let mut type_vec = vec![1, 0, 0];
-        let dims = crate::Dims {
-            nbDims: 3,
-            d: d_vec.as_mut_ptr(),
-            type_: type_vec.as_mut_ptr(),
+        let dims = unsafe {
+            crate::create_dims(
+                3,
+                d_vec.as_mut_ptr() as *mut c_int,
+                type_vec.as_mut_ptr() as *mut c_int,
+            )
         };
         let input_ret = unsafe {
             uffparser_register_input(parser, CString::new("input").unwrap().as_ptr(), dims)

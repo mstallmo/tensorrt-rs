@@ -1,4 +1,4 @@
-use crate::dims;
+use crate::dims::IsDim;
 use crate::network::Network;
 use std::error;
 use std::ffi::CString;
@@ -9,6 +9,13 @@ use tensorrt_sys::{
     uffparser_create_uff_parser, uffparser_destroy_uff_parser, uffparser_parse,
     uffparser_register_input, uffparser_register_output,
 };
+
+#[repr(C)]
+pub enum UffInputOrder {
+    Nchw,
+    Nhwc,
+    Nc,
+}
 
 pub struct UffFile(PathBuf);
 
@@ -51,13 +58,15 @@ impl UffParser {
     pub fn register_input(
         &self,
         input_name: &str,
-        dims: dims::Dims,
+        dims: impl IsDim,
+        input_order: UffInputOrder,
     ) -> Result<(), UFFRegistrationError> {
         let res = unsafe {
             uffparser_register_input(
                 self.internal_uffparser,
                 CString::new(input_name).unwrap().as_ptr(),
-                dims.internal_dims,
+                dims.internal_dims(),
+                input_order as i32,
             )
         };
 

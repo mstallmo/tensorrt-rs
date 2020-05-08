@@ -115,9 +115,9 @@ impl Drop for HostMemory {
 mod tests {
     use super::*;
     use crate::builder::Builder;
-    use crate::dims::{DimensionType, Dims};
+    use crate::dims::DimsCHW;
     use crate::runtime::{Logger, Runtime};
-    use crate::uff::{UffFile, UffParser};
+    use crate::uff::{UffFile, UffInputOrder, UffParser};
     use lazy_static::lazy_static;
     use std::fs::{remove_file, write, File};
     use std::io::prelude::*;
@@ -133,18 +133,11 @@ mod tests {
         let builder = Builder::new(&logger);
 
         let uff_parser = UffParser::new();
-        let dim = Dims::new(
-            3,
-            vec![1, 28, 28],
-            vec![
-                DimensionType::Channel,
-                DimensionType::Spacial,
-                DimensionType::Spacial,
-            ],
-        )
-        .unwrap();
+        let dim = DimsCHW::new(1, 28, 28);
 
-        uff_parser.register_input("in", dim);
+        uff_parser
+            .register_input("in", dim, UffInputOrder::Nchw)
+            .unwrap();
         uff_parser.register_output("out").unwrap();
         let uff_file = UffFile::new(Path::new("../lenet5.uff")).unwrap();
         uff_parser.parse(&uff_file, builder.get_network()).unwrap();
@@ -182,7 +175,7 @@ mod tests {
     fn write_and_read_engine() {
         let uff_engine: &Engine = &*ENGINE.lock().unwrap();
         let seralized_path = Path::new("../lenet5.engine");
-        write(seralized_path, uff_engine.serialize());
+        write(seralized_path, uff_engine.serialize()).unwrap();
 
         assert!(seralized_path.exists());
 

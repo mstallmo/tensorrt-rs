@@ -13,5 +13,5 @@ fn main() {
     println!("cargo:rustc-flags=-l dylib=nvparsers");
 //    println!("cargo:rustc-flags=-L /usr/local/cuda/lib64");
     println!(r#"cargo:rustc-link-search=-L C:/{}/{}/CUDA/v11.0/lib/x64"#, "Program Files", "NVIDIA GPU Computing Toolkit");
-//    println!("cargo:rustc-flags=-l dylib=cudart");
+    println!("cargo:rustc-flags=-l dylib=cudart");
 }

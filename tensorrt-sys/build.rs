@@ -6,7 +6,7 @@ fn main() {
                      .build();
 
     println!("cargo:rustc-link-search={}", dst.display());
-    println!("cargo:rustc-flags=-l static=trt-sys");
+    println!("cargo:rustc-flags=-l trt-sys");
 //    println!("cargo:rustc-link-lib=trt-sys");
 //    println!("cargo:rustc-flags=-l dylib=stdc++");
     println!("cargo:rustc-link-search=D:/projects/TensorRT-7.1.3.4/lib");

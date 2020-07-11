@@ -4,3 +4,6 @@ Cargo.lock
 **/cmake-build-debug
 .idea
 *.engine
+.fake
+.ionide
+build

@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 
+#include "../DLLExport.h"
 #include "../TRTDims/TRTDims.h"
 #include "../TRTNetworkDefinition/TRTNetworkDefinition.h"
 
@@ -17,13 +18,13 @@ extern "C" {
 struct UffParser;
 typedef struct UffParser UffParser_t;
 
-UffParser_t* uffparser_create_uff_parser();
-void uffparser_destroy_uff_parser(UffParser_t* uff_parser);
+DllExport UffParser_t* uffparser_create_uff_parser();
+DllExport void uffparser_destroy_uff_parser(UffParser_t* uff_parser);
 
-bool uffparser_register_input(const UffParser_t* uff_parser, const char* input_name, const Dims_t* dims, int input_order);
-bool uffparser_register_output(const UffParser_t* uff_parser, const char* output_name);
+DllExport bool uffparser_register_input(const UffParser_t* uff_parser, const char* input_name, const Dims_t* dims, int input_order);
+DllExport bool uffparser_register_output(const UffParser_t* uff_parser, const char* output_name);
 
-bool uffparser_parse(const UffParser_t* uff_parser, const char* file, const Network_t *network);
+DllExport bool uffparser_parse(const UffParser_t* uff_parser, const char* file, const Network_t *network);
 
 #ifdef __cplusplus
 };

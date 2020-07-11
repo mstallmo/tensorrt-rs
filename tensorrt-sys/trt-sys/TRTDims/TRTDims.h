@@ -5,6 +5,8 @@
 #ifndef LIBTRT_TRTDIMS_H
 #define LIBTRT_TRTDIMS_H
 
+#include "../DLLExport.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,19 +26,19 @@ typedef struct DimsCHW DimsCHW_t;
 struct DimsNCHW;
 typedef struct DimsNCHW DimsNCHW_t;
 
-Dims_t* create_dims(int nb_dims, const int* d, const int* dimension_types);
-Dims_t* create_dims2(int dim1, int dim2);
-Dims_t* create_dims3(int dim1, int dim2, int dim3);
-Dims_t* create_dims4(int dim1, int dim2, int dim3, int dim4);
-Dims_t* create_dimsHW(int height, int width);
-Dims_t* create_dimsCHW(int channel, int height, int width);
-Dims_t* create_dimsNCHW(int index, int channel, int height, int width);
+DllExport Dims_t* create_dims(int nb_dims, const int* d, const int* dimension_types);
+DllExport Dims_t* create_dims2(int dim1, int dim2);
+DllExport Dims_t* create_dims3(int dim1, int dim2, int dim3);
+DllExport Dims_t* create_dims4(int dim1, int dim2, int dim3, int dim4);
+DllExport Dims_t* create_dimsHW(int height, int width);
+DllExport Dims_t* create_dimsCHW(int channel, int height, int width);
+DllExport Dims_t* create_dimsNCHW(int index, int channel, int height, int width);
 
-void destroy_dims(Dims_t* dims);
+DllExport void destroy_dims(Dims_t* dims);
 
-void dims2_set_dimension_types(Dims_t* dims2, int type1, int type2);
-void dims3_set_dimension_types(Dims_t* dims3, int type1, int type2, int type3);
-void dims4_set_dimension_types(Dims_t* dims4, int type1, int type2, int type3, int type4);
+DllExport void dims2_set_dimension_types(Dims_t* dims2, int type1, int type2);
+DllExport void dims3_set_dimension_types(Dims_t* dims3, int type1, int type2, int type3);
+DllExport void dims4_set_dimension_types(Dims_t* dims4, int type1, int type2, int type3, int type4);
 
 
 #ifdef __cplusplus

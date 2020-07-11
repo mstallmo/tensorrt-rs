@@ -5,6 +5,8 @@
 #ifndef LIBTRT_TRTNETWORKDEFINITION_H
 #define LIBTRT_TRTNETWORKDEFINITION_H
 
+#include "../DLLExport.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,7 +14,7 @@ extern "C" {
 struct Network;
 typedef struct Network Network_t;
 
-void destroy_network(Network_t *network);
+DllExport void destroy_network(Network_t *network);
 
 #ifdef __cplusplus
 };

@@ -9,21 +9,22 @@
 extern "C" {
 #endif
 
+#include "../DLLExport.h"
 #include "../TRTContext/TRTContext.h"
 #include "../TRTHostMemory/TRTHostMemory.h"
 
 struct Engine;
 typedef struct Engine Engine_t;
 
-void destroy_cuda_engine(Engine_t* engine);
+DllExport void destroy_cuda_engine(Engine_t* engine);
 
-Context_t* engine_create_execution_context(Engine_t* engine);
+DllExport Context_t* engine_create_execution_context(Engine_t* engine);
 
-int get_nb_bindings(Engine_t* engine);
-const char* get_binding_name(Engine_t* engine, int binding_index);
-int get_binding_index(Engine_t *engine, const char* op_name);
+DllExport int get_nb_bindings(Engine_t* engine);
+DllExport const char* get_binding_name(Engine_t* engine, int binding_index);
+DllExport int get_binding_index(Engine_t *engine, const char* op_name);
 
-HostMemory_t* engine_serialize(Engine_t* engine);
+DllExport HostMemory_t* engine_serialize(Engine_t* engine);
 
 #ifdef __cplusplus
 };

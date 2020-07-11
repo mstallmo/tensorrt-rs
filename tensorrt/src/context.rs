@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use tensorrt_sys::{
-    context_get_name, context_set_name, destroy_excecution_context, execute, Context_t,
+    context_get_name, context_set_name, destroy_excecution_context, execute_n, Context_t,
 };
 
 pub struct Context<'a> {
@@ -36,7 +36,7 @@ impl<'a> Context<'a> {
         ouptut_binding_index: i32,
     ) {
         unsafe {
-            execute(
+            execute_n(
                 self.internal_context,
                 input_data.as_ptr(),
                 input_data.len(),

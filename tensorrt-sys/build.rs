@@ -20,5 +20,5 @@ fn main() {
     println!("cargo:rustc-flags=-l dylib=cudnn");
     println!("cargo:rustc-flags=-l dylib=cublas");
     println!("cargo:rustc-flags=-l dylib=nvrtc");
-    println!("cargo:rustc-flags=-l trt-sys");
+    println!("cargo:rustc-flags=-l dylib=trt-sys");
 }

@@ -5,6 +5,8 @@
 #ifndef TENSRORT_SYS_TRTLOGGER_H
 #define TENSRORT_SYS_TRTLOGGER_H
 
+#include "../DLLExport.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,11 +14,11 @@ extern "C" {
 struct Logger;
 typedef struct Logger Logger_t;
 
-void get_tensorrt_version(char* string);
+DllExport void get_tensorrt_version(char* string);
 
-Logger_t* create_logger();
-void log_error(Logger_t* logger, char* err);
-void delete_logger(Logger_t* logger);
+DllExport Logger_t* create_logger();
+DllExport void log_error(Logger_t* logger, char* err);
+DllExport void delete_logger(Logger_t* logger);
 
 
 #ifdef __cplusplus

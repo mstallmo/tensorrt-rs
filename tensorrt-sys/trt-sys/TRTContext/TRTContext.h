@@ -21,7 +21,7 @@ void destroy_excecution_context(Context_t* execution_context);
 void context_set_name(Context_t* execution_context, const char *name);
 const char* context_get_name(Context_t *execution_context);
 
-void execute_n(const Context_t* execution_context, const float* input_data, const size_t input_data_size, const int input_index,  float* output_data, const size_t output_size, const int output_index);
+void execute(const Context_t* execution_context, const float* input_data, const size_t input_data_size, const int input_index,  float* output_data, const size_t output_size, const int output_index);
 
 #ifdef __cplusplus
 };

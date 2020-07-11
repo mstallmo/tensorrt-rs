@@ -83,7 +83,7 @@ extern "C" {
     pub fn context_get_name(execution_context: *mut Context_t) -> *const ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn execute_n(
+    pub fn execute(
         execution_context: *const Context_t,
         input_data: *const f32,
         input_data_size: usize,

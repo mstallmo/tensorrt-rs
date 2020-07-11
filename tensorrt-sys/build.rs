@@ -6,6 +6,7 @@ fn main() {
                      .build();
 
     println!("cargo:rustc-link-search={}", dst.display());
+    println!("cargo:rustc-flags=-l dylib=trt-sys");
 //    println!("cargo:rustc-link-lib=trt-sys");
 //    println!("cargo:rustc-flags=-l dylib=stdc++");
     println!("cargo:rustc-link-search=D:/projects/TensorRT-7.1.3.4/lib");
@@ -19,6 +20,5 @@ fn main() {
     println!("cargo:rustc-flags=-l dylib=cudart");
     println!("cargo:rustc-flags=-l dylib=cudnn");
     println!("cargo:rustc-flags=-l dylib=cublas");
-    println!("cargo:rustc-flags=-l dylib=nvrtc");
-    println!("cargo:rustc-flags=-l dylib=trt-sys");
+    println!("cargo:rustc-flags=-l dylib=nvrtc");    
 }

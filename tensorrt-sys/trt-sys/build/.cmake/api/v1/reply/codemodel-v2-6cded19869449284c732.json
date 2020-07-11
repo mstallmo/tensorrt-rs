@@ -1,0 +1,69 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "LibTRT",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "trt-sys::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-trt-sys-Debug-cfded28d80f8303ed3d5.json",
+					"name" : "trt-sys",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "trt-sys-test::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-trt-sys-test-Debug-6043c0a26db2f409885a.json",
+					"name" : "trt-sys-test",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/projects/rust/tensorrt-rs/tensorrt-sys/trt-sys/build",
+		"source" : "D:/projects/rust/tensorrt-rs/tensorrt-sys/trt-sys"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 0
+	}
+}

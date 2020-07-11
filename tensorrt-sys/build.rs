@@ -5,8 +5,6 @@ fn main() {
                      .generator("Ninja")
                      .build();
 
-println!("{}", dst.display());
-
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=static=trt-sys");
 //    println!("cargo:rustc-flags=-l dylib=stdc++");

@@ -39,7 +39,7 @@ impl<'a> Context<'a> {
             execute(
                 self.internal_context,
                 input_data.as_ptr(),
-                input_data.len(),
+                input_data.len() * 4,
                 input_binding_index.try_into().unwrap(),
                 output_data.as_mut_ptr(),
                 output_data_size,

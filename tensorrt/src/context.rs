@@ -31,7 +31,7 @@ impl<'a> Context<'a> {
         &self,
         input_data: Vec<f32>,
         input_binding_index: i32,
-        mut output_data: Vec<f32>,
+        output_data: &mut Vec<f32>,
         output_data_size: usize,
         ouptut_binding_index: i32,
     ) {

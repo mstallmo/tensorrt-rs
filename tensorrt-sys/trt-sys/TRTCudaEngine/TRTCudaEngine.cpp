@@ -54,7 +54,7 @@ Dims_t* get_binding_dimensions(Engine_t *engine, int binding_index) {
         return nullptr;
     
     nvinfer1::Dims nvdims = engine->internal_engine->getBindingDimensions(binding_index);
-    return dims_create(nvdims); 
+    return create_dims_nv(nvdims); 
 }
 
 Context_t* engine_create_execution_context(Engine_t* engine) {

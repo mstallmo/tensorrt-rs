@@ -35,6 +35,7 @@ DllExport Dims_t* create_dimsCHW(int channel, int height, int width);
 DllExport Dims_t* create_dimsNCHW(int index, int channel, int height, int width);
 
 DllExport void destroy_dims(Dims_t* dims);
+DllExport Dims_t* create_dims_nv(nvinfer1::Dims dim);
 
 DllExport void dims2_set_dimension_types(Dims_t* dims2, int type1, int type2);
 DllExport void dims3_set_dimension_types(Dims_t* dims3, int type1, int type2, int type3);

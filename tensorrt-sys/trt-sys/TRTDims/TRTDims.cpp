@@ -52,7 +52,7 @@ nvinfer1::Dims dims_get(const Dims_t* dims) {
    return dims->internal_dims;
 }
 
-Dims_t* dims_create(nvinfer1::Dims dim) {
+Dims_t* create_dims_nv(nvinfer1::Dims dim) {
     return new Dims(dim);
 }
 

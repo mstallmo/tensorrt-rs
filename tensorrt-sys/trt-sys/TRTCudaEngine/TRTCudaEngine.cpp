@@ -49,6 +49,14 @@ int get_binding_index(Engine_t* engine, const char* op_name) {
     return engine->internal_engine->getBindingIndex(op_name);
 }
 
+Dims_t* get_binding_dimensions(Engine_t *engine, int binding_index) {
+    if (engine == nullptr)
+        return nullptr;
+    
+    nvinfer1::Dims nvdims = engine->internal_engine->getBindingDimensions(binding_index);
+    return dims_create(nvdims); 
+}
+
 Context_t* engine_create_execution_context(Engine_t* engine) {
     if (engine == nullptr)
         return nullptr;

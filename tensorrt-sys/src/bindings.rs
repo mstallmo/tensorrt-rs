@@ -136,6 +136,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
+    pub fn get_binding_dimensions(
+        engine: *mut Engine_t,
+        binding_index: ::std::os::raw::c_int,
+    ) -> *mut Dims_t;
+}
+extern "C" {
     pub fn engine_serialize(engine: *mut Engine_t) -> *mut HostMemory_t;
 }
 #[repr(C)]

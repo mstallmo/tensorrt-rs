@@ -1,5 +1,6 @@
 use crate::context::Context;
 use crate::runtime::Runtime;
+use crate::dims::Dims;
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_void;
@@ -7,7 +8,7 @@ use std::slice;
 use tensorrt_sys::{
     deserialize_cuda_engine, destroy_cuda_engine, destroy_host_memory,
     engine_create_execution_context, engine_serialize, get_binding_index, get_binding_name,
-    get_nb_bindings, host_memory_get_data, host_memory_get_size,
+    get_nb_bindings, get_binding_dimensions, host_memory_get_data, host_memory_get_size,
 };
 
 #[derive(Debug)]
@@ -61,6 +62,15 @@ impl Engine {
         } else {
             Some(binding_index)
         };
+    }
+
+    pub fn get_binding_dimensions(&self, binding_index: u32) -> Option<Dims> {
+        let binding_dimensions = unsafe {
+            let raw_dimensions = get_binding_dimensions(self.internal_engine, binding_index.try_into().unwrap());
+            Dims{internal_dims: raw_dimensions}
+        };
+
+        Some(binding_dimensions)
     }
 
     pub fn create_execution_context(&self) -> Context {

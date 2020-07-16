@@ -15,6 +15,10 @@ struct Dims {
         memcpy(internal_dims.type, type, nvinfer1::Dims::MAX_DIMS * sizeof(int));
     }
 
+    explicit Dims(nvinfer1::Dims dim) {
+        internal_dims = dim;
+    }
+
     explicit Dims(int dim1, int dim2) {
         internal_dims = nvinfer1::Dims2(dim1, dim2);
     }
@@ -46,6 +50,10 @@ Dims_t* create_dims4(int dim1, int dim2, int dim3, int dim4) {
 
 nvinfer1::Dims dims_get(const Dims_t* dims) {
    return dims->internal_dims;
+}
+
+Dims_t* dims_create(nvinfer1::Dims dim) {
+    return new Dims(dim);
 }
 
 void dims2_set_dimension_types(Dims_t* dims2, int type1, int type2) {

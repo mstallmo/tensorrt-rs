@@ -12,6 +12,7 @@ extern "C" {
 #include "../DLLExport.h"
 #include "../TRTContext/TRTContext.h"
 #include "../TRTHostMemory/TRTHostMemory.h"
+#include "../TRTDims/TRTDimsInternal.hpp"
 
 struct Engine;
 typedef struct Engine Engine_t;
@@ -23,6 +24,7 @@ DllExport Context_t* engine_create_execution_context(Engine_t* engine);
 DllExport int get_nb_bindings(Engine_t* engine);
 DllExport const char* get_binding_name(Engine_t* engine, int binding_index);
 DllExport int get_binding_index(Engine_t *engine, const char* op_name);
+DllExport Dims_t* get_binding_dimensions(Engine_t *engine, int binding_index);
 
 DllExport HostMemory_t* engine_serialize(Engine_t* engine);
 

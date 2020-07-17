@@ -2,7 +2,7 @@ use cmake::Config;
 
 fn main() {
     let dst = Config::new("trt-sys")
-                     .generator("Ninja")
+//                     .generator("Ninja")
                      .build();
 
     println!("cargo:rustc-link-search=native={}", dst.display());

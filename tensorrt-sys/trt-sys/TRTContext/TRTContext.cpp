@@ -65,8 +65,8 @@ void execute(const Context_t* execution_context, const float* input_data, const 
 
     rc = cudaThreadSynchronize();
     assert(rc == cudaSuccess);
-//    rc = cudaFree(&buffers[0]);
-//    assert(rc == cudaSuccess);
+    rc = cudaFree(&buffers[0]);
+    assert(rc == cudaSuccess);
 //   rc = cudaFree(&buffers[1]);
 //    assert(rc == cudaSuccess);
 }

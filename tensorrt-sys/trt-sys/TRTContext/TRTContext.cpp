@@ -63,9 +63,7 @@ void execute(const Context_t* execution_context, const float* input_data, const 
     rc = cudaMemcpy(output_data, buffers[output_index], output_data_size, cudaMemcpyDeviceToHost);
     assert(rc == cudaSuccess);
 
-    rc = cudaThreadSynchronize();
-    assert(rc == cudaSuccess);
-    rc = cudaFree(&buffers[0]);
+    rc = cudaFree(buffers[0]);
     assert(rc == cudaSuccess);
 //   rc = cudaFree(&buffers[1]);
 //    assert(rc == cudaSuccess);

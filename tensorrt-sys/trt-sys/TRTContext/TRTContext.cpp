@@ -1,6 +1,7 @@
 //
 // Created by mason on 9/17/19.
 //
+#include <cassert>
 #include <cstdlib>
 #include <memory>
 #include <cuda_runtime.h>
@@ -48,9 +49,13 @@ void execute(const Context_t* execution_context, const float* input_data, const 
         return;
     auto& context = execution_context->internal_context;
 
+    cudaError_t rc;
+
     void* buffers[2];
-    cudaMalloc(&buffers[0], input_data_size);
-    cudaMalloc(&buffers[1], output_data_size);
+    rc = cudaMalloc(&buffers[0], input_data_size);
+    assert(rc == cudaSuccess);
+    rc = cudaMalloc(&buffers[1], output_data_size);
+    assert(rc == cudaSuccess);
 
     cudaMemcpy(buffers[input_index], input_data, input_data_size, cudaMemcpyHostToDevice);
     context->execute(1, &buffers[input_index]);

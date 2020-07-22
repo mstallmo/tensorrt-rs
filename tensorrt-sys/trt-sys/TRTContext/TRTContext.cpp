@@ -57,10 +57,14 @@ void execute(const Context_t* execution_context, const float* input_data, const 
     rc = cudaMalloc(&buffers[1], output_data_size);
     assert(rc == cudaSuccess);
 
-    cudaMemcpy(buffers[input_index], input_data, input_data_size, cudaMemcpyHostToDevice);
+    rc = cudaMemcpy(buffers[input_index], input_data, input_data_size, cudaMemcpyHostToDevice);
+    assert(rc == cudaSuccess);
     context->execute(1, &buffers[input_index]);
-    cudaMemcpy(output_data, buffers[output_index], output_data_size, cudaMemcpyDeviceToHost);
+    rc = cudaMemcpy(output_data, buffers[output_index], output_data_size, cudaMemcpyDeviceToHost);
+    assert(rc == cudaSuccess);
 
-    cudaFree(&buffers[0]);
-    cudaFree(&buffers[1]);
+    rc = cudaFree(&buffers[0]);
+    assert(rc == cudaSuccess);
+    rc = cudaFree(&buffers[1]);
+    assert(rc == cudaSuccess);
 }

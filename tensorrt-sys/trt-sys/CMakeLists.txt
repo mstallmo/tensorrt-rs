@@ -33,11 +33,12 @@ find_library(NVINFER nvinfer)
 
 find_library(NVPARSERS nvparsers)
 
+message ("TENSORRT_INCLUDE_DIRECTORY=${TENSORRT_INCLUDE_DIRECTORY}")
+
 #add_executable(trt-sys-test ${source_files} main.cpp)
 add_library(trt-sys STATIC ${source_files})
 target_link_libraries(trt-sys PRIVATE ${NVINFER} ${NVPARSERS} ${CUDA_LIBRARIES})
 #target_link_libraries(trt-sys-test PRIVATE ${NVINFER} ${NVPARSERS} ${CUDA_LIBRARIES})
 include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
-include_directories("D://projects//TensorRT-7.1.3.4//include")
 
 install(TARGETS trt-sys DESTINATION .)

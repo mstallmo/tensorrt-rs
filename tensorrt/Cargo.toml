@@ -5,8 +5,8 @@ authors = ["Mason Stallmo <masonstallmo@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/mstallmo/tensorrt-rs"
 edition = "2018"
+description = "Rust library for using Nvidia's TensorRT deep learning acceleration library"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 # Uncomment when working locally

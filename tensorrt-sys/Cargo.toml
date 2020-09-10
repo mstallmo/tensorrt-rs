@@ -6,6 +6,7 @@ license = "MIT"
 edition = "2018"
 build = "build.rs"
 repository = "https://github.com/mstallmo/tensorrt-rs"
+description = "Low level wrapper around Nvidia's TensorRT library"
 
 [dependencies]
 libc = "0.2.62"

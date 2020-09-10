@@ -1,16 +1,17 @@
 [package]
-name = "tensorrt"
+name = "tensorrt-rs"
 version = "0.1.1"
 authors = ["Mason Stallmo <masonstallmo@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/mstallmo/tensorrt-rs"
 edition = "2018"
+description = "Rust library for using Nvidia's TensorRT deep learning acceleration library"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 # Uncomment when working locally
-tensorrt-sys = {version = "0.1", path="../tensorrt-sys"}
-
-#tensorrt-sys = {version = "0.1.1", git="https://github.com/mstallmo/tensorrt-rs"}
+#tensorrt-sys = {version = "0.1", path="../tensorrt-sys"}
+tensorrt-sys = "0.1.1"
 
 [dev-dependencies]
 lazy_static = "1.4.0"

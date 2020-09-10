@@ -2,8 +2,10 @@
 name = "tensorrt-sys"
 version = "0.1.1"
 authors = ["Mason Stallmo <masonstallmo@gmail.com>"]
+license = "MIT"
 edition = "2018"
 build = "build.rs"
+repository = "https://github.com/mstallmo/tensorrt-rs"
 
 [dependencies]
 libc = "0.2.62"

@@ -43,18 +43,18 @@ const char* context_get_name(Context_t *execution_context) {
     return execution_context->internal_context->getName();
 }
 
- void execute(Context_t* execution_context, const float* input_data, const size_t input_data_size, const int input_index, float *output_data, const size_t output_data_size, const int output_index) {
+ void execute(const Context_t* execution_context, const float* input_data, const size_t input_data_size, const int input_index,  float* output_data, const size_t output_size, const int output_index) {
     if (execution_context == nullptr)
         return;
     auto& context = execution_context->internal_context;
 
     void* buffers[2];
     cudaMalloc(&buffers[0], input_data_size);
-    cudaMalloc(&buffers[1], output_data_size);
+    cudaMalloc(&buffers[1], output_size);
 
     cudaMemcpy(buffers[input_index], input_data, input_data_size, cudaMemcpyHostToDevice);
     context->execute(1, &buffers[input_index]);
-    cudaMemcpy(output_data, buffers[output_index], output_data_size, cudaMemcpyDeviceToHost);
+    cudaMemcpy(output_data, buffers[output_index], output_size, cudaMemcpyDeviceToHost);
 
     cudaFree(&buffers[0]);
     cudaFree(&buffers[1]);

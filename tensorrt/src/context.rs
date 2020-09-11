@@ -29,17 +29,18 @@ impl<'a> Context<'a> {
 
     pub fn execute(
         &self,
-        input_data: Vec<f32>,
+        input_data: &Vec<f32>,
+        input_data_size: usize,
         input_binding_index: i32,
-        mut output_data: Vec<f32>,
+        output_data: &mut Vec<f32>,
         output_data_size: usize,
         ouptut_binding_index: i32,
     ) {
         unsafe {
-            execute(
+            tensorrt_sys::execute(
                 self.internal_context,
                 input_data.as_ptr(),
-                input_data.len(),
+                input_data_size,
                 input_binding_index.try_into().unwrap(),
                 output_data.as_mut_ptr(),
                 output_data_size,

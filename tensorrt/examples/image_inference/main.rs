@@ -1,4 +1,4 @@
-use ndarray::{Array, Ix2};
+use ndarray::Array;
 use ndarray_image;
 use std::path::Path;
 use std::iter::FromIterator;
@@ -7,7 +7,6 @@ use tensorrt_rs::builder::Builder;
 use tensorrt_rs::engine::Engine;
 use tensorrt_rs::uff::{UffInputOrder, UffParser, UffFile};
 use tensorrt_rs::dims::DimsCHW;
-use image::GenericImageView;
 
 
 fn create_engine(uff_file: &UffFile) -> Engine {
@@ -41,6 +40,7 @@ fn main() {
     let pre_processed = Array::from_iter(array.iter().map(|&x| 1.0 - (x as f32) / 255.0));
 
     // Run inference
-    let output =  context.execute(&pre_processed, 0, 1);
+    let mut output = ndarray::Array1::<f32>::zeros(10);
+    context.execute(&pre_processed, 0, &mut output, 1);
     println!("output: {}", output);
 }

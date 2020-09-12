@@ -29,25 +29,24 @@ impl<'a> Context<'a> {
         context_name.to_str().unwrap().to_string()
     }
 
-    pub fn execute<D: Dimension>(
+    pub fn execute<D1: Dimension, D2: Dimension>(
         &self,
-        input_data: &ndarray::Array<f32, D>,
+        input_data: &ndarray::Array<f32, D1>,
         input_binding_index: u32,
+        output_data: &mut ndarray::Array<f32, D2>,
         output_binding_index: u32,
-    ) -> ndarray::Array1<f32> {
-        let mut output_array = ndarray::Array1::<f32>::zeros(10);
+    ) {
         unsafe {
             execute(
                 self.internal_context,
                 input_data.as_ptr(),
                 input_data.len() * size_of::<f32>(),
                 input_binding_index,
-                output_array.as_mut_ptr(),
-                output_array.len() * size_of::<f32>(),
+                output_data.as_mut_ptr(),
+                output_data.len() * size_of::<f32>(),
                 output_binding_index,
             );
         };
-        output_array
     }
 }
 

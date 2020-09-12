@@ -1,5 +1,7 @@
-use std::convert::TryInto;
+use ndarray;
+use ndarray::Dimension;
 use std::ffi::{CStr, CString};
+use std::mem::size_of;
 use tensorrt_sys::{
     context_get_name, context_set_name, destroy_excecution_context, execute, Context_t,
 };
@@ -27,25 +29,24 @@ impl<'a> Context<'a> {
         context_name.to_str().unwrap().to_string()
     }
 
-    pub fn execute(
+    pub fn execute<D1: Dimension, D2: Dimension>(
         &self,
-        input_data: Vec<f32>,
-        input_binding_index: i32,
-        mut output_data: Vec<f32>,
-        output_data_size: usize,
-        ouptut_binding_index: i32,
+        input_data: &ndarray::Array<f32, D1>,
+        input_binding_index: u32,
+        output_data: &mut ndarray::Array<f32, D2>,
+        output_binding_index: u32,
     ) {
         unsafe {
             execute(
                 self.internal_context,
                 input_data.as_ptr(),
-                input_data.len(),
-                input_binding_index.try_into().unwrap(),
+                input_data.len() * size_of::<f32>(),
+                input_binding_index,
                 output_data.as_mut_ptr(),
-                output_data_size,
-                ouptut_binding_index.try_into().unwrap(),
+                output_data.len() * size_of::<f32>(),
+                output_binding_index,
             );
-        }
+        };
     }
 }
 

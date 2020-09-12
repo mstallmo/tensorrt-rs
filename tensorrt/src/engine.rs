@@ -206,46 +206,4 @@ mod tests {
 
         remove_file(seralized_path).unwrap();
     }
-
-    // #[test]
-    // fn get_nb_bindings() {
-    //     let engine = setup_engine_test_seralized();
-    //
-    //     assert_eq!(2, engine.get_nb_bindings());
-    // }
-    //
-    // #[test]
-    // fn get_engine_binding_name() {
-    //     let engine = setup_engine_test_seralized();
-    //
-    //     assert_eq!("data", engine.get_binding_name(0).unwrap());
-    // }
-    //
-    // #[test]
-    // fn get_invalid_engine_binding() {
-    //     let engine = setup_engine_test_seralized();
-    //
-    //     assert_eq!(None, engine.get_binding_name(2));
-    // }
-    //
-    // #[test]
-    // fn get_binding_index() {
-    //     let engine = setup_engine_test_seralized();
-    //
-    //     assert_eq!(Some(0), engine.get_binding_index("data"));
-    // }
-    //
-    // #[test]
-    // fn get_invalid_binding_index() {
-    //     let engine = setup_engine_test_seralized();
-    //
-    //     assert_eq!(None, engine.get_binding_index("not_valid"));
-    // }
-    //
-    // #[test]
-    // fn serialize_engine_to_slice() {
-    //     let engine = setup_engine_test_seralized();
-    //
-    //     assert_eq!(true, true);
-    // }
 }

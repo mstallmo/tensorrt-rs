@@ -1,30 +1,25 @@
 cmake_minimum_required(VERSION 3.10)
 project(LibTRT LANGUAGES CXX CUDA)
 
+if(${TRT_VERSION} MATCHES "5.1.5")
+    message(STATUS "TRT version is ${TRT_VERSION}")
+    add_definitions(-DTRT_VERSION="${TRT_VERSION}")
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -Wno-unknown-pragmas")
 
 file(GLOB source_files
-        "TRTLogger/*.h"
         "TRTLogger/*.cpp"
-        "TRTRuntime/*.h"
         "TRTRuntime/*cpp"
-        "TRTCudaEngine/*.h"
         "TRTCudaEngine/*.cpp"
-        "TRTContext/*.h"
         "TRTContext/*.cpp"
-        "TRTUffParser/*.h"
         "TRTUffParser/*.cpp"
-        "TRTDims/*.h"
         "TRTDims/*.cpp"
-        "TRTBuilder/*.h"
         "TRTBuilder/*.cpp"
-        "TRTNetworkDefinition/*.h"
         "TRTNetworkDefinition/*.cpp"
-        "TRTHostMemory/*.h"
         "TRTHostMemory/*.cpp"
-        "*.h"
         )
 
 find_library(CUDART_LIBRARY cudart ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})

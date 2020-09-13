@@ -8,6 +8,11 @@ build = "build.rs"
 repository = "https://github.com/mstallmo/tensorrt-rs"
 description = "Low level wrapper around Nvidia's TensorRT library"
 
+[features]
+default = ["trt-515"]
+
+trt-515 = []
+
 [dependencies]
 libc = "0.2.62"
 

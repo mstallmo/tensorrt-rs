@@ -1,6 +1,6 @@
 [package]
 name = "tensorrt-sys"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Mason Stallmo <masonstallmo@gmail.com>"]
 license = "MIT"
 edition = "2018"

@@ -59,8 +59,10 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement via email at masonstallmo@gmail.com or
-on the Rust Discord @themoose5.
+reported to the community leaders responsible for enforcement at:
+
+* Mason Stallmo <masonstallmo@gmail.com> or themoose5#6218 on Discord
+
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the

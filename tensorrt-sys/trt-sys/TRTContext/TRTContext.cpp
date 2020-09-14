@@ -1,8 +1,6 @@
 //
 // Created by mason on 9/17/19.
 //
-#include <cstdlib>
-#include <iostream>
 #include <memory>
 #include <cuda_runtime.h>
 #include "NvInfer.h"
@@ -48,10 +46,6 @@ const char* context_get_name(Context_t *execution_context) {
     if (execution_context == nullptr)
         return;
     auto& context = execution_context->internal_context;
-
-#ifdef TRT_VERSION
-    std::cout << "TRT Version: " << TRT_VERSION << "\n";
-#endif
 
     void* buffers[2];
     cudaMalloc(&buffers[0], input_data_size);

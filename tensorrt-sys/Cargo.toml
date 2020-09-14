@@ -13,6 +13,8 @@ default = ["trt-515"]
 
 trt-515 = []
 
+trt-713 = []
+
 [dependencies]
 libc = "0.2.62"
 

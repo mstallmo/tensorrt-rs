@@ -22,10 +22,7 @@ file(GLOB source_files
         "TRTHostMemory/*.cpp"
         )
 
-find_library(CUDART_LIBRARY cudart ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
-
 add_library(trt-sys STATIC ${source_files})
-target_link_libraries(trt-sys PRIVATE nvinfer ${CUDART_LIBRARY})
 include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
 install(TARGETS trt-sys DESTINATION .)

@@ -43,8 +43,7 @@ fn configuration(full_library_path: &PathBuf) {
         println!("cargo:rustc-link-search=native={}", dst.display());
         println!("cargo:rustc-flags=-l dylib=nvinfer");
         println!("cargo:rustc-flags=-l dylib=nvparsers");
-        println!("cargo:rustc-flags=-L /usr/local/cuda-10.1/lib64");
-        println!("cargo:rustc-flags=-l dylib=cudart");
+        cuda_configuration();
     } else {
         panic!("Invalid nvinfer version found. Expected: libnvinfer.so.5.1.5, Found: {}", full_library_path.to_str().unwrap());
     }
@@ -58,11 +57,28 @@ fn configuration(full_library_path: &PathBuf) {
         println!("cargo:rustc-link-search=native={}", dst.display());
         println!("cargo:rustc-flags=-l dylib=nvinfer");
         println!("cargo:rustc-flags=-l dylib=nvparsers");
-        println!("cargo:rustc-flags=-L /usr/local/cuda-10.2/lib64");
-        println!("cargo:rustc-flags=-l dylib=cudart");
+        cuda_configuration();
     } else {
         panic!("Invalid nvinfer version found. Expected: libnvinfer.so.7.1.3, Found: {}", full_library_path.to_str().unwrap());
     }
+}
+
+#[cfg(feature = "cuda-101")]
+fn cuda_configuration() {
+    println!("cargo:rustc-flags=-L /usr/local/cuda-10.1/lib64");
+    println!("cargo:rustc-flags=-l dylib=cudart");
+}
+
+#[cfg(feature = "cuda-102")]
+fn cuda_configuration() {
+    println!("cargo:rustc-flags=-L /usr/local/cuda-10.2/lib64");
+    println!("cargo:rustc-flags=-l dylib=cudart");
+}
+
+#[cfg(feature = "cuda-110")]
+fn cuda_configuration() {
+    println!("cargo:rustc-flags=-L /usr/local/cuda-11.0/lib64");
+    println!("cargo:rustc-flags=-l dylib=cudart");
 }
 
 // Not sure if I love this solution but I think it's relatively robust enough for now on Unix systems.

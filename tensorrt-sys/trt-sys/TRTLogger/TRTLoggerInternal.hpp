@@ -10,13 +10,17 @@
 
 class TRTLogger : public nvinfer1::ILogger {
 public:
-    explicit TRTLogger(nvinfer1::ILogger::Severity severity = nvinfer1::ILogger::Severity::kWARNING)
+    explicit TRTLogger(nvinfer1::ILogger::Severity severity)
             : mReportableSeverity(severity) {
     }
 
     void log(nvinfer1::ILogger::Severity severity, const char *msg) final {
         if (severity <= mReportableSeverity)
             printf("%s\n", msg);
+    }
+
+    void severity(nvinfer1::ILogger::Severity severity) {
+        mReportableSeverity = severity;
     }
 
 private:
@@ -26,8 +30,8 @@ private:
 struct Logger {
     std::unique_ptr<TRTLogger> internal_logger;
 
-    explicit Logger() {
-        internal_logger = std::make_unique<TRTLogger>();
+    explicit Logger(nvinfer1::ILogger::Severity severity) {
+        internal_logger = std::make_unique<TRTLogger>(severity);
     };
 
     [[nodiscard]] nvinfer1::ILogger& getLogger() const;

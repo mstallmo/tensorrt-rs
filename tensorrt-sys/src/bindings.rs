@@ -13,7 +13,10 @@ extern "C" {
     pub fn get_tensorrt_version(string: *mut ::std::os::raw::c_char);
 }
 extern "C" {
-    pub fn create_logger() -> *mut Logger_t;
+    pub fn create_logger(severity: ::std::os::raw::c_int) -> *mut Logger_t;
+}
+extern "C" {
+    pub fn set_logger_severity(logger: *const Logger_t, severity: ::std::os::raw::c_int);
 }
 extern "C" {
     pub fn log_error(logger: *mut Logger_t, err: *mut ::std::os::raw::c_char);

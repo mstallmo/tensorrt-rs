@@ -1,4 +1,13 @@
-use tensorrt_sys::{create_infer_runtime, create_logger, delete_logger, destroy_infer_runtime};
+use tensorrt_sys::{create_infer_runtime, create_logger, delete_logger, destroy_infer_runtime, set_logger_severity};
+
+#[repr(C)]
+pub enum LoggerSeverity {
+    InternalError,
+    Error,
+    Warning,
+    Info,
+    Verbose,
+}
 
 pub struct Logger {
     pub(crate) internal_logger: *mut tensorrt_sys::Logger_t,
@@ -6,10 +15,17 @@ pub struct Logger {
 
 impl Logger {
     pub fn new() -> Logger {
-        let logger = unsafe { create_logger() };
+        let logger = unsafe { create_logger(LoggerSeverity::Warning as i32) };
         Logger {
             internal_logger: logger,
         }
+    }
+
+    pub fn severity(mut self, severity: LoggerSeverity) -> Logger {
+        unsafe {
+            set_logger_severity(self.internal_logger, severity as i32);
+        };
+        self
     }
 }
 

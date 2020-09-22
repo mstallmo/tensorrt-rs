@@ -21,15 +21,10 @@ fn create_engine(uff_file: &UffFile) -> Engine {
     builder.build_cuda_engine()
 }
 
-//TOOD: Add get dims function to engine that returns all the dims for each binding.
-// Figure out sutiable algorithm for figuring out how to calculate the needed space based on the
-// dims information provided by the engine. See https://github.com/NVIDIA/TensorRT/blob/release/5.1/samples/common/buffers.h
-// for a C++ example. Could think about putting it as a value on the Engine struct itself?
 fn main() {
     let uff_file = UffFile::new(Path::new("../assets/sample_ssd_relu6.uff")).unwrap();
     let engine = create_engine(&uff_file);
     println!("Nb outputs: {}", engine.get_nb_bindings());
-    // println!("Binding dims: {}", engine.get)
 
     let context = engine.create_execution_context();
     let input_image = image::open("../assets/images/dog.ppm").unwrap().into_bgr();
@@ -40,6 +35,16 @@ fn main() {
     println!("NdArray shape transposed: {:?}", transposed.shape());
     let pre_processed = Array::from_iter(transposed.iter().map(|&x| 1.0 - (x as f32) / 255.0));
 
+    let binding_dim = engine.get_binding_dimensions(1);
+    let dim_slice= &binding_dim.d()[0..binding_dim.nb_dims() as usize];
+    let vol = dim_slice.iter().fold(1, |acc, x| acc * x);
+    let mut output = ndarray::Array1::<f32>::zeros(vol as usize);
+
+    //TODO: Execution fails because of an incorrect number of output bindings. SSD has 2 outputs and
+    // we've only bound 1. This causes the nmsPlugin to fail the assertion in enqueue. Line 118.
+    // Add functionality to bind more output for an engine to fix this issue.
+    context.execute(&pre_processed, 0, &mut output, 1);
+    println!("output: {}", output);
 
     println!("Done!");
 }

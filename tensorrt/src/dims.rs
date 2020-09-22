@@ -39,6 +39,18 @@ impl Dims {
 
         Dims { internal_dims }
     }
+
+    pub fn nb_dims(&self) -> i32 {
+        unsafe {
+            (*self.internal_dims).nbDims
+        }
+    }
+
+    pub fn d(&self) -> [i32; 8] {
+        unsafe {
+            (*self.internal_dims).d
+        }
+    }
 }
 
 impl Drop for Dims {

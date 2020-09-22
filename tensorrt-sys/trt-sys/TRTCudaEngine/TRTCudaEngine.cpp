@@ -2,6 +2,7 @@
 // Created by mason on 8/26/19.
 //
 #include <memory>
+#include <cstring>
 
 #include "../TRTHostMemory/TRTHostMemoryInternal.hpp"
 #include "../TRTContext/TRTContextInternal.hpp"
@@ -47,6 +48,19 @@ int get_binding_index(Engine_t* engine, const char* op_name) {
         return -1;
 
     return engine->internal_engine->getBindingIndex(op_name);
+}
+
+Dims_t* get_binding_dimensions(Engine_t *engine, int binding_index) {
+    if (engine == nullptr)
+        return nullptr;
+
+    nvinfer1::Dims nvdims = engine->internal_engine->getBindingDimensions(binding_index);
+    auto dims = static_cast<Dims_t *>(malloc(sizeof(Dims_t)));
+    dims->nbDims = nvdims.nbDims;
+    memcpy(dims->d, nvdims.d, nvinfer1::Dims::MAX_DIMS * sizeof(int));
+    memcpy(dims->type, nvdims.type, nvinfer1::Dims::MAX_DIMS * sizeof(int));
+
+    return dims;
 }
 
 Context_t* engine_create_execution_context(Engine_t* engine) {

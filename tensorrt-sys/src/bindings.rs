@@ -111,55 +111,6 @@ extern "C" {
 extern "C" {
     pub fn host_memory_get_size(host_memory: *mut HostMemory_t) -> usize;
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Engine {
-    _unused: [u8; 0],
-}
-pub type Engine_t = Engine;
-extern "C" {
-    pub fn destroy_cuda_engine(engine: *mut Engine_t);
-}
-extern "C" {
-    pub fn engine_create_execution_context(engine: *mut Engine_t) -> *mut Context_t;
-}
-extern "C" {
-    pub fn get_nb_bindings(engine: *mut Engine_t) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn get_binding_name(
-        engine: *mut Engine_t,
-        binding_index: ::std::os::raw::c_int,
-    ) -> *const ::std::os::raw::c_char;
-}
-extern "C" {
-    pub fn get_binding_index(
-        engine: *mut Engine_t,
-        op_name: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn engine_serialize(engine: *mut Engine_t) -> *mut HostMemory_t;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Runtime {
-    _unused: [u8; 0],
-}
-pub type Runtime_t = Runtime;
-extern "C" {
-    pub fn create_infer_runtime(logger: *mut Logger_t) -> *mut Runtime_t;
-}
-extern "C" {
-    pub fn deserialize_cuda_engine(
-        runtime: *mut Runtime_t,
-        blob: *const ::std::os::raw::c_void,
-        size: ::std::os::raw::c_ulonglong,
-    ) -> *mut Engine_t;
-}
-extern "C" {
-    pub fn destroy_infer_runtime(runtime: *mut Runtime_t);
-}
 pub const DimensionType_kSPATIAL: DimensionType = 0;
 pub const DimensionType_kCHANNEL: DimensionType = 1;
 pub const DimensionType_kINDEX: DimensionType = 2;
@@ -284,6 +235,61 @@ extern "C" {
 }
 extern "C" {
     pub fn destroy_dims(dims: *mut Dims_t);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Engine {
+    _unused: [u8; 0],
+}
+pub type Engine_t = Engine;
+extern "C" {
+    pub fn destroy_cuda_engine(engine: *mut Engine_t);
+}
+extern "C" {
+    pub fn engine_create_execution_context(engine: *mut Engine_t) -> *mut Context_t;
+}
+extern "C" {
+    pub fn get_nb_bindings(engine: *mut Engine_t) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn get_binding_name(
+        engine: *mut Engine_t,
+        binding_index: ::std::os::raw::c_int,
+    ) -> *const ::std::os::raw::c_char;
+}
+extern "C" {
+    pub fn get_binding_index(
+        engine: *mut Engine_t,
+        op_name: *const ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn get_binding_dimensions(
+        engine: *mut Engine_t,
+        binding_index: ::std::os::raw::c_int,
+    ) -> *mut Dims_t;
+}
+extern "C" {
+    pub fn engine_serialize(engine: *mut Engine_t) -> *mut HostMemory_t;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Runtime {
+    _unused: [u8; 0],
+}
+pub type Runtime_t = Runtime;
+extern "C" {
+    pub fn create_infer_runtime(logger: *mut Logger_t) -> *mut Runtime_t;
+}
+extern "C" {
+    pub fn deserialize_cuda_engine(
+        runtime: *mut Runtime_t,
+        blob: *const ::std::os::raw::c_void,
+        size: ::std::os::raw::c_ulonglong,
+    ) -> *mut Engine_t;
+}
+extern "C" {
+    pub fn destroy_infer_runtime(runtime: *mut Runtime_t);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

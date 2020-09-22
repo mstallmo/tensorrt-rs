@@ -160,57 +160,80 @@ extern "C" {
 extern "C" {
     pub fn destroy_infer_runtime(runtime: *mut Runtime_t);
 }
+pub const DimensionType_kSPATIAL: DimensionType = 0;
+pub const DimensionType_kCHANNEL: DimensionType = 1;
+pub const DimensionType_kINDEX: DimensionType = 2;
+pub const DimensionType_kSEQUENCE: DimensionType = 3;
+pub type DimensionType = ::std::os::raw::c_uint;
+pub use self::DimensionType as DimensionType_t;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Dims {
-    _unused: [u8; 0],
+    pub nbDims: ::std::os::raw::c_int,
+    pub d: [::std::os::raw::c_int; 8usize],
+    pub type_: [DimensionType_t; 8usize],
+}
+#[test]
+fn bindgen_test_layout_Dims() {
+    assert_eq!(
+        ::std::mem::size_of::<Dims>(),
+        68usize,
+        concat!("Size of: ", stringify!(Dims))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<Dims>(),
+        4usize,
+        concat!("Alignment of ", stringify!(Dims))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<Dims>())).nbDims as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Dims),
+            "::",
+            stringify!(nbDims)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<Dims>())).d as *const _ as usize },
+        4usize,
+        concat!("Offset of field: ", stringify!(Dims), "::", stringify!(d))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<Dims>())).type_ as *const _ as usize },
+        36usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(Dims),
+            "::",
+            stringify!(type_)
+        )
+    );
 }
 pub type Dims_t = Dims;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Dims2 {
-    _unused: [u8; 0],
-}
-pub type Dims2_t = Dims2;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Dims3 {
-    _unused: [u8; 0],
-}
-pub type Dims3_t = Dims3;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Dims4 {
-    _unused: [u8; 0],
-}
-pub type Dims4_t = Dims4;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DimsHW {
-    _unused: [u8; 0],
-}
-pub type DimsHW_t = DimsHW;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DimsCHW {
-    _unused: [u8; 0],
-}
-pub type DimsCHW_t = DimsCHW;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DimsNCHW {
-    _unused: [u8; 0],
-}
-pub type DimsNCHW_t = DimsNCHW;
 extern "C" {
     pub fn create_dims(
         nb_dims: ::std::os::raw::c_int,
         d: *const ::std::os::raw::c_int,
-        dimension_types: *const ::std::os::raw::c_int,
+        dimension_types: *const DimensionType_t,
     ) -> *mut Dims_t;
 }
 extern "C" {
     pub fn create_dims2(dim1: ::std::os::raw::c_int, dim2: ::std::os::raw::c_int) -> *mut Dims_t;
+}
+extern "C" {
+    pub fn create_dimsHW(
+        height: ::std::os::raw::c_int,
+        width: ::std::os::raw::c_int,
+    ) -> *mut Dims_t;
+}
+extern "C" {
+    pub fn dims2_set_dimension_types(
+        dims2: *mut Dims_t,
+        type1: DimensionType_t,
+        type2: DimensionType_t,
+    );
 }
 extern "C" {
     pub fn create_dims3(
@@ -220,24 +243,26 @@ extern "C" {
     ) -> *mut Dims_t;
 }
 extern "C" {
+    pub fn create_dimsCHW(
+        channel: ::std::os::raw::c_int,
+        height: ::std::os::raw::c_int,
+        width: ::std::os::raw::c_int,
+    ) -> *mut Dims_t;
+}
+extern "C" {
+    pub fn dims3_set_dimension_types(
+        dims3: *mut Dims_t,
+        type1: DimensionType_t,
+        type2: DimensionType_t,
+        type3: DimensionType_t,
+    );
+}
+extern "C" {
     pub fn create_dims4(
         dim1: ::std::os::raw::c_int,
         dim2: ::std::os::raw::c_int,
         dim3: ::std::os::raw::c_int,
         dim4: ::std::os::raw::c_int,
-    ) -> *mut Dims_t;
-}
-extern "C" {
-    pub fn create_dimsHW(
-        height: ::std::os::raw::c_int,
-        width: ::std::os::raw::c_int,
-    ) -> *mut Dims_t;
-}
-extern "C" {
-    pub fn create_dimsCHW(
-        channel: ::std::os::raw::c_int,
-        height: ::std::os::raw::c_int,
-        width: ::std::os::raw::c_int,
     ) -> *mut Dims_t;
 }
 extern "C" {
@@ -249,31 +274,16 @@ extern "C" {
     ) -> *mut Dims_t;
 }
 extern "C" {
-    pub fn destroy_dims(dims: *mut Dims_t);
-}
-extern "C" {
-    pub fn dims2_set_dimension_types(
-        dims2: *mut Dims_t,
-        type1: ::std::os::raw::c_int,
-        type2: ::std::os::raw::c_int,
-    );
-}
-extern "C" {
-    pub fn dims3_set_dimension_types(
-        dims3: *mut Dims_t,
-        type1: ::std::os::raw::c_int,
-        type2: ::std::os::raw::c_int,
-        type3: ::std::os::raw::c_int,
-    );
-}
-extern "C" {
     pub fn dims4_set_dimension_types(
         dims4: *mut Dims_t,
-        type1: ::std::os::raw::c_int,
-        type2: ::std::os::raw::c_int,
-        type3: ::std::os::raw::c_int,
-        type4: ::std::os::raw::c_int,
+        type1: DimensionType_t,
+        type2: DimensionType_t,
+        type3: DimensionType_t,
+        type4: DimensionType_t,
     );
+}
+extern "C" {
+    pub fn destroy_dims(dims: *mut Dims_t);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

@@ -1,4 +1,0 @@
-tensorrt-sys/3rdParty/TensorRT-5.1.5/libnvinfer_plugin_static.a filter=lfs diff=lfs merge=lfs -text
-tensorrt-sys/3rdParty/TensorRT-5.1.5/libnvinfer_static.a filter=lfs diff=lfs merge=lfs -text
-tensorrt-sys/3rdParty/TensorRT-5.1.5/libnvparsers_static.a filter=lfs diff=lfs merge=lfs -text
-assets/* filter=lfs diff=lfs merge=lfs -text

@@ -17,7 +17,7 @@ CMake > 3.10
 
 
 TensorRT-sys' bindings depends on TensorRT 5.1.5 for the bindings to work correctly. While other versions of
-TensorRT *may* work with the bindings there are no guarantees as functions that are boudn to may have been depricated, 
+TensorRT *may* work with the bindings there are no guarantees as functions that are bound to may have been depricated, 
 removed, or changed in future versions of TensorRT.
 
 The prerequisites enumerated above are expected to be installed in their default location on Linux. See the [nvidia
@@ -26,6 +26,10 @@ further install information.
 
 __Note:__ The tarball installation method described in the TesnorRT documentation is likely to cause major headaches with
 getting everything to link correctly. It is highly recommended to use the package manager method if possible. 
+
+If there are issues with loading default TensoRT plugins it seems that there are some missing plugins that were not
+provided with the 5.1.5 binary installation at one point in time. To get these plugins follow the instructions for building
+and installing the TensorRT OSS components from [here](https://github.com/NVIDIA/TensorRT).
 
 Windows support is not currently supported but should be coming soon!
 

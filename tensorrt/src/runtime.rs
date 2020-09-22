@@ -21,7 +21,7 @@ impl Logger {
         }
     }
 
-    pub fn severity(mut self, severity: LoggerSeverity) -> Logger {
+    pub fn severity(self, severity: LoggerSeverity) -> Logger {
         unsafe {
             set_logger_severity(self.internal_logger, severity as i32);
         };

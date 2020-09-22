@@ -98,18 +98,18 @@ fn main() {
     println!("cargo:rustc-flags=-l dylib=stdc++");
 
     match get_shared_lib_link_path("libnvinfer") {
-       Some(link_path) => {
-          match std::fs::read_link(link_path) {
-              Ok(full_library_path) => {
-                  configuration(&full_library_path);
-              },
-              Err(_) => {
-                  panic!("libnvinfer.so not found! See https://docs.nvidia.com/deeplearning/tensorrt/archives/tensorrt-515/tensorrt-install-guide/index.html for install instructions");
-              }
-          }
-       },
-       None => {
-           panic!("libnvinfer.so not found! See https://docs.nvidia.com/deeplearning/tensorrt/archives/tensorrt-515/tensorrt-install-guide/index.html for install instructions");
-       }
+        Some(link_path) => {
+            match std::fs::read_link(link_path) {
+                Ok(full_library_path) => {
+                    configuration(&full_library_path);
+                }
+                Err(_) => {
+                    panic!("libnvinfer.so not found! See https://docs.nvidia.com/deeplearning/tensorrt/archives/tensorrt-515/tensorrt-install-guide/index.html for install instructions");
+                }
+            }
+        }
+        None => {
+            panic!("libnvinfer.so not found! See https://docs.nvidia.com/deeplearning/tensorrt/archives/tensorrt-515/tensorrt-install-guide/index.html for install instructions");
+        }
     }
 }

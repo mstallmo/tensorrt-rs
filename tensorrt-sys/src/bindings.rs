@@ -88,12 +88,9 @@ extern "C" {
 extern "C" {
     pub fn execute(
         execution_context: *const Context_t,
-        input_data: *const f32,
-        input_data_size: usize,
-        input_index: ::std::os::raw::c_uint,
-        output_data: *mut f32,
-        output_size: usize,
-        output_index: ::std::os::raw::c_uint,
+        binding_data: *mut *const f32,
+        num_bindings: ::std::os::raw::c_int,
+        data_sizes: *const usize,
     );
 }
 #[repr(C)]

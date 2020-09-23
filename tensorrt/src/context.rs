@@ -2,6 +2,7 @@ use ndarray;
 use ndarray::Dimension;
 use std::ffi::{CStr, CString};
 use std::mem::size_of;
+use std::vec::Vec;
 use tensorrt_sys::{
     context_get_name, context_set_name, destroy_excecution_context, execute, Context_t,
 };
@@ -32,21 +33,28 @@ impl<'a> Context<'a> {
     pub fn execute<D1: Dimension, D2: Dimension>(
         &self,
         input_data: &ndarray::Array<f32, D1>,
-        input_binding_index: u32,
-        output_data: &mut ndarray::Array<f32, D2>,
-        output_binding_index: u32,
+        output_data: &Vec<&mut ndarray::Array<f32, D2>>,
+        num_bindings: i32,
     ) {
+        let mut binding_data = vec![(&input_data).as_ptr()];
+        for data in output_data {
+            binding_data.push((&data).as_ptr());
+        }
+
+        let mut data_sizes = vec![input_data.len() * size_of::<f32>()];
+        for data in output_data {
+            data_sizes.push(data.len() * size_of::<f32>());
+        }
+
         unsafe {
             execute(
                 self.internal_context,
-                input_data.as_ptr(),
-                input_data.len() * size_of::<f32>(),
-                input_binding_index,
-                output_data.as_mut_ptr(),
-                output_data.len() * size_of::<f32>(),
-                output_binding_index,
+                binding_data.as_mut_ptr(),
+                num_bindings,
+                data_sizes.as_ptr(),
             );
         };
+
     }
 }
 

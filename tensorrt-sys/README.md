@@ -18,10 +18,16 @@ CMake > 3.10
 
 TensorRT-sys' bindings depends on TensorRT 5.1.5 for the bindings to work correctly. While other versions of
 TensorRT *may* work with the bindings there are no guarantees as functions that are boudn to may have been depricated, 
-removed, or changed in future verions of TensorRT.
+removed, or changed in future versions of TensorRT.
 
-The prerequisites enumerated above are expected to be installed in their default location on Linux 
-(/usr/lib/x86_64-linux-gnu/)
+The prerequisites enumerated above are expected to be installed in their default location on Linux. See the [nvidia
+documentation](https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html#installing) around TensorRT for 
+further install information.
+
+__Note:__ The tarball installation method described in the TesnorRT documentation is likely to cause major headaches with
+getting everything to link correctly. It is highly recommended to use the package manager method if possible. 
+
+Windows support is not currently supported but should be coming soon!
 
 ### Support Matrix for TensorRT Classes
 Anything not listed below currently does not have any support.

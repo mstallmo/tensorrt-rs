@@ -1,7 +1,6 @@
 //
 // Created by mason on 9/17/19.
 //
-#include <cstdlib>
 #include <memory>
 #include <cuda_runtime.h>
 #include "NvInfer.h"

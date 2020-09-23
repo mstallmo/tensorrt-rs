@@ -15,7 +15,7 @@ fn create_engine(uff_file: &UffFile) -> Engine {
     let uff_parser = UffParser::new();
     let dim = DimsCHW::new(3, 300, 300);
     uff_parser.register_input("Input", dim, UffInputOrder::Nchw).unwrap();
-    uff_parser.register_output("NMS").unwrap();
+    uff_parser.register_output("MarkOutput_0").unwrap();
     uff_parser.parse(uff_file, builder.get_network()).unwrap();
 
     builder.build_cuda_engine()
@@ -36,15 +36,23 @@ fn main() {
     let pre_processed = Array::from_iter(transposed.iter().map(|&x| 1.0 - (x as f32) / 255.0));
 
     let binding_dim = engine.get_binding_dimensions(1);
-    let dim_slice= &binding_dim.d()[0..binding_dim.nb_dims() as usize];
-    let vol = dim_slice.iter().fold(1, |acc, x| acc * x);
-    let mut output = ndarray::Array1::<f32>::zeros(vol as usize);
+    let dim_slice = &binding_dim.d()[0..binding_dim.nb_dims() as usize];
+    let vol = dim_slice.iter().fold(1, |acc, x| acc * x) as usize;
+    let mut top_detections = ndarray::Array1::<f32>::zeros(vol);
 
-    //TODO: Execution fails because of an incorrect number of output bindings. SSD has 2 outputs and
-    // we've only bound 1. This causes the nmsPlugin to fail the assertion in enqueue. Line 118.
-    // Add functionality to bind more output for an engine to fix this issue.
-    context.execute(&pre_processed, 0, &mut output, 1);
-    println!("output: {}", output);
+    let binding_dim = engine.get_binding_dimensions(2);
+    let dim_slice = &binding_dim.d()[0..binding_dim.nb_dims() as usize];
+    let vol = dim_slice.iter().fold(1, |acc, x| acc * x) as usize;
+    let mut keep_count = ndarray::Array1::<f32>::zeros(vol);
+
+
+    //TODO: This is almost correct but the returned data looks slightly off.
+    // keep_count should be an i32 instead of f32 and top detection's size doesn't look quite right.
+    // Reference sampleUff.cpp file directly after the `Run Inference` comment.
+    let outputs = vec![&mut top_detections, &mut keep_count];
+    context.execute(&pre_processed, &outputs, 3);
+    println!("topDetections: {}", outputs[0]);
+    println!("keepCount: {}", outputs[1]);
 
     println!("Done!");
 }

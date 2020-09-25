@@ -55,11 +55,6 @@ fn configuration(full_library_path: &PathBuf) {
         println!("cargo:rustc-link-search=native={}", dst.display());
         println!("cargo:rustc-flags=-l dylib=nvinfer");
         println!("cargo:rustc-flags=-l dylib=nvparsers");
-        println!(
-            "cargo:rustc-flags=-L {}/3rdParty/TensorRT-5.1.5",
-            env!("CARGO_MANIFEST_DIR")
-        );
-        println!("cargo:rustc-flags=-l static=nvinfer_plugin_static");
         cuda_configuration();
     } else {
         panic!(

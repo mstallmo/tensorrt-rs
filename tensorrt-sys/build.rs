@@ -1,32 +1,44 @@
 use cmake::Config;
-use std::process::Command;
-use std::string::String;
-use std::process::Stdio;
 use std::path::PathBuf;
+use std::process::Command;
+use std::process::Stdio;
+use std::string::String;
 
 fn get_shared_lib_link_path(library_name: &str) -> Option<PathBuf> {
     match get_all_possible_link_paths(library_name) {
         Some(all_link_paths) => {
             for line in all_link_paths.lines() {
                 if line.ends_with(&format!("{}.so", library_name)) {
-                    let link_path = line.split("=>").collect::<Vec<&str>>().last().unwrap().to_owned();
+                    let link_path = line
+                        .split("=>")
+                        .collect::<Vec<&str>>()
+                        .last()
+                        .unwrap()
+                        .to_owned();
                     println!("link path: {}", link_path);
                     return Some(PathBuf::from(link_path.trim().to_owned()));
                 }
             }
             None
         }
-        None => {
-            None
-        }
+        None => None,
     }
 }
 
 fn get_all_possible_link_paths(library_name: &str) -> Option<String> {
-    let mut ld_config = Command::new("ldconfig").arg("-p").stdout(Stdio::piped()).spawn().expect("Failed to run ldconfig");
+    let mut ld_config = Command::new("ldconfig")
+        .arg("-p")
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("Failed to run ldconfig");
 
     if let Some(ld_config_output) = ld_config.stdout.take() {
-        let grep_config = Command::new("grep").arg(library_name).stdin(ld_config_output).stdout(Stdio::piped()).spawn().unwrap();
+        let grep_config = Command::new("grep")
+            .arg(library_name)
+            .stdin(ld_config_output)
+            .stdout(Stdio::piped())
+            .spawn()
+            .unwrap();
         let grep_stdout = grep_config.wait_with_output().unwrap();
         ld_config.wait().unwrap();
         Some(String::from_utf8(grep_stdout.stdout).unwrap())
@@ -43,11 +55,17 @@ fn configuration(full_library_path: &PathBuf) {
         println!("cargo:rustc-link-search=native={}", dst.display());
         println!("cargo:rustc-flags=-l dylib=nvinfer");
         println!("cargo:rustc-flags=-l dylib=nvparsers");
-        println!("cargo:rustc-flags=-L {}/3rdParty/TensorRT-5.1.5", env!("CARGO_MANIFEST_DIR"));
+        println!(
+            "cargo:rustc-flags=-L {}/3rdParty/TensorRT-5.1.5",
+            env!("CARGO_MANIFEST_DIR")
+        );
         println!("cargo:rustc-flags=-l static=nvinfer_plugin_static");
         cuda_configuration();
     } else {
-        panic!("Invalid nvinfer version found. Expected: libnvinfer.so.5.1.5, Found: {}", full_library_path.to_str().unwrap());
+        panic!(
+            "Invalid nvinfer version found. Expected: libnvinfer.so.5.1.5, Found: {}",
+            full_library_path.to_str().unwrap()
+        );
     }
 }
 
@@ -61,7 +79,10 @@ fn configuration(full_library_path: &PathBuf) {
         println!("cargo:rustc-flags=-l dylib=nvparsers");
         cuda_configuration();
     } else {
-        panic!("Invalid nvinfer version found. Expected: libnvinfer.so.7.1.3, Found: {}", full_library_path.to_str().unwrap());
+        panic!(
+            "Invalid nvinfer version found. Expected: libnvinfer.so.7.1.3, Found: {}",
+            full_library_path.to_str().unwrap()
+        );
     }
 }
 
@@ -98,16 +119,14 @@ fn main() {
     println!("cargo:rustc-flags=-l dylib=stdc++");
 
     match get_shared_lib_link_path("libnvinfer") {
-        Some(link_path) => {
-            match std::fs::read_link(link_path) {
-                Ok(full_library_path) => {
-                    configuration(&full_library_path);
-                }
-                Err(_) => {
-                    panic!("libnvinfer.so not found! See https://docs.nvidia.com/deeplearning/tensorrt/archives/tensorrt-515/tensorrt-install-guide/index.html for install instructions");
-                }
+        Some(link_path) => match std::fs::read_link(link_path) {
+            Ok(full_library_path) => {
+                configuration(&full_library_path);
             }
-        }
+            Err(_) => {
+                panic!("libnvinfer.so not found! See https://docs.nvidia.com/deeplearning/tensorrt/archives/tensorrt-515/tensorrt-install-guide/index.html for install instructions");
+            }
+        },
         None => {
             panic!("libnvinfer.so not found! See https://docs.nvidia.com/deeplearning/tensorrt/archives/tensorrt-515/tensorrt-install-guide/index.html for install instructions");
         }

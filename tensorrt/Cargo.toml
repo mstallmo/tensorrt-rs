@@ -15,6 +15,7 @@ tensorrt-sys = {version = "0.2", path="../tensorrt-sys"}
 ndarray = "0.13.1"
 ndarray-image = "0.2.1"
 image = "0.23.9"
+imageproc = "0.21.0"
 
 [dev-dependencies]
 lazy_static = "1.4.0"

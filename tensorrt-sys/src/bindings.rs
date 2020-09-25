@@ -88,7 +88,7 @@ extern "C" {
 extern "C" {
     pub fn execute(
         execution_context: *const Context_t,
-        binding_data: *mut *const f32,
+        binding_data: *mut *const ::std::os::raw::c_void,
         num_bindings: ::std::os::raw::c_int,
         data_sizes: *const usize,
     );

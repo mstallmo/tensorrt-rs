@@ -43,7 +43,7 @@ const char *context_get_name(Context_t *execution_context) {
     return execution_context->internal_context->getName();
 }
 
-void execute(const Context_t *execution_context, const float **binding_data, const int num_bindings,
+void execute(const Context_t *execution_context, const void **binding_data, const int num_bindings,
              const size_t *data_sizes) {
     if (execution_context == nullptr)
         return;

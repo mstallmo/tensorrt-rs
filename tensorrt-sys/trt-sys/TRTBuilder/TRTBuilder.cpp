@@ -24,6 +24,35 @@ struct Builder {
     };
 };
 
+
+void builder_set_max_batch_size(Builder_t* builder, int32_t batch_size) {
+    if (builder == nullptr)
+        return;
+
+	builder->internal_builder->setMaxBatchSize(batch_size);
+}
+
+int32_t builder_get_max_batch_size(Builder_t* builder) {
+    if (builder == nullptr)
+        return -1;
+
+	return builder->internal_builder->getMaxBatchSize();
+}
+
+void builder_set_max_workspace_size(Builder_t* builder, size_t workspace_size) {
+    if (builder == nullptr)
+        return;
+
+	builder->internal_builder->setMaxWorkspaceSize(workspace_size);
+}
+
+size_t builder_get_max_workspace_size(Builder_t* builder) {
+    if (builder == nullptr)
+        return -1;
+
+	return builder->internal_builder->getMaxWorkspaceSize();
+}
+
 Builder_t *create_infer_builder(Logger_t *logger) {
     initLibNvInferPlugins(&logger->getLogger(), "");
 
@@ -42,6 +71,13 @@ Network_t *create_network(Builder_t *builder) {
         return nullptr;
 
     return new Network(builder->internal_builder->createNetwork());
+}
+
+Network_t *create_network_v2(Builder_t *builder, uint32_t flags) {
+    if (builder == nullptr)
+        return nullptr;
+
+    return new Network(builder->internal_builder->createNetworkV2(flags));
 }
 
 Engine_t *build_cuda_engine(Builder_t *builder, Network_t *network) {

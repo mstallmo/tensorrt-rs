@@ -17,7 +17,9 @@ fn tensorrt_configuration() {
         println!("cargo:rustc-link-search={}", env!("TRT_LIB_DIR"));
     }
     println!("cargo:rustc-link-lib=dylib=nvinfer");
+    println!("cargo:rustc-link-lib=dylib=nvonnxparser");
     println!("cargo:rustc-link-lib=dylib=nvparsers");
+    println!("cargo:rustc-link-lib=dylib=nvinfer_plugin");
 }
 
 // Not sure if I love this solution but I think it's relatively robust enough for now on Unix systems.

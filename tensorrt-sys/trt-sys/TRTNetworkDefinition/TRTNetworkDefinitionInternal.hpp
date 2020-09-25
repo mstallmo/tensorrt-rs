@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include <NvInfer.h>
+
 #include "TRTNetworkDefinition.h"
 #include "../TRTUtils.hpp"
 
@@ -16,6 +18,12 @@ struct Network {
 
     explicit Network(nvinfer1::INetworkDefinition* networkDefinition) : internal_network(networkDefinition) {};
     [[nodiscard]] nvinfer1::INetworkDefinition& getNetworkDefinition() const;
+};
+
+struct Tensor {
+    nvinfer1::ITensor *internal_tensor;
+
+    explicit Tensor(nvinfer1::ITensor *tensor) : internal_tensor(tensor) {};
 };
 
 

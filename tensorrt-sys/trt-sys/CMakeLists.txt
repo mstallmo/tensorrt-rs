@@ -11,6 +11,7 @@ file(GLOB source_files
         "TRTCudaEngine/*.cpp"
         "TRTContext/*.cpp"
         "TRTUffParser/*.cpp"
+        "TRTOnnxParser/*.cpp"
         "TRTDims/*.cpp"
         "TRTBuilder/*.cpp"
         "TRTNetworkDefinition/*.cpp"

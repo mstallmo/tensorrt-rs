@@ -10,6 +10,7 @@
 #include "TRTCudaEngine/TRTCudaEngine.h"
 #include "TRTContext/TRTContext.h"
 #include "TRTUffParser/TRTUffParser.h"
+#include "TRTOnnxParser/TRTOnnxParser.h"
 #include "TRTDims/TRTDims.h"
 #include "TRTBuilder/TRTBuilder.h"
 #include "TRTNetworkDefinition/TRTNetworkDefinition.h"

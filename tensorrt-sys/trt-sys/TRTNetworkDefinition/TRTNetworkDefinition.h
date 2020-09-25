@@ -9,10 +9,22 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
+#include "../TRTDims/TRTDims.h"
+
+
 struct Network;
 typedef struct Network Network_t;
 
+struct Tensor;
+typedef struct Tensor Tensor_t;
+
 void destroy_network(Network_t *network);
+
+Tensor_t *network_get_input(Network_t *network, int32_t idx);
+
+void tensor_set_dimensions(Tensor_t *tensor, Dims_t *dimensions); // only valid for input tensors
 
 #ifdef __cplusplus
 };

@@ -19,22 +19,4 @@ mod tests {
     use std::fs::File;
     use std::io::prelude::*;
     use std::os::raw::{c_char, c_int, c_void};
-
-    #[cfg(feature = "trt-515")]
-    #[test]
-    fn tensorrt_version() {
-        let mut c_buf = Vec::<c_char>::with_capacity(6);
-        unsafe { get_tensorrt_version(c_buf.as_mut_ptr()) };
-        let c_str = unsafe { CStr::from_ptr(c_buf.as_ptr()) };
-        assert_eq!("5.1.5", c_str.to_str().unwrap());
-    }
-
-    #[cfg(feature = "trt-713")]
-    #[test]
-    fn tensorrt_version() {
-        let mut c_buf = Vec::<c_char>::with_capacity(6);
-        unsafe { get_tensorrt_version(c_buf.as_mut_ptr()) };
-        let c_str = unsafe { CStr::from_ptr(c_buf.as_ptr()) };
-        assert_eq!("7.1.3", c_str.to_str().unwrap());
-    }
 }

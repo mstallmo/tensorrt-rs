@@ -7,6 +7,7 @@
 
 #include <memory>
 #include "TRTLogger.h"
+#include <cstdio>
 
 class TRTLogger : public nvinfer1::ILogger {
 public:

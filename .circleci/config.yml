@@ -10,4 +10,10 @@ workflows:
   welcome:
     # Run the welcome/run job in its own container
     jobs:
-      - welcome/run
+      build:
+        machine:
+          resource_class: gpu.nvidia.small
+          image: ubuntu-1604-cuda-10.1:201909-23
+        steps:
+          - run: nvidia-smi
+          - run: docker run --gpus all nvidia/cuda:10.1-base nvidia-smi

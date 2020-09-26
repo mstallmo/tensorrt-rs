@@ -7,8 +7,17 @@ jobs:
     steps:
       - checkout
       - run: cargo build --release
+  test-tensorrt-sys:
+    docker:
+      - image: mstallmo/tensorrt-rs:0.2
+    steps:
+      - run: cd tensorrt-sys
+      - run: cargo test
 # Orchestrate or schedule a set of jobs
 workflows:
   build-docker:
     jobs:
       - build
+      - test-tensorrt-sys:
+          requires:
+            - build

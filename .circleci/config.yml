@@ -7,10 +7,16 @@ jobs:
     steps:
       - checkout
       - run: cargo build --release
+      - persist_to_workspace:
+          root: /root
+          paths:
+            - project
   test-tensorrt-sys:
     docker:
       - image: mstallmo/tensorrt-rs:0.2
     steps:
+      - attach_workspace:
+          at: /root
       - run: cd tensorrt-sys
       - run: cargo test
 # Orchestrate or schedule a set of jobs

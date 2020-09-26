@@ -5,6 +5,7 @@ jobs:
     docker:
       - image: mstallmo/tensorrt-rs:0.1
     steps:
+      - checkout
       - run: ls
 # Orchestrate or schedule a set of jobs
 workflows:

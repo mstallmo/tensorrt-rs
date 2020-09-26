@@ -2,12 +2,10 @@
 version: 2.1
 jobs:
   build:
-    machine:
-      resource_class: gpu.nvidia.small
-      image: ubuntu-1604-cuda-10.1:201909-23
+    docker:
+      - image: nvcr.io/nvidia/tensorrt:19.06-py3
     steps:
-      - run: nvidia-smi
-      - run: docker run --gpus all nvidia/cuda:10.1-base nvidia-smi
+      - run: ls /usr/lib/x86_64-linux-gnu | grep libnvinf
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"

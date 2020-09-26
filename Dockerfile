@@ -1,5 +1,16 @@
 FROM nvcr.io/nvidia/tensorrt:19.06-py3
 
+RUN apt-get update
+RUN apt install -y software-properties-common
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test
+RUN apt-get update
+RUN apt-get install g++-7 -y
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
+    --slave /usr/bin/g++ g++ /usr/bin/g++-7
+RUN update-alternatives --config gcc
+RUN gcc --version
+RUN g++ --version
+
 # Download and install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 

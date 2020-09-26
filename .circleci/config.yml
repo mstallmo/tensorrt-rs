@@ -6,7 +6,7 @@ jobs:
       - image: mstallmo/tensorrt-rs:0.1
     steps:
       - checkout
-      - run: ls
+      - run: cargo build
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"

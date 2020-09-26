@@ -2,9 +2,16 @@ use ndarray;
 use ndarray::Dimension;
 use std::ffi::{CStr, CString};
 use std::mem::size_of;
+use std::vec::Vec;
 use tensorrt_sys::{
     context_get_name, context_set_name, destroy_excecution_context, execute, Context_t,
 };
+use std::os::raw::c_void;
+
+pub enum ExecuteInput<'a, D: Dimension> {
+    Integer(&'a ndarray::Array<i32, D>),
+    Float(&'a ndarray::Array<f32, D>)
+}
 
 pub struct Context<'a> {
     pub(crate) internal_context: *mut Context_t,
@@ -31,22 +38,59 @@ impl<'a> Context<'a> {
 
     pub fn execute<D1: Dimension, D2: Dimension>(
         &self,
-        input_data: &ndarray::Array<f32, D1>,
-        input_binding_index: u32,
-        output_data: &mut ndarray::Array<f32, D2>,
-        output_binding_index: u32,
+        input_data: ExecuteInput<D1>,
+        output_data: Vec<ExecuteInput<D2>>,
+        num_bindings: i32,
     ) {
+        let mut binding_data = match input_data {
+            ExecuteInput::Integer(val) => {
+                vec![val.as_ptr() as *const c_void]
+            },
+            ExecuteInput::Float(val) => {
+                vec![val.as_ptr() as *const c_void]
+            }
+        };
+
+        for data in &output_data {
+            match data {
+                ExecuteInput::Integer(val) => {
+                   binding_data.push(val.as_ptr() as *const c_void);
+                },
+                ExecuteInput::Float(val) => {
+                    binding_data.push(val.as_ptr() as *const c_void);
+                }
+            }
+        }
+
+        let mut data_sizes = match input_data {
+            ExecuteInput::Integer(val) => {
+                vec![val.len() * size_of::<i32>()]
+            },
+            ExecuteInput::Float(val) => {
+                vec![val.len() * size_of::<f32>()]
+            }
+        };
+
+        for data in &output_data {
+            match data {
+                ExecuteInput::Integer(val) => {
+                    data_sizes.push(val.len() * size_of::<i32>());
+                },
+                ExecuteInput::Float(val) => {
+                    data_sizes.push(val.len() * size_of::<f32>());
+                }
+            }
+        }
+
         unsafe {
             execute(
                 self.internal_context,
-                input_data.as_ptr(),
-                input_data.len() * size_of::<f32>(),
-                input_binding_index,
-                output_data.as_mut_ptr(),
-                output_data.len() * size_of::<f32>(),
-                output_binding_index,
+                binding_data.as_mut_ptr(),
+                num_bindings,
+                data_sizes.as_ptr(),
             );
         };
+
     }
 }
 

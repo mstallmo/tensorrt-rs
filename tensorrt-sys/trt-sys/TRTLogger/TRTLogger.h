@@ -14,7 +14,8 @@ typedef struct Logger Logger_t;
 
 void get_tensorrt_version(char* string);
 
-Logger_t* create_logger();
+Logger_t* create_logger(const int severity);
+void set_logger_severity(const Logger_t* logger, const int severity);
 void log_error(Logger_t* logger, char* err);
 void delete_logger(Logger_t* logger);
 

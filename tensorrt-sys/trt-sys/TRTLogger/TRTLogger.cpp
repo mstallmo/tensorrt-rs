@@ -9,8 +9,10 @@ void get_tensorrt_version(char *string) {
     sprintf(string, "%d.%d.%d", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH);
 }
 
-Logger_t *create_logger() {
-    return new Logger();
+Logger_t *create_logger(const int severity) {
+    auto nvSeverity = static_cast<nvinfer1::ILogger::Severity>(severity);
+
+    return new Logger(nvSeverity);
 }
 
 void delete_logger(Logger_t *logger) {
@@ -18,6 +20,12 @@ void delete_logger(Logger_t *logger) {
         return;
 
     delete logger;
+}
+
+void set_logger_severity(const Logger_t* logger, const int severity) {
+    auto nvSeverity = static_cast<nvinfer1::ILogger::Severity>(severity);
+
+    logger->internal_logger->severity(nvSeverity);
 }
 
 void log_error(Logger_t *logger, char *err) {

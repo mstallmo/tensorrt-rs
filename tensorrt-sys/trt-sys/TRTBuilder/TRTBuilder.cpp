@@ -3,6 +3,7 @@
 //
 #include <memory>
 #include <NvInfer.h>
+#include <NvInferPlugin.h>
 
 #include "TRTBuilder.h"
 #include "../TRTNetworkDefinition/TRTNetworkDefinitionInternal.hpp"
@@ -24,6 +25,8 @@ struct Builder {
 };
 
 Builder_t *create_infer_builder(Logger_t *logger) {
+    initLibNvInferPlugins(&logger->getLogger(), "");
+
     return new Builder(logger->getLogger());
 }
 

@@ -3,9 +3,9 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: nvcr.io/nvidia/tensorrt:19.06-py3
+      - image: mstallmo/tensorrt-rs:0.1
     steps:
-      - run: ls /usr/lib/x86_64-linux-gnu | grep libnvinf
+      - run: cargo --version
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"

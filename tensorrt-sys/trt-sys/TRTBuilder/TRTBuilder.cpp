@@ -26,31 +26,32 @@ struct Builder {
 
 
 void builder_set_max_batch_size(Builder_t* builder, int32_t batch_size) {
-    if (builder == nullptr)
+    if (builder == nullptr) {
         return;
+    }
 
-	builder->internal_builder->setMaxBatchSize(batch_size);
+    builder->internal_builder->setMaxBatchSize(batch_size);
 }
 
 int32_t builder_get_max_batch_size(Builder_t* builder) {
     if (builder == nullptr)
         return -1;
 
-	return builder->internal_builder->getMaxBatchSize();
+    return builder->internal_builder->getMaxBatchSize();
 }
 
 void builder_set_max_workspace_size(Builder_t* builder, size_t workspace_size) {
     if (builder == nullptr)
         return;
 
-	builder->internal_builder->setMaxWorkspaceSize(workspace_size);
+    builder->internal_builder->setMaxWorkspaceSize(workspace_size);
 }
 
 size_t builder_get_max_workspace_size(Builder_t* builder) {
     if (builder == nullptr)
         return -1;
 
-	return builder->internal_builder->getMaxWorkspaceSize();
+    return builder->internal_builder->getMaxWorkspaceSize();
 }
 
 Builder_t *create_infer_builder(Logger_t *logger) {

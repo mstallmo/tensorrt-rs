@@ -1,6 +1,6 @@
 [package]
 name = "tensorrt-rs"
-version = "0.3.0"
+version = "1.0.0"
 authors = ["Mason Stallmo <masonstallmo@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/mstallmo/tensorrt-rs"
@@ -10,7 +10,7 @@ description = "Rust library for using Nvidia's TensorRT deep learning accelerati
 
 [dependencies]
 # Uncomment when working locally
-tensorrt-sys = { version = "0.2", path="../tensorrt-sys" }
+tensorrt-sys = { path = "../tensorrt-sys" }
 ndarray = "0.13"
 ndarray-image = "0.2"
 image = "0.23"

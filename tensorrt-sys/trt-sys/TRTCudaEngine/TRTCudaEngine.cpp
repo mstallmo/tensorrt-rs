@@ -3,6 +3,7 @@
 //
 #include <memory>
 #include <cstring>
+#include <cstdlib>
 
 #include "../TRTHostMemory/TRTHostMemoryInternal.hpp"
 #include "../TRTContext/TRTContextInternal.hpp"

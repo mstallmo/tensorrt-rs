@@ -1,6 +1,6 @@
 [package]
 name = "tensorrt-sys"
-version = "0.3.0"
+version = "1.0.0"
 authors = ["Mason Stallmo <masonstallmo@gmail.com>"]
 license = "MIT"
 edition = "2018"
@@ -8,21 +8,8 @@ build = "build.rs"
 repository = "https://github.com/mstallmo/tensorrt-rs"
 description = "Low level wrapper around Nvidia's TensorRT library"
 
-[features]
-default = ["trt-515"]
-
-trt-515 = ["cuda-101"]
-
-trt-713 = []
-
-cuda-101 = []
-
-cuda-102 = []
-
-cuda-110 = []
-
 [dependencies]
-libc = "0.2"
+libc = "0.*"
 
 [build-dependencies]
 cmake = "0.1"

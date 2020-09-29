@@ -16,7 +16,7 @@ file(GLOB source_files
         "TRTBuilder/*.cpp"
         "TRTNetworkDefinition/*.cpp"
         "TRTHostMemory/*.cpp"
-        )
+)
 
 add_library(trt-sys STATIC ${source_files})
 include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})

@@ -1,29 +1,38 @@
-use crate::context::Context;
-use crate::runtime::Runtime;
-use crate::dims::Dims;
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
+use std::marker::PhantomData;
 use std::os::raw::c_void;
 use std::slice;
-use tensorrt_sys::{deserialize_cuda_engine, destroy_cuda_engine, destroy_host_memory, engine_create_execution_context, engine_serialize, get_binding_index, get_binding_name, get_nb_bindings, host_memory_get_data, host_memory_get_size, get_binding_dimensions};
+
+use crate::context::Context;
+use crate::dims::Dims;
+use crate::runtime::{Logger, Runtime};
+use tensorrt_sys::{
+    deserialize_cuda_engine, destroy_cuda_engine, destroy_host_memory,
+    engine_create_execution_context, engine_serialize, get_binding_dimensions, get_binding_index,
+    get_binding_name, get_nb_bindings, host_memory_get_data, host_memory_get_size,
+};
 
 #[derive(Debug)]
-pub struct Engine {
+pub struct Engine<'a> {
     pub(crate) internal_engine: *mut tensorrt_sys::Engine_t,
+    pub(crate) logger: PhantomData<&'a Logger>,
 }
 
-impl Engine {
-    pub fn new(runtime: Runtime, buffer: Vec<u8>) -> Engine {
-        let engine = unsafe {
+impl<'a> Engine<'a> {
+    pub fn new(runtime: Runtime<'a>, buffer: Vec<u8>) -> Self {
+        let internal_engine = unsafe {
             deserialize_cuda_engine(
                 runtime.internal_runtime,
                 buffer.as_ptr() as *const c_void,
                 buffer.len() as u64,
             )
         };
+        let logger = PhantomData;
 
-        Engine {
-            internal_engine: engine,
+        Self {
+            internal_engine,
+            logger,
         }
     }
 
@@ -61,11 +70,11 @@ impl Engine {
     }
 
     pub fn get_binding_dimensions(&self, binding_index: i32) -> Dims {
-        let raw_dims = unsafe {
-            get_binding_dimensions(self.internal_engine, binding_index)
-        };
+        let raw_dims = unsafe { get_binding_dimensions(self.internal_engine, binding_index) };
 
-        Dims { internal_dims: raw_dims }
+        Dims {
+            internal_dims: raw_dims,
+        }
     }
 
     pub fn create_execution_context(&self) -> Context {
@@ -82,9 +91,9 @@ impl Engine {
     }
 }
 
-unsafe impl Send for Engine {}
+unsafe impl<'a> Send for Engine<'a> {}
 
-impl Drop for Engine {
+impl<'a> Drop for Engine<'a> {
     fn drop(&mut self) {
         unsafe { destroy_cuda_engine(self.internal_engine) };
     }

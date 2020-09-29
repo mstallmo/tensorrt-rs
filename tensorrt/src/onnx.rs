@@ -4,6 +4,7 @@ use std::error;
 use std::ffi::CString;
 use std::fmt::Formatter;
 use std::io;
+use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
 use tensorrt_sys::{
     onnxparser_create_parser, onnxparser_destroy_parser, onnxparser_parse_from_file,
@@ -35,17 +36,21 @@ impl OnnxFile {
     }
 }
 
-pub struct OnnxParser {
+pub struct OnnxParser<'a, 'b> {
     internal_onnxparser: *mut tensorrt_sys::OnnxParser_t,
+    pub(crate) network: PhantomData<&'a Network>,
+    pub(crate) logger: PhantomData<&'b Logger>,
 }
 
-impl OnnxParser {
+impl<'a, 'b> OnnxParser<'a, 'b> {
     // const Network_t *network, Logger_t *logger
-    pub fn new(network: &Network, logger: &Logger) -> OnnxParser {
+    pub fn new(network: &'a Network, logger: &'b Logger) -> Self {
         let internal_onnxparser =
             unsafe { onnxparser_create_parser(network.internal_network, logger.internal_logger) };
-        OnnxParser {
+        Self {
             internal_onnxparser,
+            network: PhantomData,
+            logger: PhantomData,
         }
     }
 
@@ -70,7 +75,7 @@ impl OnnxParser {
     }
 }
 
-impl Drop for OnnxParser {
+impl<'a, 'b> Drop for OnnxParser<'a, 'b> {
     fn drop(&mut self) {
         unsafe { onnxparser_destroy_parser(self.internal_onnxparser) };
     }

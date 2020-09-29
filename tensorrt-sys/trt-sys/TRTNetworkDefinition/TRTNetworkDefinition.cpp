@@ -20,15 +20,15 @@ nvinfer1::INetworkDefinition& Network::getNetworkDefinition() const {
 Tensor_t *network_get_input(Network_t *network, int32_t idx) {
     if (network == nullptr) {
         return nullptr;
-	}
+    }
 
-	return new Tensor(network->internal_network->getInput(idx));
+    return new Tensor(network->internal_network->getInput(idx));
 }
 
 void tensor_set_dimensions(Tensor_t *tensor, Dims_t *dimensions) {
     if (tensor == nullptr) {
         return;
-	}
+    }
 
-	tensor->internal_tensor->setDimensions(dims_get(dimensions));
+    tensor->internal_tensor->setDimensions(dims_get(dimensions));
 }

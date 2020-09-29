@@ -11,9 +11,8 @@ pub struct Tensor {
 
 impl Network {
     pub fn get_input(&self, idx: i32) -> Tensor {
-        Tensor {
-            internal_tensor: unsafe { network_get_input(self.internal_network, idx) },
-        }
+        let internal_tensor = unsafe { network_get_input(self.internal_network, idx) };
+        Tensor { internal_tensor }
     }
 }
 

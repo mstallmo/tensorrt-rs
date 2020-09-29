@@ -9,49 +9,34 @@ use tensorrt_rs::engine::Engine;
 use tensorrt_rs::onnx::{OnnxFile, OnnxParser};
 use tensorrt_rs::runtime::Logger;
 
-///
-/// Some strange bug with lifetimes of different trt objects. They should all be alive.
-///
-pub struct TensorRT {
-    logger: Logger,
-    engine: Engine,
-    builder: Builder,
-}
+fn create_engine<'a>(
+    logger: &'a Logger,
+    file: OnnxFile,
+    batch_size: i32,
+    workspace_size: usize,
+) -> Engine<'a> {
+    let builder = Builder::new(&logger);
+    let network = builder.create_network_v2(NetworkBuildFlags::EXPLICIT_BATCH);
+    let verbosity = 7;
 
-impl TensorRT {
-    pub fn new(file: OnnxFile, batch_size: i32, workspace_size: usize) -> Self {
-        let logger = Logger::new();
-        let builder =
-            Builder::new_v2(&logger, NetworkBuildFlags::EXPLICIT_BATCH);
-        let engine = {
-            let network = builder.get_network();
-            let parser = OnnxParser::new(network, &logger);
-            let verbosity = 7;
+    builder.set_max_batch_size(batch_size);
+    builder.set_max_workspace_size(workspace_size);
 
-            builder.set_max_batch_size(batch_size);
-            builder.set_max_workspace_size(workspace_size);
+    let parser = OnnxParser::new(&network, &logger);
+    parser.parse_from_file(&file, verbosity).unwrap();
 
-            parser.parse_from_file(&file, verbosity).unwrap();
-
-            let dim = Dims4::new(batch_size, 224, 224, 3);
-            network.get_input(0).set_dimensions(dim);
-            builder.build_cuda_engine()
-        };
-
-        Self {
-            logger,
-            engine,
-            builder,
-        }
-    }
+    let dim = Dims4::new(batch_size, 224, 224, 3);
+    network.get_input(0).set_dimensions(dim);
+    builder.build_cuda_engine(&network)
 }
 
 fn main() {
+    let logger = Logger::new();
     let file = OnnxFile::new(&PathBuf::from("../assets/efficientnet.onnx")).unwrap();
     let gb = 1024 * 1024 * 1024;
-    let trt = TensorRT::new(file, 1, 1 * gb);
+    let engine = create_engine(&logger, file, 1, 1 * gb);
 
-    let context = trt.engine.create_execution_context();
+    let context = engine.create_execution_context();
 
     let input_image = image::open("../assets/images/meme.jpg")
         .unwrap()
@@ -60,12 +45,10 @@ fn main() {
     eprintln!("Image dimensions: {:?}", input_image.dimensions());
 
     // Convert image to ndarray
-    let array: ndarray_image::NdColor =
-        ndarray_image::NdImage(&input_image).into();
+    let array: ndarray_image::NdColor = ndarray_image::NdImage(&input_image).into();
     println!("NdArray len: {}", array.len());
 
-    let pre_processed =
-        Array::from_iter(array.iter().map(|&x| 1.0 - (x as f32) / 255.0));
+    let pre_processed = Array::from_iter(array.iter().map(|&x| 1.0 - (x as f32) / 255.0));
 
     // Run inference
     let mut output = ndarray::Array1::<f32>::zeros(1000);

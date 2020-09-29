@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use crate::engine::Engine;
 use crate::network::Network;
 use crate::runtime::Logger;
@@ -7,9 +9,9 @@ use tensorrt_sys::{
     create_network, create_network_v2, destroy_builder,
 };
 
-pub struct Builder {
-    internal_builder: *mut tensorrt_sys::Builder_t,
-    network: Network,
+pub struct Builder<'a> {
+    pub(crate) internal_builder: *mut tensorrt_sys::Builder_t,
+    pub(crate) logger: PhantomData<&'a Logger>,
 }
 
 bitflags! {
@@ -19,30 +21,13 @@ bitflags! {
     }
 }
 
-impl Builder {
-    pub fn new(logger: &Logger) -> Builder {
-        let builder = unsafe { create_infer_builder(logger.internal_logger) };
-        let sys_network = unsafe { create_network(builder) };
-        let network = Network {
-            internal_network: sys_network,
-        };
-
-        Builder {
-            internal_builder: builder,
-            network,
-        }
-    }
-
-    pub fn new_v2(logger: &Logger, flags: NetworkBuildFlags) -> Builder {
-        let builder = unsafe { create_infer_builder(logger.internal_logger) };
-        let sys_network = unsafe { create_network_v2(builder, flags.bits()) };
-        let network = Network {
-            internal_network: sys_network,
-        };
-
-        Builder {
-            internal_builder: builder,
-            network,
+impl<'a> Builder<'a> {
+    pub fn new(logger: &'a Logger) -> Self {
+        let internal_builder = unsafe { create_infer_builder(logger.internal_logger) };
+        let logger = PhantomData;
+        Self {
+            internal_builder,
+            logger,
         }
     }
 
@@ -62,20 +47,28 @@ impl Builder {
         unsafe { builder_set_max_batch_size(self.internal_builder, bs as i32) }
     }
 
-    pub fn get_network(&self) -> &Network {
-        &self.network
+    pub fn create_network(&self) -> Network {
+        let internal_network = unsafe { create_network(self.internal_builder) };
+        Network { internal_network }
     }
 
-    pub fn build_cuda_engine(&self) -> Engine {
+    pub fn create_network_v2(&self, flags: NetworkBuildFlags) -> Network {
+        let internal_network = unsafe { create_network_v2(self.internal_builder, flags.bits()) };
+        Network { internal_network }
+    }
+
+    pub fn build_cuda_engine(&self, network: &Network) -> Engine<'a> {
+        let internal_engine =
+            unsafe { build_cuda_engine(self.internal_builder, network.internal_network) };
+        let logger = self.logger;
         Engine {
-            internal_engine: unsafe {
-                build_cuda_engine(self.internal_builder, self.network.internal_network)
-            },
+            internal_engine,
+            logger,
         }
     }
 }
 
-impl Drop for Builder {
+impl<'a> Drop for Builder<'a> {
     fn drop(&mut self) {
         unsafe { destroy_builder(self.internal_builder) };
     }

@@ -19,9 +19,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /root
-      - run: cd tensorrt-sys
-      - run: pwd
-      - run: ls
+      - run: cd tensorrt-sys && cargo test
 # Orchestrate or schedule a set of jobs
 workflows:
   build-docker:

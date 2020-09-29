@@ -11,8 +11,6 @@ jobs:
           root: /root
           paths:
             - project
-  # Running tests are currently broken due to an -fPIC issue in docker. Could be related to the shared libs that are
-  # installed by default in the nvidia container that we're using as a base.
   test-tensorrt-sys:
     docker:
       - image: mstallmo/tensorrt-rs:0.2

@@ -41,15 +41,11 @@ impl Dims {
     }
 
     pub fn nb_dims(&self) -> i32 {
-        unsafe {
-            (*self.internal_dims).nbDims
-        }
+        unsafe { (*self.internal_dims).nbDims }
     }
 
     pub fn d(&self) -> [i32; 8] {
-        unsafe {
-            (*self.internal_dims).d
-        }
+        unsafe { (*self.internal_dims).d }
     }
 }
 

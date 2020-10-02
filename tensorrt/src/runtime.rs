@@ -1,4 +1,8 @@
-use tensorrt_sys::{create_infer_runtime, create_logger, delete_logger, destroy_infer_runtime, set_logger_severity};
+use std::marker::PhantomData;
+
+use tensorrt_sys::{
+    create_infer_runtime, create_logger, delete_logger, destroy_infer_runtime, set_logger_severity,
+};
 
 #[repr(C)]
 pub enum LoggerSeverity {
@@ -36,20 +40,23 @@ impl Drop for Logger {
 }
 
 #[derive(Clone)]
-pub struct Runtime {
+pub struct Runtime<'a> {
     pub(crate) internal_runtime: *mut tensorrt_sys::Runtime_t,
+    pub(crate) logger: PhantomData<&'a Logger>,
 }
 
-impl Runtime {
-    pub fn new(logger: &Logger) -> Runtime {
-        let runtime = unsafe { create_infer_runtime(logger.internal_logger) };
-        Runtime {
-            internal_runtime: runtime,
+impl<'a> Runtime<'a> {
+    pub fn new(logger: &'a Logger) -> Self {
+        let internal_runtime = unsafe { create_infer_runtime(logger.internal_logger) };
+        let logger = PhantomData;
+        Self {
+            internal_runtime,
+            logger,
         }
     }
 }
 
-impl Drop for Runtime {
+impl<'a> Drop for Runtime<'a> {
     fn drop(&mut self) {
         unsafe { destroy_infer_runtime(self.internal_runtime) };
     }

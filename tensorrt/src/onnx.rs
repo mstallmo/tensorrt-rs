@@ -24,7 +24,7 @@ impl OnnxFile {
         if file_name.extension().unwrap() != "onnx" {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "Invalid ONNX file. UFF files should have a .onnx ending",
+                "Invalid ONNX file. ONNX files should have a .onnx ending",
             ));
         }
 

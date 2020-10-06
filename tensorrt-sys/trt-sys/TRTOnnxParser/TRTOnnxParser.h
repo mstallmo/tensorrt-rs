@@ -1,8 +1,6 @@
 #ifndef LIBTRT_TRTONNXPARSER_H
 #define LIBTRT_TRTONNXPARSER_H
 
-#include <stdbool.h>
-
 #include "../TRTDims/TRTDims.h"
 #include "../TRTNetworkDefinition/TRTNetworkDefinition.h"
 #include "../TRTLogger/TRTLogger.h"

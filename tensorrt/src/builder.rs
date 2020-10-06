@@ -3,10 +3,12 @@ use std::marker::PhantomData;
 use crate::engine::Engine;
 use crate::network::Network;
 use crate::runtime::Logger;
+#[cfg(not(feature = "trt-5"))]
+use tensorrt_sys::create_network_v2;
 use tensorrt_sys::{
     build_cuda_engine, builder_get_max_batch_size, builder_get_max_workspace_size,
     builder_set_max_batch_size, builder_set_max_workspace_size, create_infer_builder,
-    create_network, create_network_v2, destroy_builder,
+    create_network, destroy_builder,
 };
 
 pub struct Builder<'a> {
@@ -52,6 +54,7 @@ impl<'a> Builder<'a> {
         Network { internal_network }
     }
 
+    #[cfg(not(feature = "trt-5"))]
     pub fn create_network_v2(&self, flags: NetworkBuildFlags) -> Network {
         let internal_network = unsafe { create_network_v2(self.internal_builder, flags.bits()) };
         Network { internal_network }

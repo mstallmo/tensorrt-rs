@@ -1,10 +1,10 @@
+use bindgen::builder;
 use cmake::Config;
 
 fn cuda_configuration() {
-    let cudadir = if !env!("CUDA_INSTALL_DIR").is_empty() {
-        env!("CUDA_INSTALL_DIR")
-    } else {
-        "/usr/local/cuda"
+    let cudadir = match option_env!("CUDA_INSTALL_DIR") {
+        Some(cuda_dir) => cuda_dir,
+        None => "/usr/local/cuda",
     };
 
     println!("cargo:rustc-link-search={}/lib64", cudadir);
@@ -12,9 +12,11 @@ fn cuda_configuration() {
 }
 
 fn tensorrt_configuration() {
-    println!("cargo:rustc-link-lib=dylib=nvinfer");
-    if !env!("TRT_LIB_DIR").is_empty() {
-        println!("cargo:rustc-link-search={}", env!("TRT_LIB_DIR"));
+    match option_env!("TRT_LIB_DIR") {
+        Some(trt_lib_dir) => {
+            println!("cargo:rustc-link-search={}/lib", trt_lib_dir);
+        }
+        None => (),
     }
     println!("cargo:rustc-link-lib=dylib=nvinfer");
     println!("cargo:rustc-link-lib=dylib=nvonnxparser");
@@ -29,12 +31,51 @@ fn tensorrt_configuration() {
 //
 // Hopefully something like this will work for Windows installs as well, not having a default library
 // install location will make that significantly harder.
-fn main() {
-    let dst = Config::new("trt-sys").build();
+//
+fn main() -> Result<(), ()> {
+    let mut cfg = Config::new("trt-sys");
+
+    #[cfg(feature = "trt-5")]
+    {
+        let bindings = builder()
+            .header("trt-sys/tensorrt_api.h")
+            .size_t_is_usize(true)
+            .generate()?;
+
+        bindings.write_to_file("src/bindings.rs");
+    }
+
+    #[cfg(feature = "trt-6")]
+    {
+        cfg.define("TRT6", "");
+        let bindings = builder()
+            .clang_arg("-DTRT6")
+            .header("trt-sys/tensorrt_api.h")
+            .size_t_is_usize(true)
+            .generate()?;
+
+        bindings.write_to_file("src/bindings.rs");
+    }
+
+    #[cfg(feature = "trt-7")]
+    {
+        cfg.define("TRT7", "");
+        let bindings = builder()
+            .clang_arg("-DTRT7")
+            .header("trt-sys/tensorrt_api.h")
+            .size_t_is_usize(true)
+            .generate()?;
+
+        bindings.write_to_file("src/bindings.rs");
+    }
+
+    let dst = cfg.build();
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=static=trt-sys");
     println!("cargo:rustc-link-lib=dylib=stdc++");
 
     tensorrt_configuration();
     cuda_configuration();
+
+    Ok(())
 }

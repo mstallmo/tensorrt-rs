@@ -29,7 +29,10 @@ void builder_set_max_workspace_size(Builder_t* builder, size_t batch_size);
 size_t builder_get_max_workspace_size(Builder_t* builder);
 
 Network_t *create_network(Builder_t* builder);
+
+#if defined(TRT6) || defined(TRT7)
 Network_t *create_network_v2(Builder_t* builder, uint32_t flags);
+#endif
 
 Engine_t *build_cuda_engine(Builder_t* builder, Network_t* network);
 

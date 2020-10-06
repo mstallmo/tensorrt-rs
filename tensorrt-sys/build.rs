@@ -12,7 +12,7 @@ fn cuda_configuration() {
 }
 
 fn tensorrt_configuration() {
-    match option_env!("TRT_LIB_DIR") {
+    match option_env!("TRT_INSTALL_DIR") {
         Some(trt_lib_dir) => {
             println!("cargo:rustc-link-search={}/lib", trt_lib_dir);
         }

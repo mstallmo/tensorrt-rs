@@ -29,8 +29,8 @@ file(GLOB source_files
 add_library(trt-sys STATIC ${source_files})
 include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
-if(DEFINED ENV{TRT_LIB_DIR})
-    target_include_directories(trt-sys PRIVATE $ENV{TRT_LIB_DIR}/include)
+if(DEFINED ENV{TRT_INSTALL_DIR})
+    target_include_directories(trt-sys PRIVATE $ENV{TRT_INSTALL_DIR}/include)
 endif()
 
 install(TARGETS trt-sys DESTINATION .)

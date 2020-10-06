@@ -4,17 +4,18 @@ use std::path::PathBuf;
 use ndarray::Array;
 use ndarray_image;
 use tensorrt_rs::builder::{Builder, NetworkBuildFlags};
+use tensorrt_rs::context::ExecuteInput;
 use tensorrt_rs::dims::Dims4;
 use tensorrt_rs::engine::Engine;
 use tensorrt_rs::onnx::{OnnxFile, OnnxParser};
 use tensorrt_rs::runtime::Logger;
 
-fn create_engine<'a>(
-    logger: &'a Logger,
+fn create_engine(
+    logger: &Logger,
     file: OnnxFile,
     batch_size: i32,
     workspace_size: usize,
-) -> Engine<'a> {
+) -> Engine {
     let builder = Builder::new(&logger);
     let network = builder.create_network_v2(NetworkBuildFlags::EXPLICIT_BATCH);
     let verbosity = 7;
@@ -52,6 +53,7 @@ fn main() {
 
     // Run inference
     let mut output = ndarray::Array1::<f32>::zeros(1000);
-    context.execute(&pre_processed, 0, &mut output, 1);
+    let outputs = vec![ExecuteInput::Float(&mut output)];
+    context.execute(ExecuteInput::Float(&pre_processed), outputs, 2);
     println!("output: {}", output);
 }

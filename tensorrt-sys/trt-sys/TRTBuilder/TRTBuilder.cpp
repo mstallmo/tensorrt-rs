@@ -74,12 +74,14 @@ Network_t *create_network(Builder_t *builder) {
     return new Network(builder->internal_builder->createNetwork());
 }
 
+#if defined(TRT6) || defined(TRT7)
 Network_t *create_network_v2(Builder_t *builder, uint32_t flags) {
     if (builder == nullptr)
         return nullptr;
 
     return new Network(builder->internal_builder->createNetworkV2(flags));
 }
+#endif
 
 Engine_t *build_cuda_engine(Builder_t *builder, Network_t *network) {
     if (builder == nullptr || network == nullptr)

@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: mstallmo/tensorrt-rs:0.2
+      - image: mstallmo/tensorrt-rs:0.4
     steps:
       - checkout
       - run: cargo build --release
@@ -13,7 +13,7 @@ jobs:
             - project
   test-tensorrt-sys:
     docker:
-      - image: mstallmo/tensorrt-rs:0.2
+      - image: mstallmo/tensorrt-rs:0.4
     steps:
       - attach_workspace:
           at: /root

@@ -7,10 +7,20 @@ repository = "https://github.com/mstallmo/tensorrt-rs"
 edition = "2018"
 description = "Rust library for using Nvidia's TensorRT deep learning acceleration library"
 
+[features]
+default = ["trt-5"]
+
+trt-5 = ["tensorrt-sys/trt-5"]
+
+trt-6 = ["tensorrt-sys/trt-6"]
+
+trt-7 = ["tensorrt-sys/trt-7"]
+
 
 [dependencies]
 # Uncomment when working locally
-tensorrt-sys = { path = "../tensorrt-sys" }
+tensorrt-sys = { path = "../tensorrt-sys"}
+# tensorrt-sys = "0.3"
 ndarray = "0.13"
 ndarray-image = "0.2"
 image = "0.23"

@@ -10,6 +10,8 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
 RUN update-alternatives --config gcc
 RUN gcc --version
 RUN g++ --version
+RUN apt-get update
+RUN apt-get install clang-6.0 -y
 
 # Download and install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y

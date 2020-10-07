@@ -24,7 +24,13 @@ tensorrt-sys = { path = "../tensorrt-sys"}
 ndarray = "0.13"
 ndarray-image = "0.2"
 image = "0.23"
+imageproc = "0.21.0"
 bitflags = "1.2"
 
 [dev-dependencies]
 lazy_static = "1.4"
+
+
+[[example]]
+name = "onnx"
+required-features = ["trt-7"]

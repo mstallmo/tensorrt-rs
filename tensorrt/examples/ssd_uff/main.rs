@@ -10,9 +10,9 @@ use tensorrt_rs::engine::Engine;
 use tensorrt_rs::runtime::Logger;
 use tensorrt_rs::uff::{UffFile, UffInputOrder, UffParser};
 
-fn create_engine(uff_file: &UffFile) -> Engine {
-    let logger = Logger::new();
+fn create_engine<'a>(logger: &'a Logger, uff_file: &UffFile) -> Engine<'a> {
     let builder = Builder::new(&logger);
+    let network = builder.create_network();
 
     let uff_parser = UffParser::new();
     let dim = DimsCHW::new(3, 300, 300);
@@ -20,9 +20,9 @@ fn create_engine(uff_file: &UffFile) -> Engine {
         .register_input("Input", dim, UffInputOrder::Nchw)
         .unwrap();
     uff_parser.register_output("NMS").unwrap();
-    uff_parser.parse(uff_file, builder.get_network()).unwrap();
+    uff_parser.parse(uff_file, &network).unwrap();
 
-    builder.build_cuda_engine()
+    builder.build_cuda_engine(&network)
 }
 
 //Input formatting logic comes directly from the C++ code in the sampleUffSSD.cpp.
@@ -92,8 +92,9 @@ fn verify_output(image: &mut RgbImage, top_detections: &Array1<f32>, keep_count:
 }
 
 fn main() {
+    let logger = Logger::new();
     let uff_file = UffFile::new(Path::new("../assets/sample_ssd_relu6.uff")).unwrap();
-    let engine = create_engine(&uff_file);
+    let engine = create_engine(&logger, &uff_file);
 
     let mut input_image = image::open("../assets/images/dog.ppm").unwrap().into_rgb();
     let input_buffer = process_input(&input_image);

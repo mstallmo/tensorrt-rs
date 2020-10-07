@@ -139,12 +139,12 @@ mod tests {
     use std::sync::Mutex;
 
     lazy_static! {
-        static ref ENGINE: Mutex<Engine> = Mutex::new(setup_engine_test_uff());
+        static ref LOGGER: Mutex<Logger> = Mutex::new(Logger::new());
     }
 
-    fn setup_engine_test_uff() -> Engine {
-        let logger = Logger::new();
+    fn setup_engine_test_uff(logger: &Logger) -> Engine {
         let builder = Builder::new(&logger);
+        let network = builder.create_network();
 
         let uff_parser = UffParser::new();
         let dim = DimsCHW::new(1, 28, 28);
@@ -153,41 +153,48 @@ mod tests {
             .register_input("in", dim, UffInputOrder::Nchw)
             .unwrap();
         uff_parser.register_output("out").unwrap();
-        let uff_file = UffFile::new(Path::new("../lenet5.uff")).unwrap();
-        uff_parser.parse(&uff_file, builder.get_network()).unwrap();
+        let uff_file = UffFile::new(Path::new("../assets/lenet5.uff")).unwrap();
+        uff_parser.parse(&uff_file, &network).unwrap();
 
-        builder.build_cuda_engine()
+        builder.build_cuda_engine(&network)
     }
 
     #[test]
     fn get_nb_bindings() {
-        let engine = ENGINE.lock().unwrap();
+        let logger = LOGGER.lock().unwrap();
+        let engine = setup_engine_test_uff(&logger);
 
         assert_eq!(2, engine.get_nb_bindings());
     }
 
     #[test]
     fn get_engine_binding_name() {
-        let engine = ENGINE.lock().unwrap();
+        let logger = LOGGER.lock().unwrap();
+        let engine = setup_engine_test_uff(&logger);
+
         assert_eq!("in", engine.get_binding_name(0).unwrap());
     }
 
     #[test]
     fn get_invalid_engine_binding() {
-        let engine = ENGINE.lock().unwrap();
+        let logger = LOGGER.lock().unwrap();
+        let engine = setup_engine_test_uff(&logger);
+
         assert_eq!(None, engine.get_binding_name(3));
     }
 
     #[test]
     fn get_binding_index() {
-        let engine = ENGINE.lock().unwrap();
+        let logger = LOGGER.lock().unwrap();
+        let engine = setup_engine_test_uff(&logger);
 
         assert_eq!(Some(0), engine.get_binding_index("in"));
     }
 
     #[test]
     fn write_and_read_engine() {
-        let uff_engine: &Engine = &*ENGINE.lock().unwrap();
+        let logger = LOGGER.lock().unwrap();
+        let uff_engine = setup_engine_test_uff(&logger);
         let seralized_path = Path::new("../lenet5.engine");
         write(seralized_path, uff_engine.serialize()).unwrap();
 

@@ -3,6 +3,7 @@ use ndarray_image;
 use std::iter::FromIterator;
 use std::path::Path;
 use tensorrt_rs::builder::Builder;
+use tensorrt_rs::context::ExecuteInput;
 use tensorrt_rs::dims::DimsCHW;
 use tensorrt_rs::engine::Engine;
 use tensorrt_rs::runtime::Logger;
@@ -43,7 +44,7 @@ fn main() {
 
     // Run inference
     let mut output = ndarray::Array1::<f32>::zeros(10);
-    let outputs = vec![&mut output];
-    context.execute(&pre_processed, &outputs, 2);
-    println!("output: {}", outputs[0]);
+    let outputs = vec![ExecuteInput::Float(&mut output)];
+    context.execute(ExecuteInput::Float(&pre_processed), outputs, 2);
+    println!("output: {}", output);
 }

@@ -33,6 +33,8 @@ impl Logger {
     }
 }
 
+unsafe impl Send for Logger {}
+
 impl Drop for Logger {
     fn drop(&mut self) {
         unsafe { delete_logger(self.internal_logger) };
@@ -59,13 +61,5 @@ impl<'a> Runtime<'a> {
 impl<'a> Drop for Runtime<'a> {
     fn drop(&mut self) {
         unsafe { destroy_infer_runtime(self.internal_runtime) };
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
     }
 }

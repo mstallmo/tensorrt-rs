@@ -6,9 +6,16 @@ use crate::runtime::Logger;
 #[cfg(not(feature = "trt-5"))]
 use tensorrt_sys::create_network_v2;
 use tensorrt_sys::{
-    build_cuda_engine, builder_get_max_batch_size, builder_get_max_workspace_size,
-    builder_set_max_batch_size, builder_set_max_workspace_size, create_infer_builder,
-    create_network, destroy_builder,
+    build_cuda_engine, builder_allow_gpu_fallback, builder_get_average_find_iterations,
+    builder_get_debug_sync, builder_get_dla_core, builder_get_fp16_mode, builder_get_half2_mode,
+    builder_get_int8_mode, builder_get_max_batch_size, builder_get_max_dla_batch_size,
+    builder_get_max_workspace_size, builder_get_min_find_iterations, builder_get_nb_dla_cores,
+    builder_get_refittable, builder_get_strict_type_constraints, builder_platform_has_fast_fp16,
+    builder_platform_has_fast_int8, builder_reset, builder_set_average_find_iterations,
+    builder_set_debug_sync, builder_set_dla_core, builder_set_fp16_mode, builder_set_half2_mode,
+    builder_set_int8_mode, builder_set_max_batch_size, builder_set_max_workspace_size,
+    builder_set_min_find_iterations, builder_set_refittable, builder_set_strict_type_constraints,
+    create_infer_builder, create_network, destroy_builder,
 };
 
 pub struct Builder<'a> {
@@ -49,6 +56,98 @@ impl<'a> Builder<'a> {
         unsafe { builder_set_max_batch_size(self.internal_builder, bs as i32) }
     }
 
+    pub fn set_half2_mode(&self, mode: bool) {
+        unsafe { builder_set_half2_mode(self.internal_builder, mode) }
+    }
+
+    pub fn get_half2_mode(&self) -> bool {
+        unsafe { builder_get_half2_mode(self.internal_builder) }
+    }
+
+    pub fn set_debug_sync(&self, sync: bool) {
+        unsafe { builder_set_debug_sync(self.internal_builder, sync) }
+    }
+
+    pub fn get_debug_sync(&self) -> bool {
+        unsafe { builder_get_debug_sync(self.internal_builder) }
+    }
+
+    pub fn set_min_find_iterations(&self, min_find: i32) {
+        unsafe { builder_set_min_find_iterations(self.internal_builder, min_find) }
+    }
+
+    pub fn get_min_find_iterations(&self) -> i32 {
+        unsafe { builder_get_min_find_iterations(self.internal_builder) }
+    }
+
+    pub fn set_average_find_iterations(&self, avg_find: i32) {
+        unsafe { builder_set_average_find_iterations(self.internal_builder, avg_find) }
+    }
+
+    pub fn get_average_find_iterations(&self) -> i32 {
+        unsafe { builder_get_average_find_iterations(self.internal_builder) }
+    }
+
+    pub fn platform_has_fast_fp16(&self) -> bool {
+        unsafe { builder_platform_has_fast_fp16(self.internal_builder) }
+    }
+
+    pub fn platform_has_fast_int8(&self) -> bool {
+        unsafe { builder_platform_has_fast_int8(self.internal_builder) }
+    }
+
+    pub fn set_int8_mode(&self, mode: bool) {
+        unsafe { builder_set_int8_mode(self.internal_builder, mode) }
+    }
+
+    pub fn get_int8_mode(&self) -> bool {
+        unsafe { builder_get_int8_mode(self.internal_builder) }
+    }
+
+    pub fn set_fp16_mode(&self, mode: bool) {
+        unsafe { builder_set_fp16_mode(self.internal_builder, mode) }
+    }
+
+    pub fn get_fp16_mode(&self) -> bool {
+        unsafe { builder_get_fp16_mode(self.internal_builder) }
+    }
+
+    pub fn get_max_dla_batch_size(&self) -> i32 {
+        unsafe { builder_get_max_dla_batch_size(self.internal_builder) }
+    }
+
+    pub fn allow_gpu_fallback(&self, set_fallback_mode: bool) {
+        unsafe { builder_allow_gpu_fallback(self.internal_builder, set_fallback_mode) }
+    }
+
+    pub fn get_nb_dla_cores(&self) -> i32 {
+        unsafe { builder_get_nb_dla_cores(self.internal_builder) }
+    }
+
+    pub fn set_dla_core(&self, dla_core: i32) {
+        unsafe { builder_set_dla_core(self.internal_builder, dla_core) }
+    }
+
+    pub fn get_dla_core(&self) -> i32 {
+        unsafe { builder_get_dla_core(self.internal_builder) }
+    }
+
+    pub fn set_strict_type_constraints(&self, mode: bool) {
+        unsafe { builder_set_strict_type_constraints(self.internal_builder, mode) }
+    }
+
+    pub fn get_strict_type_constraints(&self) -> bool {
+        unsafe { builder_get_strict_type_constraints(self.internal_builder) }
+    }
+
+    pub fn set_refittable(&self, can_refit: bool) {
+        unsafe { builder_set_refittable(self.internal_builder, can_refit) }
+    }
+
+    pub fn get_refittable(&self) -> bool {
+        unsafe { builder_get_refittable(self.internal_builder) }
+    }
+
     pub fn create_network(&self) -> Network {
         let internal_network = unsafe { create_network(self.internal_builder) };
         Network { internal_network }
@@ -69,10 +168,282 @@ impl<'a> Builder<'a> {
             logger,
         }
     }
+
+    pub fn reset(&self, network: Network) {
+        unsafe { builder_reset(self.internal_builder, network.internal_network) }
+    }
 }
 
 impl<'a> Drop for Builder<'a> {
     fn drop(&mut self) {
         unsafe { destroy_builder(self.internal_builder) };
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use lazy_static::lazy_static;
+    use std::sync::Mutex;
+
+    lazy_static! {
+        static ref LOGGER: Mutex<Logger> = Mutex::new(Logger::new());
+    }
+
+    #[test]
+    fn set_half2_mode_true() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_half2_mode(true);
+        assert_eq!(builder.get_half2_mode(), true);
+    }
+
+    #[test]
+    fn set_half2_mode_false() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_half2_mode(false);
+        assert_eq!(builder.get_half2_mode(), false);
+    }
+
+    #[test]
+    fn set_debug_sync_true() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_debug_sync(true);
+        assert_eq!(builder.get_debug_sync(), true);
+    }
+
+    #[test]
+    fn set_debug_sync_false() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_debug_sync(false);
+        assert_eq!(builder.get_debug_sync(), false);
+    }
+
+    #[test]
+    fn set_min_find_iterations() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_min_find_iterations(10);
+        assert_eq!(builder.get_min_find_iterations(), 10);
+    }
+
+    #[test]
+    fn set_average_find_iterations() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_average_find_iterations(20);
+        assert_eq!(builder.get_average_find_iterations(), 20);
+    }
+
+    #[test]
+    fn platform_has_fast_fp16() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        assert_eq!(builder.platform_has_fast_fp16(), true);
+    }
+
+    #[test]
+    fn platform_has_fast_int8() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        assert_eq!(builder.platform_has_fast_int8(), true);
+    }
+
+    #[test]
+    fn set_int8_mode_true() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_int8_mode(true);
+        assert_eq!(builder.get_int8_mode(), true);
+    }
+
+    #[test]
+    fn set_int8_mode_false() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_int8_mode(false);
+        assert_eq!(builder.get_int8_mode(), false);
+    }
+
+    #[test]
+    fn set_fp16_mode_true() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_fp16_mode(true);
+        assert_eq!(builder.get_fp16_mode(), true);
+    }
+
+    #[test]
+    fn set_fp16_mode_false() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_fp16_mode(false);
+        assert_eq!(builder.get_fp16_mode(), false);
+    }
+
+    #[test]
+    fn get_max_dla_batch_size() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        assert_eq!(builder.get_max_dla_batch_size(), 1);
+    }
+
+    #[test]
+    fn allow_gpu_fallback_true() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.allow_gpu_fallback(true);
+    }
+
+    #[test]
+    fn get_nb_dla_cores() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        assert_eq!(builder.get_nb_dla_cores(), 0);
+    }
+
+    #[test]
+    fn set_dla_core() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_dla_core(1);
+
+        assert_eq!(builder.get_dla_core(), 1);
+    }
+
+    #[test]
+    fn reset_builder() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+        assert_eq!(builder.get_half2_mode(), false);
+        builder.set_half2_mode(true);
+
+        let network = builder.create_network();
+        assert_eq!(builder.get_half2_mode(), true);
+
+        builder.reset(network);
+        assert_eq!(builder.get_half2_mode(), false);
+    }
+
+    #[test]
+    fn set_strict_type_constraints_true() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_strict_type_constraints(true);
+
+        assert_eq!(builder.get_strict_type_constraints(), true);
+    }
+
+    #[test]
+    fn set_strict_type_constraints_false() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_strict_type_constraints(false);
+
+        assert_eq!(builder.get_strict_type_constraints(), false);
+    }
+
+    #[test]
+    fn set_refittable_true() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_refittable(true);
+
+        assert_eq!(builder.get_refittable(), true);
+    }
+
+    #[test]
+    fn set_refittable_false() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let builder = Builder::new(&logger);
+
+        builder.set_refittable(false);
+
+        assert_eq!(builder.get_refittable(), false);
     }
 }

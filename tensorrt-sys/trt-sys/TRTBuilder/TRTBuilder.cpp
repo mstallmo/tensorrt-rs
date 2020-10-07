@@ -54,6 +54,167 @@ size_t builder_get_max_workspace_size(Builder_t* builder) {
     return builder->internal_builder->getMaxWorkspaceSize();
 }
 
+void builder_set_half2_mode(Builder_t* builder, bool mode) {
+    if(builder == nullptr)
+        return;
+
+    builder->internal_builder->setHalf2Mode(mode);
+}
+
+bool builder_get_half2_mode(Builder_t* builder) {
+    if(builder == nullptr)
+        return false;
+
+    return builder->internal_builder->getHalf2Mode();
+}
+
+void builder_set_debug_sync(Builder_t* builder, bool sync) {
+    if(builder == nullptr)
+        return;
+
+    builder->internal_builder->setDebugSync(sync);
+}
+
+bool builder_get_debug_sync(Builder_t* builder) {
+    if(builder == nullptr)
+        return false;
+
+    return builder->internal_builder->getDebugSync();
+}
+
+void builder_set_min_find_iterations(Builder_t* builder, int min_find) {
+    if(builder == nullptr)
+        return;
+
+    builder->internal_builder->setMinFindIterations(min_find);
+}
+
+int builder_get_min_find_iterations(Builder_t* builder) {
+    if(builder == nullptr)
+        return -1;
+
+    return builder->internal_builder->getMinFindIterations();
+}
+
+void builder_set_average_find_iterations(Builder_t* builder, int avg_find) {
+    if (builder == nullptr)
+        return;
+
+    builder->internal_builder->setAverageFindIterations(avg_find);
+}
+
+int builder_get_average_find_iterations(Builder_t* builder) {
+    if(builder == nullptr)
+        return -1;
+
+    return builder->internal_builder->getAverageFindIterations();
+}
+
+bool builder_platform_has_fast_fp16(Builder_t* builder){
+    if(builder == nullptr)
+        return false;
+
+    return builder->internal_builder->platformHasFastFp16();
+}
+
+bool builder_platform_has_fast_int8(Builder_t* builder) {
+    if(builder == nullptr)
+        return false;
+
+    return builder->internal_builder->platformHasFastInt8();
+}
+
+void builder_set_int8_mode(Builder_t* builder, bool mode) {
+    if(builder == nullptr)
+        return;
+
+    builder->internal_builder->setInt8Mode(mode);
+}
+
+bool builder_get_int8_mode(Builder_t* builder) {
+    if(builder == nullptr)
+        return false;
+
+    return builder->internal_builder->getInt8Mode();
+}
+
+void builder_set_fp16_mode(Builder_t* builder, bool mode) {
+    if (builder == nullptr)
+        return;
+
+    builder->internal_builder->setFp16Mode(mode);
+}
+
+bool builder_get_fp16_mode(Builder_t* builder) {
+    if (builder == nullptr)
+        return false;
+
+    return builder->internal_builder->getFp16Mode();
+}
+
+int builder_get_max_dla_batch_size(Builder_t* builder) {
+    if(builder == nullptr)
+        return -1;
+
+    return builder->internal_builder->getMaxBatchSize();
+}
+
+void builder_allow_gpu_fallback(Builder_t* builder, bool set_fallback_mode) {
+    if(builder == nullptr)
+        return;
+
+    builder->internal_builder->allowGPUFallback(set_fallback_mode);
+}
+
+int builder_get_nb_dla_cores(Builder_t* builder) {
+    if (builder == nullptr)
+        return -1;
+
+    return builder->internal_builder->getNbDLACores();
+}
+
+void builder_set_dla_core(Builder_t* builder, int dla_core) {
+    if(builder == nullptr)
+        return;
+
+    builder->internal_builder->setDLACore(dla_core);
+}
+
+int builder_get_dla_core(Builder_t* builder) {
+    if(builder == nullptr)
+        return -1;
+
+    return builder->internal_builder->getDLACore();
+}
+
+void builder_set_strict_type_constraints(Builder_t* builder, bool mode) {
+    if(builder == nullptr)
+        return;
+
+    builder->internal_builder->setStrictTypeConstraints(mode);
+}
+
+bool builder_get_strict_type_constraints(Builder_t* builder) {
+    if(builder == nullptr)
+        return false;
+
+    return builder->internal_builder->getStrictTypeConstraints();
+}
+
+void builder_set_refittable(Builder_t* builder, bool can_refit) {
+    if(builder == nullptr)
+        return;
+
+    builder->internal_builder->setRefittable(can_refit);
+}
+
+bool builder_get_refittable(Builder_t* builder) {
+    if (builder == nullptr)
+        return false;
+
+    return builder->internal_builder->getRefittable();
+}
+
 Builder_t *create_infer_builder(Logger_t *logger) {
     initLibNvInferPlugins(&logger->getLogger(), "");
 
@@ -91,4 +252,11 @@ Engine_t *build_cuda_engine(Builder_t *builder, Network_t *network) {
 
     auto engine = b->buildCudaEngine(network->getNetworkDefinition());
     return create_engine(engine);
+}
+
+void builder_reset(Builder_t* builder, Network_t* network) {
+    if(builder == nullptr || network == nullptr)
+        return;
+
+    builder->internal_builder->reset(network->getNetworkDefinition());
 }

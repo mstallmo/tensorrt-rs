@@ -9,6 +9,7 @@
 #include "../TRTNetworkDefinition/TRTNetworkDefinitionInternal.hpp"
 #include "../TRTLogger/TRTLoggerInternal.hpp"
 #include "../TRTCudaEngine/TRTCudaEngineInternal.hpp"
+#include "../TRTLayer/TRTLayerInternal.hpp"
 #include "../TRTUtils.hpp"
 
 #define MAX_WORKSPACE (1 << 30)
@@ -150,6 +151,60 @@ bool builder_get_fp16_mode(Builder_t* builder) {
         return false;
 
     return builder->internal_builder->getFp16Mode();
+}
+
+void builder_set_device_type(Builder_t* builder, Layer_t* layer, DeviceType_t deviceType) {
+    if(builder == nullptr || layer == nullptr) {
+        return;
+    }
+
+    builder->internal_builder->setDeviceType(layer->internal_layer, static_cast<nvinfer1::DeviceType>(deviceType));
+}
+
+DeviceType_t builder_get_device_type(Builder_t* builder, Layer_t* layer) {
+    if (builder == nullptr) {
+        return DeviceType::kGPU;
+    }
+
+    return static_cast<DeviceType_t>(builder->internal_builder->getDeviceType(layer->internal_layer));
+}
+
+bool builder_is_device_type_set(Builder_t* builder, Layer_t* layer) {
+    if (builder == nullptr || layer == nullptr) {
+        return false;
+    }
+
+    return builder->internal_builder->isDeviceTypeSet(layer->internal_layer);
+}
+
+void builder_set_default_device_type(Builder_t* builder, DeviceType_t deviceType) {
+    if(builder == nullptr)
+        return;
+
+    builder->internal_builder->setDefaultDeviceType(static_cast<nvinfer1::DeviceType>(deviceType));
+}
+
+DeviceType_t builder_get_default_device_type(Builder_t *builder) {
+    if (builder == nullptr)
+        return DeviceType::kGPU;
+
+    return static_cast<DeviceType_t>(builder->internal_builder->getDefaultDeviceType());
+}
+
+void builder_reset_device_type(Builder_t* builder, Layer_t* layer) {
+   if (builder == nullptr || layer == nullptr) {
+       return;
+   }
+
+   builder->internal_builder->resetDeviceType(layer->internal_layer);
+}
+
+bool builder_can_run_on_dla(Builder_t* builder, Layer_t* layer) {
+    if (builder == nullptr || layer == nullptr) {
+        return false;
+    }
+
+    return builder->internal_builder->canRunOnDLA(layer->internal_layer);
 }
 
 int builder_get_max_dla_batch_size(Builder_t* builder) {

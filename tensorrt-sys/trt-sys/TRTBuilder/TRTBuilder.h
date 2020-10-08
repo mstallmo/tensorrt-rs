@@ -8,6 +8,7 @@
 #include "../TRTLogger/TRTLogger.h"
 #include "../TRTNetworkDefinition/TRTNetworkDefinition.h"
 #include "../TRTCudaEngine/TRTCudaEngine.h"
+#include "../TRTLayer/TRTLayer.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -15,6 +16,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+enum DeviceType {
+    kGPU = 0,
+    kDLA = 1,
+};
+typedef enum DeviceType DeviceType_t;
 
 struct Builder;
 typedef struct Builder Builder_t;
@@ -48,6 +55,16 @@ bool builder_get_int8_mode(Builder_t* builder);
 
 void builder_set_fp16_mode(Builder_t* builder, bool mode);
 bool builder_get_fp16_mode(Builder_t* builder);
+
+void builder_set_device_type(Builder_t* builder, Layer_t* layer, DeviceType_t deviceType);
+DeviceType_t  builder_get_device_type(Builder_t* builder, Layer_t* layer);
+bool builder_is_device_type_set(Builder_t* builder, Layer_t* layer);
+
+void builder_set_default_device_type(Builder_t* builder, DeviceType_t deviceType);
+DeviceType_t  builder_get_default_device_type(Builder_t* builder);
+
+void builder_reset_device_type(Builder_t* builder, Layer_t* layer);
+bool builder_can_run_on_dla(Builder_t* builder, Layer_t* layer);
 
 int builder_get_max_dla_batch_size(Builder_t* builder);
 

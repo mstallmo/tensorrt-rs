@@ -4,22 +4,36 @@ mod tests;
 use std::marker::PhantomData;
 
 use crate::engine::Engine;
+use crate::network::layer::Layer;
 use crate::network::Network;
 use crate::runtime::Logger;
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
+use std::os::raw::c_uint;
 #[cfg(not(feature = "trt-5"))]
 use tensorrt_sys::create_network_v2;
 use tensorrt_sys::{
-    build_cuda_engine, builder_allow_gpu_fallback, builder_get_average_find_iterations,
-    builder_get_debug_sync, builder_get_dla_core, builder_get_fp16_mode, builder_get_half2_mode,
+    build_cuda_engine, builder_allow_gpu_fallback, builder_can_run_on_dla,
+    builder_get_average_find_iterations, builder_get_debug_sync, builder_get_default_device_type,
+    builder_get_device_type, builder_get_dla_core, builder_get_fp16_mode, builder_get_half2_mode,
     builder_get_int8_mode, builder_get_max_batch_size, builder_get_max_dla_batch_size,
     builder_get_max_workspace_size, builder_get_min_find_iterations, builder_get_nb_dla_cores,
-    builder_get_refittable, builder_get_strict_type_constraints, builder_platform_has_fast_fp16,
-    builder_platform_has_fast_int8, builder_reset, builder_set_average_find_iterations,
-    builder_set_debug_sync, builder_set_dla_core, builder_set_fp16_mode, builder_set_half2_mode,
-    builder_set_int8_mode, builder_set_max_batch_size, builder_set_max_workspace_size,
-    builder_set_min_find_iterations, builder_set_refittable, builder_set_strict_type_constraints,
-    create_infer_builder, create_network, destroy_builder,
+    builder_get_refittable, builder_get_strict_type_constraints, builder_is_device_type_set,
+    builder_platform_has_fast_fp16, builder_platform_has_fast_int8, builder_reset,
+    builder_reset_device_type, builder_set_average_find_iterations, builder_set_debug_sync,
+    builder_set_default_device_type, builder_set_device_type, builder_set_dla_core,
+    builder_set_fp16_mode, builder_set_half2_mode, builder_set_int8_mode,
+    builder_set_max_batch_size, builder_set_max_workspace_size, builder_set_min_find_iterations,
+    builder_set_refittable, builder_set_strict_type_constraints, create_infer_builder,
+    create_network, destroy_builder,
 };
+
+#[repr(C)]
+#[derive(Eq, PartialEq, Debug, FromPrimitive)]
+pub enum DeviceType {
+    GPU,
+    DLA,
+}
 
 pub struct Builder<'a> {
     pub(crate) internal_builder: *mut tensorrt_sys::Builder_t,
@@ -113,6 +127,43 @@ impl<'a> Builder<'a> {
 
     pub fn get_fp16_mode(&self) -> bool {
         unsafe { builder_get_fp16_mode(self.internal_builder) }
+    }
+
+    pub fn set_device_type(&self, layer: &Layer, device_type: DeviceType) {
+        unsafe {
+            builder_set_device_type(
+                self.internal_builder,
+                layer.internal_layer,
+                device_type as c_uint,
+            )
+        }
+    }
+
+    pub fn get_device_type(&self, layer: &Layer) -> DeviceType {
+        let primitive =
+            unsafe { builder_get_device_type(self.internal_builder, layer.internal_layer) };
+        FromPrimitive::from_u32(primitive).unwrap()
+    }
+
+    pub fn is_device_type_set(&self, layer: &Layer) -> bool {
+        unsafe { builder_is_device_type_set(self.internal_builder, layer.internal_layer) }
+    }
+
+    pub fn set_default_device_type(&self, device_type: DeviceType) {
+        unsafe { builder_set_default_device_type(self.internal_builder, device_type as c_uint) }
+    }
+
+    pub fn get_default_device_type(&self) -> DeviceType {
+        let primitive = unsafe { builder_get_default_device_type(self.internal_builder) };
+        FromPrimitive::from_u32(primitive).unwrap()
+    }
+
+    pub fn reset_device_type(&self, layer: &Layer) {
+        unsafe { builder_reset_device_type(self.internal_builder, layer.internal_layer) }
+    }
+
+    pub fn can_run_on_dla(&self, layer: &Layer) -> bool {
+        unsafe { builder_can_run_on_dla(self.internal_builder, layer.internal_layer) }
     }
 
     pub fn get_max_dla_batch_size(&self) -> i32 {

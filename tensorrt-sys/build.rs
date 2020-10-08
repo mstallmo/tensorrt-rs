@@ -42,7 +42,7 @@ fn main() -> Result<(), ()> {
             .size_t_is_usize(true)
             .generate()?;
 
-        bindings.write_to_file("src/bindings.rs");
+        bindings.write_to_file("src/bindings.rs").unwrap();
     }
 
     #[cfg(feature = "trt-6")]
@@ -54,7 +54,7 @@ fn main() -> Result<(), ()> {
             .size_t_is_usize(true)
             .generate()?;
 
-        bindings.write_to_file("src/bindings.rs");
+        bindings.write_to_file("src/bindings.rs").unwrap();
     }
 
     #[cfg(feature = "trt-7")]
@@ -66,7 +66,7 @@ fn main() -> Result<(), ()> {
             .size_t_is_usize(true)
             .generate()?;
 
-        bindings.write_to_file("src/bindings.rs");
+        bindings.write_to_file("src/bindings.rs").unwrap();
     }
 
     let dst = cfg.build();

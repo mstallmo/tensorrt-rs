@@ -29,6 +29,14 @@ void destroy_excecution_context(Context_t *execution_context) {
     delete execution_context;
 }
 
+void context_set_debug_sync(Context_t *execution_context, bool sync) {
+    execution_context->internal_context->setDebugSync(sync);
+}
+
+bool context_get_debug_sync(Context_t *execution_context) {
+    return execution_context->internal_context->getDebugSync();
+}
+
 void context_set_name(Context_t *execution_context, const char *name) {
     if (execution_context == nullptr)
         return;

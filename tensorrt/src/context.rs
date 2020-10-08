@@ -5,7 +5,8 @@ use std::mem::size_of;
 use std::os::raw::c_void;
 use std::vec::Vec;
 use tensorrt_sys::{
-    context_get_name, context_set_name, destroy_excecution_context, execute, Context_t,
+    context_get_debug_sync, context_get_name, context_set_debug_sync, context_set_name,
+    destroy_excecution_context, execute, Context_t,
 };
 
 pub enum ExecuteInput<'a, D: Dimension> {
@@ -19,6 +20,14 @@ pub struct Context<'a, 'b> {
 }
 
 impl<'a, 'b> Context<'a, 'b> {
+    pub fn set_debug_sync(&self, sync: bool) {
+        unsafe { context_set_debug_sync(self.internal_context, sync) }
+    }
+
+    pub fn get_debug_sync(&self) -> bool {
+        unsafe { context_get_debug_sync(self.internal_context) }
+    }
+
     pub fn set_name(&mut self, context_name: &str) {
         unsafe {
             context_set_name(
@@ -93,31 +102,45 @@ impl<'a, 'b> Drop for Context<'a, 'b> {
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
-    // use crate::engine::Engine;
-    // use crate::runtime::{Logger, Runtime};
-    // use std::fs::File;
-    // use std::io::prelude::*;
+    use crate::builder::Builder;
+    use crate::dims::DimsCHW;
+    use crate::engine::Engine;
+    use crate::runtime::Logger;
+    use crate::uff::{UffFile, UffInputOrder, UffParser};
+    use lazy_static::lazy_static;
+    use std::path::Path;
+    use std::sync::Mutex;
 
-    // fn setup_engine_test() -> Engine {
-    //     let logger = Logger::new();
-    //     let runtime = Runtime::new(&logger);
-    //
-    //     let mut f = File::open("../tensorrt-sys/resnet34-unet-Aug25-07-25-16-best.engine").unwrap();
-    //     let mut buffer = Vec::new();
-    //     f.read_to_end(&mut buffer).unwrap();
-    //
-    //     Engine::new(runtime, buffer)
-    // }
-    //
-    // #[test]
-    // fn set_context_name() {
-    //     let engine = setup_engine_test();
-    //     let mut context = engine.create_execution_context();
-    //
-    //     context.set_name("Mason");
-    //     let name = context.get_name();
-    //
-    //     assert_eq!(name, "Mason".to_string());
-    // }
+    lazy_static! {
+        static ref LOGGER: Mutex<Logger> = Mutex::new(Logger::new());
+    }
+
+    fn setup_engine_test_uff(logger: &Logger) -> Engine {
+        let builder = Builder::new(&logger);
+        let network = builder.create_network();
+
+        let uff_parser = UffParser::new();
+        let dim = DimsCHW::new(1, 28, 28);
+
+        uff_parser
+            .register_input("in", dim, UffInputOrder::Nchw)
+            .unwrap();
+        uff_parser.register_output("out").unwrap();
+        let uff_file = UffFile::new(Path::new("../assets/lenet5.uff")).unwrap();
+        uff_parser.parse(&uff_file, &network).unwrap();
+
+        builder.build_cuda_engine(&network)
+    }
+    #[test]
+    fn set_debug_sync_true() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let engine = setup_engine_test_uff(&logger);
+        let context = engine.create_execution_context();
+
+        context.set_debug_sync(true);
+        assert_eq!(context.get_debug_sync(), true);
+    }
 }

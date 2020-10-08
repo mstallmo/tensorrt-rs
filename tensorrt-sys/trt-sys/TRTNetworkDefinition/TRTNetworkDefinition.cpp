@@ -5,6 +5,7 @@
 
 #include "TRTNetworkDefinitionInternal.hpp"
 #include "../TRTDims/TRTDimsInternal.hpp"
+#include "../TRTLayer/TRTLayerInternal.hpp"
 
 void destroy_network(Network_t *network) {
     if (network == nullptr)
@@ -23,6 +24,13 @@ Tensor_t *network_get_input(Network_t *network, int32_t idx) {
     }
 
     return new Tensor(network->internal_network->getInput(idx));
+}
+
+Layer_t* network_get_layer(Network_t *network, int index) {
+    if (network == nullptr)
+        return nullptr;
+
+    return new Layer(network->internal_network->getLayer(index));
 }
 
 void tensor_set_dimensions(Tensor_t *tensor, Dims_t *dimensions) {

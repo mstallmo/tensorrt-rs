@@ -12,7 +12,7 @@ extern "C" {
 #include <stdint.h>
 
 #include "../TRTDims/TRTDims.h"
-
+#include "../TRTLayer/TRTLayer.h"
 
 struct Network;
 typedef struct Network Network_t;
@@ -21,6 +21,8 @@ struct Tensor;
 typedef struct Tensor Tensor_t;
 
 void destroy_network(Network_t *network);
+
+Layer_t* network_get_layer(Network_t *network, int index);
 
 Tensor_t *network_get_input(Network_t *network, int32_t idx);
 

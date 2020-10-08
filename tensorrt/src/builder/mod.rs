@@ -15,17 +15,18 @@ use tensorrt_sys::create_network_v2;
 use tensorrt_sys::{
     build_cuda_engine, builder_allow_gpu_fallback, builder_can_run_on_dla,
     builder_get_average_find_iterations, builder_get_debug_sync, builder_get_default_device_type,
-    builder_get_device_type, builder_get_dla_core, builder_get_fp16_mode, builder_get_half2_mode,
-    builder_get_int8_mode, builder_get_max_batch_size, builder_get_max_dla_batch_size,
-    builder_get_max_workspace_size, builder_get_min_find_iterations, builder_get_nb_dla_cores,
-    builder_get_refittable, builder_get_strict_type_constraints, builder_is_device_type_set,
+    builder_get_device_type, builder_get_dla_core, builder_get_engine_capability,
+    builder_get_fp16_mode, builder_get_half2_mode, builder_get_int8_mode,
+    builder_get_max_batch_size, builder_get_max_dla_batch_size, builder_get_max_workspace_size,
+    builder_get_min_find_iterations, builder_get_nb_dla_cores, builder_get_refittable,
+    builder_get_strict_type_constraints, builder_is_device_type_set,
     builder_platform_has_fast_fp16, builder_platform_has_fast_int8, builder_reset,
     builder_reset_device_type, builder_set_average_find_iterations, builder_set_debug_sync,
     builder_set_default_device_type, builder_set_device_type, builder_set_dla_core,
-    builder_set_fp16_mode, builder_set_half2_mode, builder_set_int8_mode,
-    builder_set_max_batch_size, builder_set_max_workspace_size, builder_set_min_find_iterations,
-    builder_set_refittable, builder_set_strict_type_constraints, create_infer_builder,
-    create_network, destroy_builder,
+    builder_set_engine_capability, builder_set_fp16_mode, builder_set_half2_mode,
+    builder_set_int8_mode, builder_set_max_batch_size, builder_set_max_workspace_size,
+    builder_set_min_find_iterations, builder_set_refittable, builder_set_strict_type_constraints,
+    create_infer_builder, create_network, destroy_builder,
 };
 
 #[repr(C)]
@@ -33,6 +34,14 @@ use tensorrt_sys::{
 pub enum DeviceType {
     GPU,
     DLA,
+}
+
+#[repr(C)]
+#[derive(Eq, PartialEq, Debug, FromPrimitive)]
+pub enum EngineCapability {
+    Default,
+    SafeGpu,
+    SafeDla,
 }
 
 pub struct Builder<'a> {
@@ -200,6 +209,15 @@ impl<'a> Builder<'a> {
 
     pub fn get_refittable(&self) -> bool {
         unsafe { builder_get_refittable(self.internal_builder) }
+    }
+
+    pub fn set_engine_capability(&self, engine_capability: EngineCapability) {
+        unsafe { builder_set_engine_capability(self.internal_builder, engine_capability as c_uint) }
+    }
+
+    pub fn get_engine_capability(&self) -> EngineCapability {
+        let primitive = unsafe { builder_get_engine_capability(self.internal_builder) };
+        FromPrimitive::from_u32(primitive).unwrap()
     }
 
     pub fn create_network(&self) -> Network {

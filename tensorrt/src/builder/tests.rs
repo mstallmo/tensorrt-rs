@@ -383,3 +383,16 @@ fn set_refittable_false() {
 
     assert_eq!(builder.get_refittable(), false);
 }
+
+#[test]
+fn set_engine_capability() {
+    let logger = match LOGGER.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => poisoned.into_inner(),
+    };
+    let builder = Builder::new(&logger);
+
+    builder.set_engine_capability(EngineCapability::Default);
+
+    assert_eq!(builder.get_engine_capability(), EngineCapability::Default);
+}

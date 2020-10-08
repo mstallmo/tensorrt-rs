@@ -23,6 +23,13 @@ enum DeviceType {
 };
 typedef enum DeviceType DeviceType_t;
 
+enum EngineCapabiliy {
+    kDEFAULT = 0,
+    kSAFE_GPU = 1,
+    kSAFE_DLA = 2,
+};
+typedef enum EngineCapabiliy EngineCapabiliy_t;
+
 struct Builder;
 typedef struct Builder Builder_t;
 
@@ -79,6 +86,9 @@ bool builder_get_strict_type_constraints(Builder_t* builder);
 
 void builder_set_refittable(Builder_t* builder, bool can_refit);
 bool builder_get_refittable(Builder_t* builder);
+
+void builder_set_engine_capability(Builder_t* builder, EngineCapabiliy_t engine_capability);
+EngineCapabiliy_t builder_get_engine_capability(Builder_t* builder);
 
 Network_t *create_network(Builder_t* builder);
 

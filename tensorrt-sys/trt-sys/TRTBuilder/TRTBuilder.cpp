@@ -270,6 +270,20 @@ bool builder_get_refittable(Builder_t* builder) {
     return builder->internal_builder->getRefittable();
 }
 
+void builder_set_engine_capability(Builder_t* builder, EngineCapabiliy_t engine_capability) {
+    if (builder == nullptr)
+        return;
+
+    builder->internal_builder->setEngineCapability(static_cast<nvinfer1::EngineCapability>(engine_capability));
+}
+
+EngineCapabiliy_t builder_get_engine_capability(Builder_t* builder) {
+    if (builder == nullptr)
+        return EngineCapabiliy::kDEFAULT;
+
+    return static_cast<EngineCapabiliy_t>(builder->internal_builder->getEngineCapability());
+}
+
 Builder_t *create_infer_builder(Logger_t *logger) {
     initLibNvInferPlugins(&logger->getLogger(), "");
 

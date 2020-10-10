@@ -6,6 +6,7 @@
 #include <cuda_runtime.h>
 #include "NvInfer.h"
 #include "TRTContextInternal.hpp"
+#include "../TRTProfiler/TRTProfilerInternal.hpp"
 #include "../TRTUtils.hpp"
 
 struct Context {
@@ -16,6 +17,11 @@ struct Context {
         internal_context = IExecutionContextPtr(executionContext);
     }
 
+    ~Context() {
+        _concreteProfiler->destroy();
+    }
+
+    ConcreteProfiler* _concreteProfiler = nullptr;
 };
 
 Context_t *create_execution_context(nvinfer1::IExecutionContext *execution_context) {
@@ -49,6 +55,18 @@ const char *context_get_name(Context_t *execution_context) {
         return "";
 
     return execution_context->internal_context->getName();
+}
+
+void context_set_profiler(Context_t *context, Profiler_t *profiler) {
+    auto concreteProfiler = new ConcreteProfiler(profiler);
+    concreteProfiler->reportLayerTime("Test layer name", 0.005);
+    context->_concreteProfiler = concreteProfiler;
+    context->internal_context->setProfiler(concreteProfiler);
+}
+
+Profiler_t* context_get_profiler(Context_t *context) {
+    auto concreteProfiler = dynamic_cast<ConcreteProfiler *>(context->internal_context->getProfiler());
+    return concreteProfiler->getInternalProfiler();
 }
 
 void execute(const Context_t *execution_context, const void **binding_data, const int num_bindings,

@@ -1,12 +1,15 @@
+use crate::engine::Engine;
+use crate::profiler::{IProfiler, ProfilerBinding};
 use ndarray;
 use ndarray::Dimension;
 use std::ffi::{CStr, CString};
 use std::mem::size_of;
-use std::os::raw::c_void;
+use std::os::raw::{c_char, c_void};
 use std::vec::Vec;
 use tensorrt_sys::{
-    context_get_debug_sync, context_get_name, context_set_debug_sync, context_set_name,
-    destroy_excecution_context, execute, Context_t,
+    context_get_debug_sync, context_get_name, context_get_profiler, context_set_debug_sync,
+    context_set_name, context_set_profiler, destroy_excecution_context, execute, Context_t,
+    Profiler_t,
 };
 
 pub enum ExecuteInput<'a, D: Dimension> {
@@ -43,6 +46,20 @@ impl<'a, 'b> Context<'a, 'b> {
             CStr::from_ptr(raw_context_name)
         };
         context_name.to_str().unwrap().to_string()
+    }
+
+    pub fn set_profiler<T: IProfiler>(&self, profiler: &mut T) {
+        let profiler_ptr =
+            Box::into_raw(Box::new(ProfilerBinding::new(profiler))) as *mut Profiler_t;
+        unsafe { context_set_profiler(self.internal_context, profiler_ptr) }
+    }
+
+    pub fn get_profiler<T: IProfiler>(&self) -> &T {
+        unsafe {
+            let profiler_ptr =
+                context_get_profiler(self.internal_context) as *mut ProfilerBinding<T>;
+            &(*(*profiler_ptr).context)
+        }
     }
 
     pub fn execute<D1: Dimension, D2: Dimension>(
@@ -105,6 +122,7 @@ mod tests {
     use crate::builder::Builder;
     use crate::dims::DimsCHW;
     use crate::engine::Engine;
+    use crate::profiler::RustProfiler;
     use crate::runtime::Logger;
     use crate::uff::{UffFile, UffInputOrder, UffParser};
     use lazy_static::lazy_static;
@@ -142,5 +160,24 @@ mod tests {
 
         context.set_debug_sync(true);
         assert_eq!(context.get_debug_sync(), true);
+    }
+
+    #[test]
+    fn set_profiler() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let engine = setup_engine_test_uff(&logger);
+        let context = engine.create_execution_context();
+
+        let mut profiler = RustProfiler::new();
+        context.set_profiler(&mut profiler);
+
+        let other_profiler = context.get_profiler::<RustProfiler>();
+        assert_eq!(
+            &profiler as *const RustProfiler,
+            other_profiler as *const RustProfiler
+        );
     }
 }

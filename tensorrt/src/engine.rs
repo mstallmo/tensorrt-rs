@@ -6,6 +6,7 @@ use std::slice;
 
 use crate::context::Context;
 use crate::dims::Dims;
+use crate::profiler::RustProfiler;
 use crate::runtime::{Logger, Runtime};
 use tensorrt_sys::{
     deserialize_cuda_engine, destroy_cuda_engine, destroy_host_memory,

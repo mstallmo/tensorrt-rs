@@ -1,13 +1,34 @@
 use crate::context::Context;
 use crate::dims::Dims;
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
 use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use std::slice;
 use tensorrt_sys::{
-    destroy_cuda_engine, destroy_host_memory, engine_create_execution_context, engine_serialize,
-    get_binding_dimensions, get_binding_index, get_binding_name, get_nb_bindings,
-    host_memory_get_data, host_memory_get_size,
+    destroy_cuda_engine, destroy_host_memory, engine_binding_is_input,
+    engine_create_execution_context, engine_create_execution_context_without_device_memory,
+    engine_get_binding_data_type, engine_get_device_memory_size, engine_get_location,
+    engine_get_max_batch_size, engine_get_nb_layers, engine_get_workspace_size,
+    engine_is_refittable, engine_serialize, get_binding_dimensions, get_binding_index,
+    get_binding_name, get_nb_bindings, host_memory_get_data, host_memory_get_size,
 };
+
+#[repr(C)]
+#[derive(Debug, FromPrimitive, Eq, PartialEq)]
+pub enum DataType {
+    Float,
+    Half,
+    Int8,
+    Int32,
+}
+
+#[repr(C)]
+#[derive(Debug, FromPrimitive, Eq, PartialEq)]
+pub enum TensorLocation {
+    Host,
+    Device,
+}
 
 #[derive(Debug)]
 pub struct Engine {
@@ -48,12 +69,34 @@ impl Engine {
         };
     }
 
+    pub fn binding_is_input(&self, binding_index: i32) -> bool {
+        unsafe { engine_binding_is_input(self.internal_engine, binding_index) }
+    }
+
     pub fn get_binding_dimensions(&self, binding_index: i32) -> Dims {
         let raw_dims = unsafe { get_binding_dimensions(self.internal_engine, binding_index) };
 
         Dims {
             internal_dims: raw_dims,
         }
+    }
+
+    pub fn get_binding_data_type(&self, binding_index: i32) -> DataType {
+        let primitive =
+            unsafe { engine_get_binding_data_type(self.internal_engine, binding_index) };
+        FromPrimitive::from_u32(primitive).unwrap()
+    }
+
+    pub fn get_max_batch_size(&self) -> i32 {
+        unsafe { engine_get_max_batch_size(self.internal_engine) }
+    }
+
+    pub fn get_nb_layers(&self) -> i32 {
+        unsafe { engine_get_nb_layers(self.internal_engine) }
+    }
+
+    pub fn get_workspace_size(&self) -> usize {
+        unsafe { engine_get_workspace_size(self.internal_engine) }
     }
 
     pub fn create_execution_context(&self) -> Context {
@@ -64,9 +107,31 @@ impl Engine {
         }
     }
 
+    pub fn create_execution_context_without_device_memory(&self) -> Context {
+        let execution_context =
+            unsafe { engine_create_execution_context_without_device_memory(self.internal_engine) };
+        Context {
+            internal_context: execution_context,
+            _engine: &self,
+        }
+    }
+
     pub fn serialize(&self) -> HostMemory {
         let memory = unsafe { engine_serialize(self.internal_engine) };
         HostMemory { memory }
+    }
+
+    pub fn get_location(&self, binding_index: i32) -> TensorLocation {
+        let primitive = unsafe { engine_get_location(self.internal_engine, binding_index) };
+        FromPrimitive::from_u32(primitive).unwrap()
+    }
+
+    pub fn get_device_memory_size(&self) -> usize {
+        unsafe { engine_get_device_memory_size(self.internal_engine) }
+    }
+
+    pub fn is_refittable(&self) -> bool {
+        unsafe { engine_is_refittable(self.internal_engine) }
     }
 }
 
@@ -140,7 +205,10 @@ mod tests {
 
     #[test]
     fn get_nb_bindings() {
-        let logger = LOGGER.lock().unwrap();
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
         let engine = setup_engine_test_uff(&logger);
 
         assert_eq!(2, engine.get_nb_bindings());
@@ -148,7 +216,10 @@ mod tests {
 
     #[test]
     fn get_engine_binding_name() {
-        let logger = LOGGER.lock().unwrap();
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
         let engine = setup_engine_test_uff(&logger);
 
         assert_eq!("in", engine.get_binding_name(0).unwrap());
@@ -156,23 +227,87 @@ mod tests {
 
     #[test]
     fn get_invalid_engine_binding() {
-        let logger = LOGGER.lock().unwrap();
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
         let engine = setup_engine_test_uff(&logger);
 
         assert_eq!(None, engine.get_binding_name(3));
     }
 
     #[test]
+    fn binding_is_input() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let engine = setup_engine_test_uff(&logger);
+
+        assert_eq!(engine.binding_is_input(0), true);
+    }
+
+    #[test]
     fn get_binding_index() {
-        let logger = LOGGER.lock().unwrap();
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
         let engine = setup_engine_test_uff(&logger);
 
         assert_eq!(Some(0), engine.get_binding_index("in"));
     }
 
     #[test]
-    fn write_and_read_engine() {
-        let logger = LOGGER.lock().unwrap();
+    fn get_binding_data_type() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let engine = setup_engine_test_uff(&logger);
+
+        assert_eq!(engine.get_binding_data_type(0), DataType::Float);
+    }
+
+    #[test]
+    fn get_max_batch_size() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let engine = setup_engine_test_uff(&logger);
+
+        assert_eq!(engine.get_max_batch_size(), 1);
+    }
+
+    #[test]
+    fn get_nb_layers() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let engine = setup_engine_test_uff(&logger);
+
+        assert_eq!(engine.get_nb_layers(), 9);
+    }
+
+    #[test]
+    fn get_workspace_size() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let engine = setup_engine_test_uff(&logger);
+
+        assert_eq!(engine.get_workspace_size(), 0);
+    }
+
+    #[test]
+    fn serialize() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
         let uff_engine = setup_engine_test_uff(&logger);
         let seralized_path = Path::new("../lenet5.engine");
         write(seralized_path, uff_engine.serialize()).unwrap();
@@ -205,5 +340,38 @@ mod tests {
         }
 
         remove_file(seralized_path).unwrap();
+    }
+
+    #[test]
+    fn get_location() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let engine = setup_engine_test_uff(&logger);
+
+        assert_eq!(engine.get_location(0), TensorLocation::Host);
+    }
+
+    #[test]
+    fn get_device_memory_size() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let engine = setup_engine_test_uff(&logger);
+
+        assert_eq!(engine.get_device_memory_size(), 57856);
+    }
+
+    #[test]
+    fn is_refittable() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let engine = setup_engine_test_uff(&logger);
+
+        assert_eq!(engine.is_refittable(), false);
     }
 }

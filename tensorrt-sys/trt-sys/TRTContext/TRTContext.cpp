@@ -18,7 +18,9 @@ struct Context {
     }
 
     ~Context() {
-        _concreteProfiler->destroy();
+        if (_concreteProfiler) {
+            _concreteProfiler->destroy();
+        }
     }
 
     ConcreteProfiler* _concreteProfiler = nullptr;
@@ -59,7 +61,6 @@ const char *context_get_name(Context_t *execution_context) {
 
 void context_set_profiler(Context_t *context, Profiler_t *profiler) {
     auto concreteProfiler = new ConcreteProfiler(profiler);
-    concreteProfiler->reportLayerTime("Test layer name", 0.005);
     context->_concreteProfiler = concreteProfiler;
     context->internal_context->setProfiler(concreteProfiler);
 }

@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use tensorrt_sys::{
     create_infer_runtime, create_logger, delete_logger, destroy_infer_runtime,
-    runtime_get_nb_dla_cores, set_logger_severity,
+    runtime_get_dla_core, runtime_get_nb_dla_cores, runtime_set_dla_core, set_logger_severity,
 };
 
 #[repr(C)]
@@ -61,6 +61,14 @@ impl<'a> Runtime<'a> {
     pub fn get_nb_dla_cores(&self) -> i32 {
         unsafe { runtime_get_nb_dla_cores(self.internal_runtime) }
     }
+
+    pub fn get_dla_core(&self) -> i32 {
+        unsafe { runtime_get_dla_core(self.internal_runtime) }
+    }
+
+    pub fn set_dla_core(&self, dla_core: i32) {
+        unsafe { runtime_set_dla_core(self.internal_runtime, dla_core) }
+    }
 }
 
 impl<'a> Drop for Runtime<'a> {
@@ -89,5 +97,30 @@ mod tests {
         let runtime = Runtime::new(&logger);
 
         assert_eq!(runtime.get_nb_dla_cores(), 0);
+    }
+
+    #[test]
+    fn get_dla_core() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+
+        let runtime = Runtime::new(&logger);
+
+        assert_eq!(runtime.get_dla_core(), 0);
+    }
+
+    #[cfg(target_arch = "aarch64")]
+    #[test]
+    fn set_dla_core() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+
+        let runtime = Runtime::new(&logger);
+        runtime.set_dla_core(1);
+        assert_eq!(runtime.get_dla_core(), 1);
     }
 }

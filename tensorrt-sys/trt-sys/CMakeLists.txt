@@ -25,6 +25,7 @@ file(GLOB source_files
         "TRTNetworkDefinition/*.cpp"
         "TRTHostMemory/*.cpp"
         "TRTLayer/*.cpp"
+        "TRTTensor/*.cpp"
 )
 
 add_library(trt-sys STATIC ${source_files})

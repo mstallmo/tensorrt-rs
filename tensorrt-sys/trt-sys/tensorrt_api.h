@@ -16,5 +16,6 @@
 #include "TRTNetworkDefinition/TRTNetworkDefinition.h"
 #include "TRTHostMemory/TRTHostMemory.h"
 #include "TRTProfiler/TRTProfiler.h"
+#include "TRTTensor/TRTTensor.h"
 
 #endif //TENSRORT_SYS_TENSORRT_API_H

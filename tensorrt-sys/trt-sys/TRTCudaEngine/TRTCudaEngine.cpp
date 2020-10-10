@@ -23,28 +23,28 @@ Engine_t* create_engine(nvinfer1::ICudaEngine* engine) {
     return new Engine(engine);
 }
 
-void destroy_cuda_engine(Engine_t* engine) {
+void engine_destroy(Engine_t* engine) {
     if (engine == nullptr)
         return;
 
     delete engine;
 }
 
-int get_nb_bindings(Engine_t* engine) {
+int engine_get_nb_bindings(Engine_t* engine) {
     if (engine == nullptr)
         return -1;
 
     return engine->internal_engine->getNbBindings();
 }
 
-int get_binding_index(Engine_t* engine, const char* op_name) {
+int engine_get_binding_index(Engine_t* engine, const char* op_name) {
     if (engine == nullptr)
         return -1;
 
     return engine->internal_engine->getBindingIndex(op_name);
 }
 
-const char* get_binding_name(Engine_t* engine, int binding_index) {
+const char* engine_get_binding_name(Engine_t* engine, int binding_index) {
     if (engine == nullptr)
         return "";
 
@@ -55,7 +55,7 @@ bool engine_binding_is_input(Engine_t *engine, int binding_index) {
     return engine->internal_engine->bindingIsInput(binding_index);
 }
 
-Dims_t* get_binding_dimensions(Engine_t *engine, int binding_index) {
+Dims_t* engine_get_binding_dimensions(Engine_t *engine, int binding_index) {
     if (engine == nullptr)
         return nullptr;
 

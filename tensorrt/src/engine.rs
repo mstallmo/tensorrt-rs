@@ -6,12 +6,13 @@ use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use std::slice;
 use tensorrt_sys::{
-    destroy_cuda_engine, destroy_host_memory, engine_binding_is_input,
-    engine_create_execution_context, engine_create_execution_context_without_device_memory,
-    engine_get_binding_data_type, engine_get_device_memory_size, engine_get_location,
-    engine_get_max_batch_size, engine_get_nb_layers, engine_get_workspace_size,
-    engine_is_refittable, engine_serialize, get_binding_dimensions, get_binding_index,
-    get_binding_name, get_nb_bindings, host_memory_get_data, host_memory_get_size,
+    destroy_host_memory, engine_binding_is_input, engine_create_execution_context,
+    engine_create_execution_context_without_device_memory, engine_destroy,
+    engine_get_binding_data_type, engine_get_binding_dimensions, engine_get_binding_index,
+    engine_get_binding_name, engine_get_device_memory_size, engine_get_location,
+    engine_get_max_batch_size, engine_get_nb_bindings, engine_get_nb_layers,
+    engine_get_workspace_size, engine_is_refittable, engine_serialize, host_memory_get_data,
+    host_memory_get_size,
 };
 
 #[repr(C)]
@@ -37,7 +38,7 @@ pub struct Engine {
 
 impl Engine {
     pub fn get_nb_bindings(&self) -> i32 {
-        unsafe { get_nb_bindings(self.internal_engine) }
+        unsafe { engine_get_nb_bindings(self.internal_engine) }
     }
 
     pub fn get_binding_name(&self, binding_index: i32) -> Option<String> {
@@ -47,7 +48,7 @@ impl Engine {
 
         let binding_name = unsafe {
             let raw_binding_name =
-                get_binding_name(self.internal_engine, binding_index.try_into().unwrap());
+                engine_get_binding_name(self.internal_engine, binding_index.try_into().unwrap());
             CStr::from_ptr(raw_binding_name)
         };
 
@@ -56,7 +57,7 @@ impl Engine {
 
     pub fn get_binding_index(&self, binding_name: &str) -> Option<i32> {
         let binding_index = unsafe {
-            get_binding_index(
+            engine_get_binding_index(
                 self.internal_engine,
                 CString::new(binding_name).unwrap().as_ptr(),
             )
@@ -74,7 +75,8 @@ impl Engine {
     }
 
     pub fn get_binding_dimensions(&self, binding_index: i32) -> Dims {
-        let raw_dims = unsafe { get_binding_dimensions(self.internal_engine, binding_index) };
+        let raw_dims =
+            unsafe { engine_get_binding_dimensions(self.internal_engine, binding_index) };
 
         Dims {
             internal_dims: raw_dims,
@@ -139,7 +141,7 @@ unsafe impl Send for Engine {}
 
 impl Drop for Engine {
     fn drop(&mut self) {
-        unsafe { destroy_cuda_engine(self.internal_engine) };
+        unsafe { engine_destroy(self.internal_engine) };
     }
 }
 

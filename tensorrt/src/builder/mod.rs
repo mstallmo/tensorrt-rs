@@ -231,14 +231,10 @@ impl<'a> Builder<'a> {
         Network { internal_network }
     }
 
-    pub fn build_cuda_engine(&self, network: &Network) -> Engine<'a> {
+    pub fn build_cuda_engine(&self, network: &Network) -> Engine {
         let internal_engine =
             unsafe { build_cuda_engine(self.internal_builder, network.internal_network) };
-        let logger = self.logger;
-        Engine {
-            internal_engine,
-            logger,
-        }
+        Engine { internal_engine }
     }
 
     pub fn reset(&self, network: Network) {

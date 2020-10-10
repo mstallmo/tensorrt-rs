@@ -1,41 +1,20 @@
-use std::convert::TryInto;
-use std::ffi::{CStr, CString};
-use std::marker::PhantomData;
-use std::os::raw::c_void;
-use std::slice;
-
 use crate::context::Context;
 use crate::dims::Dims;
-use crate::runtime::{Logger, Runtime};
+use std::convert::TryInto;
+use std::ffi::{CStr, CString};
+use std::slice;
 use tensorrt_sys::{
-    deserialize_cuda_engine, destroy_cuda_engine, destroy_host_memory,
-    engine_create_execution_context, engine_serialize, get_binding_dimensions, get_binding_index,
-    get_binding_name, get_nb_bindings, host_memory_get_data, host_memory_get_size,
+    destroy_cuda_engine, destroy_host_memory, engine_create_execution_context, engine_serialize,
+    get_binding_dimensions, get_binding_index, get_binding_name, get_nb_bindings,
+    host_memory_get_data, host_memory_get_size,
 };
 
 #[derive(Debug)]
-pub struct Engine<'a> {
+pub struct Engine {
     pub(crate) internal_engine: *mut tensorrt_sys::Engine_t,
-    pub(crate) logger: PhantomData<&'a Logger>,
 }
 
-impl<'a> Engine<'a> {
-    pub fn new(runtime: Runtime<'a>, buffer: Vec<u8>) -> Self {
-        let internal_engine = unsafe {
-            deserialize_cuda_engine(
-                runtime.internal_runtime,
-                buffer.as_ptr() as *const c_void,
-                buffer.len() as u64,
-            )
-        };
-        let logger = PhantomData;
-
-        Self {
-            internal_engine,
-            logger,
-        }
-    }
-
+impl Engine {
     pub fn get_nb_bindings(&self) -> i32 {
         unsafe { get_nb_bindings(self.internal_engine) }
     }
@@ -91,9 +70,9 @@ impl<'a> Engine<'a> {
     }
 }
 
-unsafe impl<'a> Send for Engine<'a> {}
+unsafe impl Send for Engine {}
 
-impl<'a> Drop for Engine<'a> {
+impl Drop for Engine {
     fn drop(&mut self) {
         unsafe { destroy_cuda_engine(self.internal_engine) };
     }
@@ -207,7 +186,7 @@ mod tests {
         let mut buffer = Vec::new();
         f.read_to_end(&mut buffer).unwrap();
 
-        let seralized_engine = Engine::new(runtime, buffer);
+        let seralized_engine = runtime.deserialize_cuda_engine(buffer);
 
         assert_eq!(
             uff_engine.get_nb_bindings(),

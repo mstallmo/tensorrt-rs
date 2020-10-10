@@ -34,3 +34,14 @@ Engine_t* deserialize_cuda_engine(Runtime_t* runtime, const void* blob, unsigned
     return create_engine(engine);
 }
 
+int runtime_get_nb_dla_cores(Runtime_t *runtime) {
+    return runtime->internal_runtime->getNbDLACores();
+}
+
+int runtime_get_dla_core(Runtime_t *runtime) {
+    return runtime->internal_runtime->getDLACore();
+}
+
+void runtime_set_dla_core(Runtime_t *runtime, int dla_core) {
+    runtime->internal_runtime->setDLACore(dla_core);
+}

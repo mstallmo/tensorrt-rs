@@ -7,5 +7,6 @@ pub mod dims;
 pub mod engine;
 pub mod network;
 pub mod onnx;
+pub mod profiler;
 pub mod runtime;
 pub mod uff;

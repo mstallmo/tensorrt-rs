@@ -1,7 +1,5 @@
-use std::alloc::{dealloc, Layout};
 use std::ffi::CStr;
 use std::os::raw::c_char;
-use std::ptr;
 use tensorrt_sys::Profiler_t;
 
 pub trait IProfiler {
@@ -49,10 +47,6 @@ where
             destroy,
             context,
         }
-    }
-
-    pub(crate) unsafe fn from_raw<U: IProfiler>(ptr: *mut Profiler_t) -> Box<Self> {
-        Box::from_raw(ptr as *mut Self)
     }
 }
 

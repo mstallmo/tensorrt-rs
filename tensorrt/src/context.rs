@@ -1,10 +1,9 @@
-use crate::engine::Engine;
 use crate::profiler::{IProfiler, ProfilerBinding};
 use ndarray;
 use ndarray::Dimension;
 use std::ffi::{CStr, CString};
 use std::mem::size_of;
-use std::os::raw::{c_char, c_void};
+use std::os::raw::c_void;
 use std::vec::Vec;
 use tensorrt_sys::{
     context_get_debug_sync, context_get_name, context_get_profiler, context_set_debug_sync,

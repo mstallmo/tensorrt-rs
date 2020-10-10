@@ -1,7 +1,8 @@
 use std::marker::PhantomData;
 
 use tensorrt_sys::{
-    create_infer_runtime, create_logger, delete_logger, destroy_infer_runtime, set_logger_severity,
+    create_infer_runtime, create_logger, delete_logger, destroy_infer_runtime,
+    runtime_get_nb_dla_cores, set_logger_severity,
 };
 
 #[repr(C)]
@@ -56,10 +57,37 @@ impl<'a> Runtime<'a> {
             logger,
         }
     }
+
+    pub fn get_nb_dla_cores(&self) -> i32 {
+        unsafe { runtime_get_nb_dla_cores(self.internal_runtime) }
+    }
 }
 
 impl<'a> Drop for Runtime<'a> {
     fn drop(&mut self) {
         unsafe { destroy_infer_runtime(self.internal_runtime) };
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use lazy_static::lazy_static;
+    use std::sync::Mutex;
+
+    lazy_static! {
+        static ref LOGGER: Mutex<Logger> = Mutex::new(Logger::new());
+    }
+
+    #[test]
+    fn get_nb_dla_cores() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+
+        let runtime = Runtime::new(&logger);
+
+        assert_eq!(runtime.get_nb_dla_cores(), 0);
     }
 }

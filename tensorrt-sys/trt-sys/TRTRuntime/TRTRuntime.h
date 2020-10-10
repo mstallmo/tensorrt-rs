@@ -16,8 +16,13 @@ struct Runtime;
 typedef struct Runtime Runtime_t;
 
 Runtime_t* create_infer_runtime(Logger_t* logger);
-Engine_t* deserialize_cuda_engine(Runtime_t* runtime, const void* blob, unsigned long long size);
 void destroy_infer_runtime(Runtime_t* runtime);
+
+Engine_t* deserialize_cuda_engine(Runtime_t* runtime, const void* blob, unsigned long long size);
+int runtime_get_nb_dla_cores(Runtime_t* runtime);
+int runtime_get_dla_core(Runtime_t *runtime);
+void runtime_set_dla_core(Runtime_t *runtime, int dla_core);
+
 
 #ifdef __cplusplus
 };

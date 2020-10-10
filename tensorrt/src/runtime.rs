@@ -1,8 +1,11 @@
 use std::marker::PhantomData;
 
+use crate::engine::Engine;
+use bitflags::_core::ffi::c_void;
 use tensorrt_sys::{
-    create_infer_runtime, create_logger, delete_logger, destroy_infer_runtime,
-    runtime_get_dla_core, runtime_get_nb_dla_cores, runtime_set_dla_core, set_logger_severity,
+    create_infer_runtime, create_logger, delete_logger, deserialize_cuda_engine,
+    destroy_infer_runtime, runtime_get_dla_core, runtime_get_nb_dla_cores, runtime_set_dla_core,
+    set_logger_severity,
 };
 
 #[repr(C)]
@@ -56,6 +59,18 @@ impl<'a> Runtime<'a> {
             internal_runtime,
             logger,
         }
+    }
+
+    pub fn deserialize_cuda_engine(&self, buffer: Vec<u8>) -> Engine {
+        let internal_engine = unsafe {
+            deserialize_cuda_engine(
+                self.internal_runtime,
+                buffer.as_ptr() as *const c_void,
+                buffer.len() as u64,
+            )
+        };
+
+        Engine { internal_engine }
     }
 
     pub fn get_nb_dla_cores(&self) -> i32 {

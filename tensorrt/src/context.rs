@@ -16,12 +16,12 @@ pub enum ExecuteInput<'a, D: Dimension> {
     Float(&'a ndarray::Array<f32, D>),
 }
 
-pub struct Context<'a, 'b> {
+pub struct Context<'a> {
     pub(crate) internal_context: *mut Context_t,
-    pub(crate) _engine: &'a crate::engine::Engine<'b>,
+    pub(crate) _engine: &'a crate::engine::Engine,
 }
 
-impl<'a, 'b> Context<'a, 'b> {
+impl<'a> Context<'a> {
     pub fn set_debug_sync(&self, sync: bool) {
         unsafe { context_set_debug_sync(self.internal_context, sync) }
     }
@@ -110,7 +110,7 @@ impl<'a, 'b> Context<'a, 'b> {
     }
 }
 
-impl<'a, 'b> Drop for Context<'a, 'b> {
+impl<'a> Drop for Context<'a> {
     fn drop(&mut self) {
         unsafe { destroy_excecution_context(self.internal_context) };
     }

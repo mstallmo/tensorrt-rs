@@ -10,7 +10,7 @@ use tensorrt_rs::engine::Engine;
 use tensorrt_rs::runtime::Logger;
 use tensorrt_rs::uff::{UffFile, UffInputOrder, UffParser};
 
-fn create_engine<'a>(logger: &'a Logger, uff_file: &UffFile) -> Engine<'a> {
+fn create_engine(logger: &Logger, uff_file: &UffFile) -> Engine {
     let builder = Builder::new(&logger);
     let network = builder.create_network();
 

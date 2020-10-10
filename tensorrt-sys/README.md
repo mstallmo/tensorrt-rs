@@ -40,13 +40,14 @@ Anything not listed below currently does not have any support.
 |------------------| ---|
 | nvinfer1::ILogger| Complete|
 |nvinfer1::IBuilder| Complete |
-|nvinfer1::IExecutionContext| Partial|
+|nvinfer1::IExecutionContext| Complete |
 |nvinfer1::IRuntime| Partial|
 |nvinfer1::ICudaEngine| Partial|
 |nvinfer1::INetworkDefinition| Partial|
 |nvinfer1::IHostMemory| Partial|
 |nvinfer1::IDims (and all sub-dims)| Complete|
-/nvinfer1::ILayer / Partial /
+|nvinfer1::ILayer | Partial |
+|nvinfer1::IProfiler | Complete |
 |nvuffparser::IUffParser| Partial|
 
 

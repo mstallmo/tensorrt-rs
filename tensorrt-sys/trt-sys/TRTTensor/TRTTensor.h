@@ -14,6 +14,7 @@ extern "C" {
 struct Tensor;
 typedef struct Tensor Tensor_t;
 
+const char* tensor_get_name(Tensor_t*);
 void tensor_set_dimensions(Tensor_t *tensor, Dims_t *dimensions); // only valid for input tensors
 
 #ifdef __cplusplus

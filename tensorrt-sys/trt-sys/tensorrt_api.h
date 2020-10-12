@@ -5,6 +5,7 @@
 #ifndef TENSRORT_SYS_TENSORRT_API_H
 #define TENSRORT_SYS_TENSORRT_API_H
 
+#include "TRTEnums.h"
 #include "TRTLogger/TRTLogger.h"
 #include "TRTRuntime/TRTRuntime.h"
 #include "TRTCudaEngine/TRTCudaEngine.h"

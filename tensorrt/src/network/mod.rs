@@ -1,8 +1,15 @@
 pub mod layer;
 
 use crate::dims::IsDim;
+use crate::engine::DataType;
 use layer::Layer;
-use tensorrt_sys::{destroy_network, network_get_input, network_get_layer, tensor_set_dimensions};
+use std::ffi::{CStr, CString};
+use tensorrt_sys::{
+    destroy_network, network_add_identity_layer, network_add_input, network_get_input,
+    network_get_layer, network_get_nb_inputs, network_get_nb_layers, network_get_nb_outputs,
+    network_get_output, network_mark_output, network_remove_tensor, network_unmark_output,
+    tensor_get_name, tensor_set_dimensions,
+};
 
 pub struct Network {
     pub(crate) internal_network: *mut tensorrt_sys::Network_t,
@@ -13,26 +20,83 @@ pub struct Tensor {
 }
 
 impl Network {
+    pub fn get_nb_inputs(&self) -> i32 {
+        unsafe { network_get_nb_inputs(self.internal_network) }
+    }
+
+    pub fn add_input<T: IsDim>(&self, name: &str, data_type: DataType, dims: T) -> Tensor {
+        let internal_tensor = unsafe {
+            network_add_input(
+                self.internal_network,
+                CString::new(name).unwrap().as_ptr(),
+                data_type as u32,
+                dims.internal_dims(),
+            )
+        };
+        Tensor { internal_tensor }
+    }
+
     pub fn get_input(&self, idx: i32) -> Tensor {
         let internal_tensor = unsafe { network_get_input(self.internal_network, idx) };
         Tensor { internal_tensor }
+    }
+
+    pub fn get_nb_layers(&self) -> i32 {
+        unsafe { network_get_nb_layers(self.internal_network) }
     }
 
     pub fn get_layer(&self, index: i32) -> Layer {
         let internal_layer = unsafe { network_get_layer(self.internal_network, index) };
         Layer { internal_layer }
     }
-}
 
-impl Tensor {
-    pub fn set_dimensions<D: IsDim>(&mut self, dims: D) {
-        unsafe { tensor_set_dimensions(self.internal_tensor, dims.internal_dims()) };
+    pub fn add_identity_layer(&self, input_tensor: &Tensor) -> Layer {
+        let internal_layer = unsafe {
+            network_add_identity_layer(self.internal_network, input_tensor.internal_tensor)
+        };
+        Layer { internal_layer }
+    }
+
+    pub fn get_nb_outputs(&self) -> i32 {
+        unsafe { network_get_nb_outputs(self.internal_network) }
+    }
+
+    pub fn get_output(&self, index: i32) -> Tensor {
+        let internal_tensor = unsafe { network_get_output(self.internal_network, index) };
+        Tensor { internal_tensor }
+    }
+
+    pub fn remove_tensor(&self, tensor: &Tensor) {
+        unsafe { network_remove_tensor(self.internal_network, tensor.internal_tensor) }
+    }
+
+    pub fn mark_output(&self, output_tensor: &Tensor) {
+        unsafe { network_mark_output(self.internal_network, output_tensor.internal_tensor) }
+    }
+
+    pub fn unmark_output(&self, output_tensor: &Tensor) {
+        unsafe { network_unmark_output(self.internal_network, output_tensor.internal_tensor) }
     }
 }
 
 impl Drop for Network {
     fn drop(&mut self) {
         unsafe { destroy_network(self.internal_network) };
+    }
+}
+
+impl Tensor {
+    pub fn get_name(&self) -> String {
+        unsafe {
+            CStr::from_ptr(tensor_get_name(self.internal_tensor))
+                .to_str()
+                .unwrap()
+                .to_owned()
+        }
+    }
+
+    pub fn set_dimensions<D: IsDim>(&mut self, dims: D) {
+        unsafe { tensor_set_dimensions(self.internal_tensor, dims.internal_dims()) };
     }
 }
 
@@ -52,6 +116,11 @@ mod tests {
     }
 
     fn create_network(logger: &Logger) -> Network {
+        let builder = Builder::new(logger);
+        builder.create_network()
+    }
+
+    fn create_network_from_uff(logger: &Logger) -> Network {
         let builder = Builder::new(&logger);
         let network = builder.create_network();
 
@@ -69,15 +138,143 @@ mod tests {
     }
 
     #[test]
+    fn get_nb_layers_uff() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network_from_uff(&logger);
+
+        assert_eq!(network.get_nb_layers(), 24);
+    }
+
+    #[test]
     fn layer_name() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network_from_uff(&logger);
+
+        let layer = network.get_layer(0);
+        assert_eq!(layer.get_name(), "wc1");
+    }
+
+    #[test]
+    fn get_nb_inputs() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network_from_uff(&logger);
+
+        assert_eq!(network.get_nb_inputs(), 1);
+    }
+
+    #[test]
+    fn add_input() {
         let logger = match LOGGER.lock() {
             Ok(guard) => guard,
             Err(poisoned) => poisoned.into_inner(),
         };
         let network = create_network(&logger);
 
-        let layer = network.get_layer(0);
+        let tensor = network.add_input("new_input", DataType::Float, DimsCHW::new(1, 28, 28));
+        assert_eq!(tensor.get_name(), "new_input");
+    }
 
-        assert_eq!(layer.get_name(), "wc1");
+    #[test]
+    fn get_input() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network_from_uff(&logger);
+
+        assert_eq!(network.get_input(0).get_name(), "in");
+    }
+
+    #[test]
+    fn add_identity_layer() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network(&logger);
+        let tensor = network.add_input("new_input", DataType::Float, DimsCHW::new(1, 28, 28));
+        network.add_identity_layer(&tensor);
+        assert_eq!(network.get_nb_layers(), 1);
+    }
+
+    #[test]
+    fn get_nb_outputs() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network_from_uff(&logger);
+
+        assert_eq!(network.get_nb_outputs(), 1);
+    }
+
+    #[test]
+    fn get_output() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network_from_uff(&logger);
+
+        assert_eq!(network.get_output(0).get_name(), "out");
+    }
+
+    #[test]
+    fn remove_tensor() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let uff_network = create_network_from_uff(&logger);
+        let output_tensor = uff_network.get_layer(21).get_output(0);
+
+        let network = create_network(&logger);
+        let tensor = network.add_input("new_input", DataType::Float, DimsCHW::new(1, 28, 28));
+        let layer = network.add_identity_layer(&tensor);
+
+        assert_eq!(network.get_layer(0).get_input(0).get_name(), "new_input");
+        layer.set_input(0, &output_tensor);
+        network.remove_tensor(&tensor);
+        assert_eq!(network.get_nb_inputs(), 0);
+        assert_eq!(network.get_layer(0).get_input(0).get_name(), "matmul2");
+    }
+
+    #[test]
+    fn mark_output() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network_from_uff(&logger);
+        let new_output_tensor = network.get_layer(21).get_output(0);
+
+        assert_eq!(network.get_nb_outputs(), 1);
+        network.mark_output(&new_output_tensor);
+        assert_eq!(network.get_nb_outputs(), 2);
+    }
+
+    #[test]
+    fn unmark_output() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network_from_uff(&logger);
+        let new_output_tensor = network.get_layer(21).get_output(0);
+
+        assert_eq!(network.get_nb_outputs(), 1);
+        network.mark_output(&new_output_tensor);
+        assert_eq!(network.get_nb_outputs(), 2);
+        network.unmark_output(&new_output_tensor);
+        assert_eq!(network.get_nb_outputs(), 1);
     }
 }

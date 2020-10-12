@@ -9,6 +9,7 @@
 #include "../TRTNetworkDefinition/TRTNetworkDefinition.h"
 #include "../TRTCudaEngine/TRTCudaEngine.h"
 #include "../TRTLayer/TRTLayer.h"
+#include "../TRTEnums.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -16,19 +17,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-enum DeviceType {
-    kGPU = 0,
-    kDLA = 1,
-};
-typedef enum DeviceType DeviceType_t;
-
-enum EngineCapabiliy {
-    kDEFAULT = 0,
-    kSAFE_GPU = 1,
-    kSAFE_DLA = 2,
-};
-typedef enum EngineCapabiliy EngineCapabiliy_t;
 
 struct Builder;
 typedef struct Builder Builder_t;

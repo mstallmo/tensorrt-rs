@@ -138,24 +138,24 @@ impl<'a> Builder<'a> {
         unsafe { builder_get_fp16_mode(self.internal_builder) }
     }
 
-    pub fn set_device_type(&self, layer: &Layer, device_type: DeviceType) {
+    pub fn set_device_type<T: Layer>(&self, layer: &T, device_type: DeviceType) {
         unsafe {
             builder_set_device_type(
                 self.internal_builder,
-                layer.internal_layer,
+                layer.get_internal_layer(),
                 device_type as c_uint,
             )
         }
     }
 
-    pub fn get_device_type(&self, layer: &Layer) -> DeviceType {
+    pub fn get_device_type(&self, layer: &dyn Layer) -> DeviceType {
         let primitive =
-            unsafe { builder_get_device_type(self.internal_builder, layer.internal_layer) };
+            unsafe { builder_get_device_type(self.internal_builder, layer.get_internal_layer()) };
         FromPrimitive::from_u32(primitive).unwrap()
     }
 
-    pub fn is_device_type_set(&self, layer: &Layer) -> bool {
-        unsafe { builder_is_device_type_set(self.internal_builder, layer.internal_layer) }
+    pub fn is_device_type_set(&self, layer: &dyn Layer) -> bool {
+        unsafe { builder_is_device_type_set(self.internal_builder, layer.get_internal_layer()) }
     }
 
     pub fn set_default_device_type(&self, device_type: DeviceType) {
@@ -167,12 +167,12 @@ impl<'a> Builder<'a> {
         FromPrimitive::from_u32(primitive).unwrap()
     }
 
-    pub fn reset_device_type(&self, layer: &Layer) {
-        unsafe { builder_reset_device_type(self.internal_builder, layer.internal_layer) }
+    pub fn reset_device_type(&self, layer: &dyn Layer) {
+        unsafe { builder_reset_device_type(self.internal_builder, layer.get_internal_layer()) }
     }
 
-    pub fn can_run_on_dla(&self, layer: &Layer) -> bool {
-        unsafe { builder_can_run_on_dla(self.internal_builder, layer.internal_layer) }
+    pub fn can_run_on_dla(&self, layer: &dyn Layer) -> bool {
+        unsafe { builder_can_run_on_dla(self.internal_builder, layer.get_internal_layer()) }
     }
 
     pub fn get_max_dla_batch_size(&self) -> i32 {

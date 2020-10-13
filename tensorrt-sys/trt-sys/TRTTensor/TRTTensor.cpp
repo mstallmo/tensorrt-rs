@@ -17,3 +17,7 @@ void tensor_set_dimensions(Tensor_t *tensor, Dims_t *dimensions) {
     tensor->internal_tensor->setDimensions(dims_get(dimensions));
 }
 
+void tensor_destroy(Tensor_t *tensor) {
+    delete tensor;
+}
+

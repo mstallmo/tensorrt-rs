@@ -2,13 +2,13 @@ pub mod layer;
 
 use crate::dims::IsDim;
 use crate::engine::DataType;
-use layer::Layer;
+use layer::{BaseLayer, IdentityLayer, Layer};
 use std::ffi::{CStr, CString};
 use tensorrt_sys::{
     destroy_network, network_add_identity_layer, network_add_input, network_get_input,
     network_get_layer, network_get_nb_inputs, network_get_nb_layers, network_get_nb_outputs,
     network_get_output, network_mark_output, network_remove_tensor, network_unmark_output,
-    tensor_get_name, tensor_set_dimensions,
+    tensor_destroy, tensor_get_name, tensor_set_dimensions,
 };
 
 pub struct Network {
@@ -45,16 +45,16 @@ impl Network {
         unsafe { network_get_nb_layers(self.internal_network) }
     }
 
-    pub fn get_layer(&self, index: i32) -> Layer {
+    pub fn get_layer(&self, index: i32) -> BaseLayer {
         let internal_layer = unsafe { network_get_layer(self.internal_network, index) };
-        Layer { internal_layer }
+        BaseLayer { internal_layer }
     }
 
-    pub fn add_identity_layer(&self, input_tensor: &Tensor) -> Layer {
+    pub fn add_identity_layer(&self, input_tensor: &Tensor) -> IdentityLayer {
         let internal_layer = unsafe {
             network_add_identity_layer(self.internal_network, input_tensor.internal_tensor)
         };
-        Layer { internal_layer }
+        IdentityLayer { internal_layer }
     }
 
     pub fn get_nb_outputs(&self) -> i32 {
@@ -97,6 +97,12 @@ impl Tensor {
 
     pub fn set_dimensions<D: IsDim>(&mut self, dims: D) {
         unsafe { tensor_set_dimensions(self.internal_tensor, dims.internal_dims()) };
+    }
+}
+
+impl Drop for Tensor {
+    fn drop(&mut self) {
+        unsafe { tensor_destroy(self.internal_tensor) }
     }
 }
 

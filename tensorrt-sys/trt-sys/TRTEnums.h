@@ -38,6 +38,35 @@ enum EngineCapabiliy {
 };
 typedef enum EngineCapabiliy EngineCapabiliy_t;
 
+enum LayerType {
+    kCONVOLUTION = 0,
+    kFULLY_CONNECTED = 1,
+    kACTIVATION  = 2,
+    kPOOLING = 3,
+    kLRN = 4,
+    kSCALE = 5,
+    kSOFTMAX = 6,
+    kDECONVOLUTION = 7,
+    kCONCATENATION = 8,
+    kELEMENTWISE = 9,
+    kPLUGIN = 10,
+    kRNN = 11,
+    kUNARY = 12,
+    kPADDING = 13,
+    kSHUFFLE = 14,
+    kREDUCE = 15,
+    kTOPK = 16,
+    kGATHER = 17,
+    kMATRIX_MULTIPLY = 18,
+    kRAGGED_SOFTMAX = 19,
+    kCONSTANT = 20,
+    kRNN_V2 = 21,
+    kIDENTITY = 22,
+    kPLUGIN_V2 = 23,
+    kSLICE = 24,
+};
+typedef enum LayerType LayerType_t;
+
 enum TensorLocation {
     kDEVICE = 0,
     kHOST = 1,

@@ -34,7 +34,7 @@ Layer_t *network_get_layer(Network_t *network, int index) {
     return new Layer(network->internal_network->getLayer(index));
 }
 
-Layer_t* network_add_identity_layer(Network_t *network, Tensor_t *inputTensor) {
+Layer_t *network_add_identity_layer(Network_t *network, Tensor_t *inputTensor) {
     return new Layer(network->internal_network->addIdentity(*inputTensor->internal_tensor));
 }
 
@@ -66,3 +66,7 @@ void network_unmark_output(Network_t *network, Tensor_t *tensor) {
     network->internal_network->unmarkOutput(*tensor->internal_tensor);
 }
 
+Layer_t *network_add_element_wise(Network_t *network, Tensor_t *input1, Tensor_t *input2, ElementWiseOperation_t op) {
+    return new Layer(network->internal_network->addElementWise(*input1->internal_tensor, *input2->internal_tensor,
+                                                               static_cast<nvinfer1::ElementWiseOperation>(op)));
+}

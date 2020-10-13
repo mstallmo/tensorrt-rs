@@ -2,13 +2,13 @@ pub mod layer;
 
 use crate::dims::IsDim;
 use crate::engine::DataType;
-use layer::{BaseLayer, IdentityLayer, Layer};
+use layer::*;
 use std::ffi::{CStr, CString};
 use tensorrt_sys::{
-    destroy_network, network_add_identity_layer, network_add_input, network_get_input,
-    network_get_layer, network_get_nb_inputs, network_get_nb_layers, network_get_nb_outputs,
-    network_get_output, network_mark_output, network_remove_tensor, network_unmark_output,
-    tensor_destroy, tensor_get_name, tensor_set_dimensions,
+    destroy_network, network_add_element_wise, network_add_identity_layer, network_add_input,
+    network_get_input, network_get_layer, network_get_nb_inputs, network_get_nb_layers,
+    network_get_nb_outputs, network_get_output, network_mark_output, network_remove_tensor,
+    network_unmark_output, tensor_destroy, tensor_get_name, tensor_set_dimensions,
 };
 
 pub struct Network {
@@ -50,13 +50,6 @@ impl Network {
         BaseLayer { internal_layer }
     }
 
-    pub fn add_identity_layer(&self, input_tensor: &Tensor) -> IdentityLayer {
-        let internal_layer = unsafe {
-            network_add_identity_layer(self.internal_network, input_tensor.internal_tensor)
-        };
-        IdentityLayer { internal_layer }
-    }
-
     pub fn get_nb_outputs(&self) -> i32 {
         unsafe { network_get_nb_outputs(self.internal_network) }
     }
@@ -76,6 +69,30 @@ impl Network {
 
     pub fn unmark_output(&self, output_tensor: &Tensor) {
         unsafe { network_unmark_output(self.internal_network, output_tensor.internal_tensor) }
+    }
+
+    pub fn add_identity_layer(&self, input_tensor: &Tensor) -> IdentityLayer {
+        let internal_layer = unsafe {
+            network_add_identity_layer(self.internal_network, input_tensor.internal_tensor)
+        };
+        IdentityLayer { internal_layer }
+    }
+
+    pub fn add_element_wise_layer(
+        &self,
+        input_tensor1: &Tensor,
+        input_tensor2: &Tensor,
+        op: ElementWiseOperation,
+    ) -> ElementWiseLayer {
+        let internal_layer = unsafe {
+            network_add_element_wise(
+                self.internal_network,
+                input_tensor1.internal_tensor,
+                input_tensor2.internal_tensor,
+                op as u32,
+            )
+        };
+        ElementWiseLayer { internal_layer }
     }
 }
 
@@ -113,6 +130,7 @@ mod tests {
     use crate::dims::DimsCHW;
     use crate::runtime::Logger;
     use crate::uff::{UffFile, UffInputOrder, UffParser};
+    use layer::LayerType;
     use lazy_static::lazy_static;
     use std::path::Path;
     use std::sync::Mutex;
@@ -201,18 +219,6 @@ mod tests {
     }
 
     #[test]
-    fn add_identity_layer() {
-        let logger = match LOGGER.lock() {
-            Ok(guard) => guard,
-            Err(poisoned) => poisoned.into_inner(),
-        };
-        let network = create_network(&logger);
-        let tensor = network.add_input("new_input", DataType::Float, DimsCHW::new(1, 28, 28));
-        network.add_identity_layer(&tensor);
-        assert_eq!(network.get_nb_layers(), 1);
-    }
-
-    #[test]
     fn get_nb_outputs() {
         let logger = match LOGGER.lock() {
             Ok(guard) => guard,
@@ -282,5 +288,32 @@ mod tests {
         assert_eq!(network.get_nb_outputs(), 2);
         network.unmark_output(&new_output_tensor);
         assert_eq!(network.get_nb_outputs(), 1);
+    }
+
+    #[test]
+    fn add_identity_layer() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network(&logger);
+        let tensor = network.add_input("new_input", DataType::Float, DimsCHW::new(1, 28, 28));
+        network.add_identity_layer(&tensor);
+        assert_eq!(network.get_nb_layers(), 1);
+    }
+
+    #[test]
+    fn add_element_wise_layer() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network(&logger);
+        let input1 = network.add_input("new_input1", DataType::Float, DimsCHW::new(1, 28, 28));
+        let input2 = network.add_input("new_input2", DataType::Float, DimsCHW::new(1, 28, 28));
+        network.add_element_wise_layer(&input1, &input2, ElementWiseOperation::Sum);
+
+        assert_eq!(network.get_nb_layers(), 1);
+        assert_eq!(network.get_layer(0).get_type(), LayerType::ElementWise);
     }
 }

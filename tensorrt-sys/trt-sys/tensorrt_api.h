@@ -18,5 +18,7 @@
 #include "TRTHostMemory/TRTHostMemory.h"
 #include "TRTProfiler/TRTProfiler.h"
 #include "TRTTensor/TRTTensor.h"
+#include "TRTLayer/TRTLayer.h"
+#include "TRTLayer/TRTElementWiseLayer.h"
 
 #endif //TENSRORT_SYS_TENSORRT_API_H

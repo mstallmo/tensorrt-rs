@@ -31,6 +31,17 @@ enum DimensionType {
 };
 typedef enum DimensionType DimensionType_t;
 
+enum ElementWiseOperation {
+    kSUM = 0,
+    kPROD = 1,
+    kMAX = 2,
+    kMIN = 3,
+    kSUB = 4,
+    kDIV = 5,
+    kPOW = 6,
+};
+typedef enum ElementWiseOperation ElementWiseOperation_t;
+
 enum EngineCapabiliy {
     kDEFAULT = 0,
     kSAFE_GPU = 1,

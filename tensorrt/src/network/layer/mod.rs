@@ -1,5 +1,7 @@
+pub use element_wise_layer::{ElementWiseLayer, ElementWiseOperation};
 pub use identity_layer::IdentityLayer;
 
+mod element_wise_layer;
 mod identity_layer;
 
 use crate::engine::DataType;

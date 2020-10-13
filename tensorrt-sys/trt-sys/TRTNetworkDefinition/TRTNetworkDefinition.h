@@ -42,6 +42,8 @@ void network_mark_output(Network_t *network, Tensor_t *tensor);
 void network_unmark_output(Network_t *network, Tensor_t *tensor);
 
 
+Layer_t* network_add_element_wise(Network_t *network, Tensor_t *input1, Tensor_t *input2, ElementWiseOperation_t op);
+
 #ifdef __cplusplus
 };
 #endif

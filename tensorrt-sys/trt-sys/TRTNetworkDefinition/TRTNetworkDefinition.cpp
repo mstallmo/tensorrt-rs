@@ -70,3 +70,7 @@ Layer_t *network_add_element_wise(Network_t *network, Tensor_t *input1, Tensor_t
     return new Layer(network->internal_network->addElementWise(*input1->internal_tensor, *input2->internal_tensor,
                                                                static_cast<nvinfer1::ElementWiseOperation>(op)));
 }
+
+Layer_t *network_add_gather(Network_t *network, Tensor_t *data, Tensor_t *indices, int32_t axis) {
+    return new Layer(network->internal_network->addGather(*data->internal_tensor, *indices->internal_tensor, axis));
+}

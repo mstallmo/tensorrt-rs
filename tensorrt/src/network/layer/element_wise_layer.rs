@@ -1,7 +1,7 @@
-use super::private::LayerPrivate;
 use super::*;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
+use tensorrt_rs_derive::Layer;
 use tensorrt_sys::{elementwise_destroy, elementwise_get_operation, elementwise_set_operation};
 
 #[repr(C)]
@@ -16,6 +16,7 @@ pub enum ElementWiseOperation {
     Pow,
 }
 
+#[derive(Layer)]
 pub struct ElementWiseLayer {
     pub(crate) internal_layer: *mut tensorrt_sys::Layer_t,
 }
@@ -30,14 +31,6 @@ impl ElementWiseLayer {
         unsafe { elementwise_set_operation(self.internal_layer, op as u32) }
     }
 }
-
-impl LayerPrivate for ElementWiseLayer {
-    fn get_internal_layer(&self) -> *mut tensorrt_sys::Layer_t {
-        self.internal_layer
-    }
-}
-
-impl Layer for ElementWiseLayer {}
 
 impl Drop for ElementWiseLayer {
     fn drop(&mut self) {

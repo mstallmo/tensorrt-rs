@@ -20,5 +20,6 @@
 #include "TRTTensor/TRTTensor.h"
 #include "TRTLayer/TRTLayer.h"
 #include "TRTLayer/TRTElementWiseLayer.h"
+#include "TRTLayer/TRTGatherLayer.h"
 
 #endif //TENSRORT_SYS_TENSORRT_API_H

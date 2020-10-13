@@ -1,7 +1,9 @@
 pub use element_wise_layer::{ElementWiseLayer, ElementWiseOperation};
+pub use gather_layer::GatherLayer;
 pub use identity_layer::IdentityLayer;
 
 mod element_wise_layer;
+mod gather_layer;
 mod identity_layer;
 
 use crate::engine::DataType;
@@ -9,6 +11,7 @@ use crate::network::Tensor;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::ffi::{CStr, CString};
+use tensorrt_rs_derive::Layer;
 use tensorrt_sys::{
     layer_get_input, layer_get_name, layer_get_nb_inputs, layer_get_nb_outputs, layer_get_output,
     layer_get_output_type, layer_get_precision, layer_get_type, layer_output_type_is_set,
@@ -133,18 +136,9 @@ mod private {
     }
 }
 
+#[derive(Layer)]
 pub struct BaseLayer {
     pub(crate) internal_layer: *mut tensorrt_sys::Layer_t,
-}
-
-impl BaseLayer {}
-
-impl Layer for BaseLayer {}
-
-impl private::LayerPrivate for BaseLayer {
-    fn get_internal_layer(&self) -> *mut tensorrt_sys::Layer_t {
-        self.internal_layer
-    }
 }
 
 #[cfg(test)]

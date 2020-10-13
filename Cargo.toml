@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "tensorrt",
-    "tensorrt-sys"
+    "tensorrt-sys",
+    "tensorrt_rs_derive",
 ]

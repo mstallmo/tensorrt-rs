@@ -46,6 +46,8 @@ Layer_t *network_add_element_wise(Network_t *network, Tensor_t *input1, Tensor_t
 
 Layer_t *network_add_gather(Network_t *network, Tensor_t *data, Tensor_t *indices, int32_t axis);
 
+Layer_t *network_add_activation(Network_t *network, Tensor_t *input, ActivationType_t type);
+
 #ifdef __cplusplus
 };
 #endif

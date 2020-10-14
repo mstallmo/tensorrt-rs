@@ -9,6 +9,22 @@
 extern "C" {
 #endif
 
+enum ActivationType {
+    kRELU = 0,
+    kSIGMOID = 1,
+    kTANH = 2,
+    kLEAKY_RELU = 3,
+    kELU = 4,
+    kSELU = 5,
+    kSOFTSIGN = 6,
+    kSOFTPLUS = 7,
+    kCLIP = 8,
+    kHARD_SIGMOID = 9,
+    kSCALED_TANH = 10,
+    kTHRESHOLDED_RELU = 11,
+};
+typedef enum ActivationType ActivationType_t;
+
 enum DataType {
     kFLOAT = 0,
     kHALF = 1,

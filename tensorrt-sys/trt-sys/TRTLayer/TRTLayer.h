@@ -5,6 +5,7 @@
 #ifndef LIBTRT_TRTLAYER_H
 #define LIBTRT_TRTLAYER_H
 
+#include <stdint.h>
 #include "../TRTTensor/TRTTensor.h"
 #include "../TRTEnums.h"
 

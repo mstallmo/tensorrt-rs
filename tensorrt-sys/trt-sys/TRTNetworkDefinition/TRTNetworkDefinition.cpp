@@ -74,3 +74,8 @@ Layer_t *network_add_element_wise(Network_t *network, Tensor_t *input1, Tensor_t
 Layer_t *network_add_gather(Network_t *network, Tensor_t *data, Tensor_t *indices, int32_t axis) {
     return new Layer(network->internal_network->addGather(*data->internal_tensor, *indices->internal_tensor, axis));
 }
+
+Layer_t *network_add_activation(Network_t *network, Tensor_t *input, ActivationType_t type) {
+    return new Layer(network->internal_network->addActivation(*input->internal_tensor,
+                                                              static_cast<nvinfer1::ActivationType>(type)));
+}

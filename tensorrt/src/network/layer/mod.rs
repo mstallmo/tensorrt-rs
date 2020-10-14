@@ -1,7 +1,9 @@
+pub use activation_layer::{ActivationLayer, ActivationType};
 pub use element_wise_layer::{ElementWiseLayer, ElementWiseOperation};
 pub use gather_layer::GatherLayer;
 pub use identity_layer::IdentityLayer;
 
+mod activation_layer;
 mod element_wise_layer;
 mod gather_layer;
 mod identity_layer;

@@ -2,17 +2,20 @@ pub use activation_layer::{ActivationLayer, ActivationType};
 pub use element_wise_layer::{ElementWiseLayer, ElementWiseOperation};
 pub use gather_layer::GatherLayer;
 pub use identity_layer::IdentityLayer;
+pub use pooling_layer::{PoolingLayer, PoolingType};
 
 mod activation_layer;
 mod element_wise_layer;
 mod gather_layer;
 mod identity_layer;
+mod pooling_layer;
 
 use crate::engine::DataType;
 use crate::network::Tensor;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::ffi::{CStr, CString};
+use std::os::raw::c_int;
 use tensorrt_rs_derive::Layer;
 use tensorrt_sys::{
     layer_get_input, layer_get_name, layer_get_nb_inputs, layer_get_nb_outputs, layer_get_output,
@@ -54,7 +57,7 @@ pub enum LayerType {
 pub trait Layer: private::LayerPrivate {
     fn get_type(&self) -> LayerType {
         let raw = unsafe { layer_get_type(self.get_internal_layer()) };
-        FromPrimitive::from_u32(raw).unwrap()
+        FromPrimitive::from_i32(raw).unwrap()
     }
 
     fn set_name(&self, name: &str) {
@@ -98,12 +101,12 @@ pub trait Layer: private::LayerPrivate {
     }
 
     fn set_precision(&self, precision: DataType) {
-        unsafe { layer_set_precision(self.get_internal_layer(), precision as u32) }
+        unsafe { layer_set_precision(self.get_internal_layer(), precision as c_int) }
     }
 
     fn get_precision(&self) -> DataType {
         let raw = unsafe { layer_get_precision(self.get_internal_layer()) };
-        FromPrimitive::from_u32(raw).unwrap()
+        FromPrimitive::from_i32(raw).unwrap()
     }
 
     fn precision_is_set(&self) -> bool {
@@ -115,12 +118,12 @@ pub trait Layer: private::LayerPrivate {
     }
 
     fn set_output_type(&self, index: i32, data_type: DataType) {
-        unsafe { layer_set_output_type(self.get_internal_layer(), index, data_type as u32) }
+        unsafe { layer_set_output_type(self.get_internal_layer(), index, data_type as c_int) }
     }
 
     fn get_output_type(&self, index: i32) -> DataType {
         let raw = unsafe { layer_get_output_type(self.get_internal_layer(), index) };
-        FromPrimitive::from_u32(raw).unwrap()
+        FromPrimitive::from_i32(raw).unwrap()
     }
 
     fn output_type_is_set(&self, index: i32) -> bool {

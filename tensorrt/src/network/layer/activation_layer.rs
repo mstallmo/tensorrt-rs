@@ -32,11 +32,11 @@ pub struct ActivationLayer {
 impl ActivationLayer {
     pub fn get_activation_type(&self) -> ActivationType {
         let raw = unsafe { activation_get_activation_type(self.internal_layer) };
-        FromPrimitive::from_u32(raw).unwrap()
+        FromPrimitive::from_i32(raw).unwrap()
     }
 
     pub fn set_activation_type(&self, activation_type: ActivationType) {
-        unsafe { activation_set_activation_type(self.internal_layer, activation_type as u32) }
+        unsafe { activation_set_activation_type(self.internal_layer, activation_type as c_int) }
     }
 
     pub fn get_alpha(&self) -> f32 {

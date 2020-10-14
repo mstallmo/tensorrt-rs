@@ -79,3 +79,9 @@ Layer_t *network_add_activation(Network_t *network, Tensor_t *input, ActivationT
     return new Layer(network->internal_network->addActivation(*input->internal_tensor,
                                                               static_cast<nvinfer1::ActivationType>(type)));
 }
+
+Layer_t *network_add_pooling(Network_t *network, Tensor_t *input, PoolingType poolingType, Dims_t *dims) {
+    return new Layer(network->internal_network->addPooling(*input->internal_tensor,
+                                                           static_cast<nvinfer1::PoolingType>(poolingType),
+                                                           dimsHW_get(dims)));
+}

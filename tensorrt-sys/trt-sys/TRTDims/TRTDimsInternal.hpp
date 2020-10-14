@@ -10,5 +10,6 @@
 #include "TRTDims.h"
 
 nvinfer1::Dims dims_get(const Dims_t* dims);
+nvinfer1::DimsHW dimsHW_get(const Dims_t* dims);
 
 #endif //LIBTRT_TRTDIMSINTERNAL_HPP

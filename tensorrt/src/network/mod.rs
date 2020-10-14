@@ -1,15 +1,16 @@
 pub mod layer;
 
-use crate::dims::IsDim;
+use crate::dims::{DimsHW, IsDim};
 use crate::engine::DataType;
 use layer::*;
 use std::ffi::{CStr, CString};
+use std::os::raw::c_int;
 use tensorrt_sys::{
     destroy_network, network_add_activation, network_add_element_wise, network_add_gather,
-    network_add_identity_layer, network_add_input, network_get_input, network_get_layer,
-    network_get_nb_inputs, network_get_nb_layers, network_get_nb_outputs, network_get_output,
-    network_mark_output, network_remove_tensor, network_unmark_output, tensor_destroy,
-    tensor_get_name, tensor_set_dimensions,
+    network_add_identity_layer, network_add_input, network_add_pooling, network_get_input,
+    network_get_layer, network_get_nb_inputs, network_get_nb_layers, network_get_nb_outputs,
+    network_get_output, network_mark_output, network_remove_tensor, network_unmark_output,
+    tensor_destroy, tensor_get_name, tensor_set_dimensions,
 };
 
 pub struct Network {
@@ -30,7 +31,7 @@ impl Network {
             network_add_input(
                 self.internal_network,
                 CString::new(name).unwrap().as_ptr(),
-                data_type as u32,
+                data_type as c_int,
                 dims.internal_dims(),
             )
         };
@@ -90,7 +91,7 @@ impl Network {
                 self.internal_network,
                 input_tensor1.internal_tensor,
                 input_tensor2.internal_tensor,
-                op as u32,
+                op as c_int,
             )
         };
         ElementWiseLayer { internal_layer }
@@ -117,10 +118,27 @@ impl Network {
             network_add_activation(
                 self.internal_network,
                 input.internal_tensor,
-                activation_type as u32,
+                activation_type as c_int,
             )
         };
         ActivationLayer { internal_layer }
+    }
+
+    pub fn add_pooling(
+        &self,
+        input: &Tensor,
+        pooling_type: PoolingType,
+        window_size: DimsHW,
+    ) -> PoolingLayer {
+        let internal_layer = unsafe {
+            network_add_pooling(
+                self.internal_network,
+                input.internal_tensor,
+                pooling_type as c_int,
+                window_size.internal_dims,
+            )
+        };
+        PoolingLayer { internal_layer }
     }
 }
 
@@ -155,7 +173,7 @@ impl Drop for Tensor {
 mod tests {
     use super::*;
     use crate::builder::Builder;
-    use crate::dims::DimsCHW;
+    use crate::dims::{DimsCHW, DimsHW};
     use crate::runtime::Logger;
     use crate::uff::{UffFile, UffInputOrder, UffParser};
     use layer::LayerType;
@@ -371,5 +389,18 @@ mod tests {
         network.add_activation(&input1, ActivationType::Relu);
 
         assert_eq!(network.get_layer(0).get_type(), LayerType::Activation);
+    }
+
+    #[test]
+    fn add_pooling() {
+        let logger = match LOGGER.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let network = create_network(&logger);
+        let input1 = network.add_input("new_input1", DataType::Float, DimsCHW::new(1, 28, 28));
+
+        network.add_pooling(&input1, PoolingType::Max, DimsHW::new(10, 10));
+        assert_eq!(network.get_layer(0).get_type(), LayerType::Pooling);
     }
 }

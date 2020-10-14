@@ -48,6 +48,8 @@ Layer_t *network_add_gather(Network_t *network, Tensor_t *data, Tensor_t *indice
 
 Layer_t *network_add_activation(Network_t *network, Tensor_t *input, ActivationType_t type);
 
+Layer_t *network_add_pooling(Network_t *network, Tensor_t *input, PoolingType poolingType, Dims_t *dims);
+
 #ifdef __cplusplus
 };
 #endif

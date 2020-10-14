@@ -24,11 +24,11 @@ pub struct ElementWiseLayer {
 impl ElementWiseLayer {
     pub fn get_operation(&self) -> ElementWiseOperation {
         let raw = unsafe { elementwise_get_operation(self.internal_layer) };
-        FromPrimitive::from_u32(raw).unwrap()
+        FromPrimitive::from_i32(raw).unwrap()
     }
 
     pub fn set_operation(&self, op: ElementWiseOperation) {
-        unsafe { elementwise_set_operation(self.internal_layer, op as u32) }
+        unsafe { elementwise_set_operation(self.internal_layer, op as c_int) }
     }
 }
 

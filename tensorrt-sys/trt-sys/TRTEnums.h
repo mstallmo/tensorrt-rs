@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-enum ActivationType {
+enum class ActivationType {
     kRELU = 0,
     kSIGMOID = 1,
     kTANH = 2,
@@ -25,7 +25,7 @@ enum ActivationType {
 };
 typedef enum ActivationType ActivationType_t;
 
-enum DataType {
+enum class DataType {
     kFLOAT = 0,
     kHALF = 1,
     kINT8 = 2,
@@ -33,13 +33,13 @@ enum DataType {
 };
 typedef enum DataType DataType_t;
 
-enum DeviceType {
+enum class DeviceType {
     kGPU = 0,
     kDLA = 1,
 };
 typedef enum DeviceType DeviceType_t;
 
-enum DimensionType {
+enum class DimensionType {
     kSPATIAL = 0,
     kCHANNEL = 1,
     kINDEX = 2,
@@ -47,7 +47,7 @@ enum DimensionType {
 };
 typedef enum DimensionType DimensionType_t;
 
-enum ElementWiseOperation {
+enum class ElementWiseOperation {
     kSUM = 0,
     kPROD = 1,
     kMAX = 2,
@@ -58,14 +58,14 @@ enum ElementWiseOperation {
 };
 typedef enum ElementWiseOperation ElementWiseOperation_t;
 
-enum EngineCapabiliy {
+enum class EngineCapabiliy {
     kDEFAULT = 0,
     kSAFE_GPU = 1,
     kSAFE_DLA = 2,
 };
 typedef enum EngineCapabiliy EngineCapabiliy_t;
 
-enum LayerType {
+enum class LayerType {
     kCONVOLUTION = 0,
     kFULLY_CONNECTED = 1,
     kACTIVATION  = 2,
@@ -94,7 +94,13 @@ enum LayerType {
 };
 typedef enum LayerType LayerType_t;
 
-enum TensorLocation {
+enum class PoolingType {
+    kMAX = 0,
+    kAVERAGE = 1,
+    kMAX_AVERAGE_BLEND = 2,
+};
+
+enum class TensorLocation {
     kDEVICE = 0,
     kHOST = 1,
 };

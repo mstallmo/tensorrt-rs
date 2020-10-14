@@ -52,8 +52,8 @@ Dims_t* create_dimsHW(int height , int width) {
     dims->nbDims = 2;
     dims->d[0] = height;
     dims->d[1] = width;
-    dims->type[0] = kSPATIAL;
-    dims->type[1] = kSPATIAL;
+    dims->type[0] = DimensionType::kSPATIAL;
+    dims->type[1] = DimensionType::kSPATIAL;
 
     return dims;
 }
@@ -73,9 +73,9 @@ Dims_t* create_dimsCHW(int channels, int height, int width) {
     dims->d[0] = channels;
     dims->d[1] = height;
     dims->d[2] = width;
-    dims->type[0] = kCHANNEL;
-    dims->type[1] = kSPATIAL;
-    dims->type[2] = kSPATIAL;
+    dims->type[0] = DimensionType::kCHANNEL;
+    dims->type[1] = DimensionType::kSPATIAL;
+    dims->type[2] = DimensionType::kSPATIAL;
 
     return dims;
 }
@@ -98,10 +98,10 @@ Dims_t* create_dimsNCHW(int batchSize, int channel, int height, int width) {
     dims->d[1] = channel;
     dims->d[2] = height;
     dims->d[3] = width;
-    dims->type[0] = kINDEX;
-    dims->type[1] = kCHANNEL;
-    dims->type[2] = kSPATIAL;
-    dims->type[2] = kSPATIAL;
+    dims->type[0] = DimensionType::kINDEX;
+    dims->type[1] = DimensionType::kCHANNEL;
+    dims->type[2] = DimensionType::kSPATIAL;
+    dims->type[2] = DimensionType::kSPATIAL;
 
     return dims;
 }
@@ -111,6 +111,11 @@ nvinfer1::Dims dims_get(const Dims_t* dims) {
     nvDim.nbDims = dims->nbDims;
     memcpy(nvDim.d, dims->d, nvinfer1::Dims::MAX_DIMS * sizeof(int));
     memcpy(nvDim.type, dims->type, nvinfer1::Dims::MAX_DIMS * sizeof(int));
+    return nvDim;
+}
+
+nvinfer1::DimsHW dimsHW_get(const Dims_t *dims) {
+    nvinfer1::DimsHW nvDim(dims->d[0], dims->d[1]);
     return nvDim;
 }
 

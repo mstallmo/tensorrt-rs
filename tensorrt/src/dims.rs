@@ -1,6 +1,6 @@
 use std::error;
 use std::fmt::Formatter;
-use std::os::raw::{c_int, c_uint};
+use std::os::raw::c_int;
 use tensorrt_sys::{
     create_dims, create_dims2, create_dims3, create_dims4, create_dimsCHW, create_dimsHW,
     create_dimsNCHW, destroy_dims, dims2_set_dimension_types, dims3_set_dimension_types,
@@ -33,7 +33,7 @@ impl Dims {
             create_dims(
                 num_dims,
                 dimension_sizes.as_mut_ptr() as *mut c_int,
-                dimension_types.as_ptr() as *const c_uint,
+                dimension_types.as_ptr() as *const c_int,
             )
         };
 
@@ -74,7 +74,7 @@ impl Dims2 {
     }
 
     pub fn set_dimension_types(&self, type1: DimensionType, type2: DimensionType) {
-        unsafe { dims2_set_dimension_types(self.internal_dims, type1 as u32, type2 as u32) }
+        unsafe { dims2_set_dimension_types(self.internal_dims, type1 as c_int, type2 as c_int) }
     }
 }
 
@@ -125,7 +125,12 @@ impl Dims3 {
         type3: DimensionType,
     ) {
         unsafe {
-            dims3_set_dimension_types(self.internal_dims, type1 as u32, type2 as u32, type3 as u32)
+            dims3_set_dimension_types(
+                self.internal_dims,
+                type1 as c_int,
+                type2 as c_int,
+                type3 as c_int,
+            )
         };
     }
 }
@@ -185,10 +190,10 @@ impl Dims4 {
         unsafe {
             dims4_set_dimension_types(
                 self.internal_dims,
-                type1 as u32,
-                type2 as u32,
-                type3 as u32,
-                type4 as u32,
+                type1 as c_int,
+                type2 as c_int,
+                type3 as c_int,
+                type4 as c_int,
             )
         };
     }

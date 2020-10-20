@@ -5,17 +5,12 @@
 #ifndef LIBTRT_TRTDIMS_H
 #define LIBTRT_TRTDIMS_H
 
+#include "../TRTEnums.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-enum DimensionType {
-    kSPATIAL = 0,
-    kCHANNEL = 1,
-    kINDEX = 2,
-    kSEQUENCE = 3
-};
-typedef enum DimensionType DimensionType_t;
 
 struct Dims {
     int nbDims;

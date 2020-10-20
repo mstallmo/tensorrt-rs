@@ -20,11 +20,5 @@ struct Network {
     [[nodiscard]] nvinfer1::INetworkDefinition& getNetworkDefinition() const;
 };
 
-struct Tensor {
-    nvinfer1::ITensor *internal_tensor;
-
-    explicit Tensor(nvinfer1::ITensor *tensor) : internal_tensor(tensor) {};
-};
-
 
 #endif //LIBTRT_TRTNETWORKDEFINITIONINTERNAL_HPP

@@ -8,24 +8,11 @@
 #include "../TRTContext/TRTContext.h"
 #include "../TRTHostMemory/TRTHostMemory.h"
 #include "../TRTDims/TRTDims.h"
+#include "../TRTEnums.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-enum DataType {
-    kFLOAT = 0,
-    kHALF = 1,
-    kINT8 = 2,
-    kINT32 = 3,
-};
-typedef enum DataType DataType_t;
-
-enum TensorLocation {
-    kDEVICE = 0,
-    kHOST = 1,
-};
-typedef enum TensorLocation TensorLocation_t;
 
 struct Engine;
 typedef struct Engine Engine_t;

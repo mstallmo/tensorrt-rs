@@ -9,7 +9,7 @@ use crate::network::Network;
 use crate::runtime::Logger;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
-use std::os::raw::c_uint;
+use std::os::raw::c_int;
 #[cfg(not(feature = "trt-5"))]
 use tensorrt_sys::create_network_v2;
 use tensorrt_sys::{
@@ -138,41 +138,41 @@ impl<'a> Builder<'a> {
         unsafe { builder_get_fp16_mode(self.internal_builder) }
     }
 
-    pub fn set_device_type(&self, layer: &Layer, device_type: DeviceType) {
+    pub fn set_device_type<T: Layer>(&self, layer: &T, device_type: DeviceType) {
         unsafe {
             builder_set_device_type(
                 self.internal_builder,
-                layer.internal_layer,
-                device_type as c_uint,
+                layer.get_internal_layer(),
+                device_type as c_int,
             )
         }
     }
 
-    pub fn get_device_type(&self, layer: &Layer) -> DeviceType {
+    pub fn get_device_type(&self, layer: &dyn Layer) -> DeviceType {
         let primitive =
-            unsafe { builder_get_device_type(self.internal_builder, layer.internal_layer) };
-        FromPrimitive::from_u32(primitive).unwrap()
+            unsafe { builder_get_device_type(self.internal_builder, layer.get_internal_layer()) };
+        FromPrimitive::from_i32(primitive).unwrap()
     }
 
-    pub fn is_device_type_set(&self, layer: &Layer) -> bool {
-        unsafe { builder_is_device_type_set(self.internal_builder, layer.internal_layer) }
+    pub fn is_device_type_set(&self, layer: &dyn Layer) -> bool {
+        unsafe { builder_is_device_type_set(self.internal_builder, layer.get_internal_layer()) }
     }
 
     pub fn set_default_device_type(&self, device_type: DeviceType) {
-        unsafe { builder_set_default_device_type(self.internal_builder, device_type as c_uint) }
+        unsafe { builder_set_default_device_type(self.internal_builder, device_type as c_int) }
     }
 
     pub fn get_default_device_type(&self) -> DeviceType {
         let primitive = unsafe { builder_get_default_device_type(self.internal_builder) };
-        FromPrimitive::from_u32(primitive).unwrap()
+        FromPrimitive::from_i32(primitive).unwrap()
     }
 
-    pub fn reset_device_type(&self, layer: &Layer) {
-        unsafe { builder_reset_device_type(self.internal_builder, layer.internal_layer) }
+    pub fn reset_device_type(&self, layer: &dyn Layer) {
+        unsafe { builder_reset_device_type(self.internal_builder, layer.get_internal_layer()) }
     }
 
-    pub fn can_run_on_dla(&self, layer: &Layer) -> bool {
-        unsafe { builder_can_run_on_dla(self.internal_builder, layer.internal_layer) }
+    pub fn can_run_on_dla(&self, layer: &dyn Layer) -> bool {
+        unsafe { builder_can_run_on_dla(self.internal_builder, layer.get_internal_layer()) }
     }
 
     pub fn get_max_dla_batch_size(&self) -> i32 {
@@ -212,12 +212,12 @@ impl<'a> Builder<'a> {
     }
 
     pub fn set_engine_capability(&self, engine_capability: EngineCapability) {
-        unsafe { builder_set_engine_capability(self.internal_builder, engine_capability as c_uint) }
+        unsafe { builder_set_engine_capability(self.internal_builder, engine_capability as c_int) }
     }
 
     pub fn get_engine_capability(&self) -> EngineCapability {
         let primitive = unsafe { builder_get_engine_capability(self.internal_builder) };
-        FromPrimitive::from_u32(primitive).unwrap()
+        FromPrimitive::from_i32(primitive).unwrap()
     }
 
     pub fn create_network(&self) -> Network {

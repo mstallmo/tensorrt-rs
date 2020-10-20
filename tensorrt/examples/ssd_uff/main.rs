@@ -5,7 +5,7 @@ use std::iter::FromIterator;
 use std::path::Path;
 use tensorrt_rs::builder::Builder;
 use tensorrt_rs::context::ExecuteInput;
-use tensorrt_rs::dims::DimsCHW;
+use tensorrt_rs::dims::{Dim, DimsCHW};
 use tensorrt_rs::engine::Engine;
 use tensorrt_rs::runtime::Logger;
 use tensorrt_rs::uff::{UffFile, UffInputOrder, UffParser};

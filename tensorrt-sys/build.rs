@@ -38,6 +38,7 @@ fn main() -> Result<(), ()> {
     #[cfg(feature = "trt-5")]
     {
         let bindings = builder()
+            .clang_args(&["-x", "c++"])
             .header("trt-sys/tensorrt_api.h")
             .size_t_is_usize(true)
             .generate()?;
@@ -50,6 +51,7 @@ fn main() -> Result<(), ()> {
         cfg.define("TRT6", "");
         let bindings = builder()
             .clang_arg("-DTRT6")
+            .clang_args(&["-x", "c++"])
             .header("trt-sys/tensorrt_api.h")
             .size_t_is_usize(true)
             .generate()?;
@@ -62,6 +64,7 @@ fn main() -> Result<(), ()> {
         cfg.define("TRT7", "");
         let bindings = builder()
             .clang_arg("-DTRT7")
+            .clang_arg("-x c++")
             .header("trt-sys/tensorrt_api.h")
             .size_t_is_usize(true)
             .generate()?;

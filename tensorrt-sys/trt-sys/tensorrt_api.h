@@ -5,6 +5,7 @@
 #ifndef TENSRORT_SYS_TENSORRT_API_H
 #define TENSRORT_SYS_TENSORRT_API_H
 
+#include "TRTEnums.h"
 #include "TRTLogger/TRTLogger.h"
 #include "TRTRuntime/TRTRuntime.h"
 #include "TRTCudaEngine/TRTCudaEngine.h"
@@ -16,5 +17,11 @@
 #include "TRTNetworkDefinition/TRTNetworkDefinition.h"
 #include "TRTHostMemory/TRTHostMemory.h"
 #include "TRTProfiler/TRTProfiler.h"
+#include "TRTTensor/TRTTensor.h"
+#include "TRTLayer/TRTLayer.h"
+#include "TRTLayer/TRTElementWiseLayer.h"
+#include "TRTLayer/TRTGatherLayer.h"
+#include "TRTLayer/TRTActivationLayer.h"
+#include "TRTLayer/TRTPoolingLayer.h"
 
 #endif //TENSRORT_SYS_TENSORRT_API_H

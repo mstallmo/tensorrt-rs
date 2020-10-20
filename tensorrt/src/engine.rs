@@ -86,7 +86,7 @@ impl Engine {
     pub fn get_binding_data_type(&self, binding_index: i32) -> DataType {
         let primitive =
             unsafe { engine_get_binding_data_type(self.internal_engine, binding_index) };
-        FromPrimitive::from_u32(primitive).unwrap()
+        FromPrimitive::from_i32(primitive).unwrap()
     }
 
     pub fn get_max_batch_size(&self) -> i32 {
@@ -125,7 +125,7 @@ impl Engine {
 
     pub fn get_location(&self, binding_index: i32) -> TensorLocation {
         let primitive = unsafe { engine_get_location(self.internal_engine, binding_index) };
-        FromPrimitive::from_u32(primitive).unwrap()
+        FromPrimitive::from_i32(primitive).unwrap()
     }
 
     pub fn get_device_memory_size(&self) -> usize {

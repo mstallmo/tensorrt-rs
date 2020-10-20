@@ -4,8 +4,9 @@
 #include <NvInfer.h>
 
 #include "TRTNetworkDefinitionInternal.hpp"
-#include "../TRTDims/TRTDimsInternal.hpp"
 #include "../TRTLayer/TRTLayerInternal.hpp"
+#include "../TRTTensor/TRTTensorInternal.hpp"
+#include "../TRTDims/TRTDimsInternal.hpp"
 
 void destroy_network(Network_t *network) {
     if (network == nullptr)
@@ -14,29 +15,73 @@ void destroy_network(Network_t *network) {
     delete network;
 }
 
-nvinfer1::INetworkDefinition& Network::getNetworkDefinition() const {
-   return *this->internal_network;
+nvinfer1::INetworkDefinition &Network::getNetworkDefinition() const {
+    return *this->internal_network;
 }
 
-Tensor_t *network_get_input(Network_t *network, int32_t idx) {
-    if (network == nullptr) {
-        return nullptr;
-    }
-
-    return new Tensor(network->internal_network->getInput(idx));
+Tensor_t *network_add_input(Network_t *network, const char *name, DataType_t type, Dims_t *dims) {
+    return new Tensor(network->internal_network->addInput(name, static_cast<nvinfer1::DataType>(type), dims_get(dims)));
 }
 
-Layer_t* network_get_layer(Network_t *network, int index) {
+int network_get_nb_layers(Network_t *network) {
+    return network->internal_network->getNbLayers();
+}
+
+Layer_t *network_get_layer(Network_t *network, int index) {
     if (network == nullptr)
         return nullptr;
 
     return new Layer(network->internal_network->getLayer(index));
 }
 
-void tensor_set_dimensions(Tensor_t *tensor, Dims_t *dimensions) {
-    if (tensor == nullptr) {
-        return;
-    }
+Layer_t *network_add_identity_layer(Network_t *network, Tensor_t *inputTensor) {
+    return new Layer(network->internal_network->addIdentity(*inputTensor->internal_tensor));
+}
 
-    tensor->internal_tensor->setDimensions(dims_get(dimensions));
+int network_get_nb_inputs(Network_t *network) {
+    return network->internal_network->getNbInputs();
+}
+
+Tensor_t *network_get_input(Network_t *network, int32_t idx) {
+    return new Tensor(network->internal_network->getInput(idx));
+}
+
+int network_get_nb_outputs(Network_t *network) {
+    return network->internal_network->getNbOutputs();
+}
+
+Tensor_t *network_get_output(Network_t *network, int32_t index) {
+    return new Tensor(network->internal_network->getOutput(index));
+}
+
+void network_remove_tensor(Network_t *network, Tensor_t *tensor) {
+    network->internal_network->removeTensor(*tensor->internal_tensor);
+}
+
+void network_mark_output(Network_t *network, Tensor_t *tensor) {
+    network->internal_network->markOutput(*tensor->internal_tensor);
+}
+
+void network_unmark_output(Network_t *network, Tensor_t *tensor) {
+    network->internal_network->unmarkOutput(*tensor->internal_tensor);
+}
+
+Layer_t *network_add_element_wise(Network_t *network, Tensor_t *input1, Tensor_t *input2, ElementWiseOperation_t op) {
+    return new Layer(network->internal_network->addElementWise(*input1->internal_tensor, *input2->internal_tensor,
+                                                               static_cast<nvinfer1::ElementWiseOperation>(op)));
+}
+
+Layer_t *network_add_gather(Network_t *network, Tensor_t *data, Tensor_t *indices, int32_t axis) {
+    return new Layer(network->internal_network->addGather(*data->internal_tensor, *indices->internal_tensor, axis));
+}
+
+Layer_t *network_add_activation(Network_t *network, Tensor_t *input, ActivationType_t type) {
+    return new Layer(network->internal_network->addActivation(*input->internal_tensor,
+                                                              static_cast<nvinfer1::ActivationType>(type)));
+}
+
+Layer_t *network_add_pooling(Network_t *network, Tensor_t *input, PoolingType poolingType, Dims_t *dims) {
+    return new Layer(network->internal_network->addPooling(*input->internal_tensor,
+                                                           static_cast<nvinfer1::PoolingType>(poolingType),
+                                                           dimsHW_get(dims)));
 }

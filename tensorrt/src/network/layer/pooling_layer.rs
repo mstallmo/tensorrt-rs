@@ -1,7 +1,7 @@
 use super::*;
 use crate::dims::{Dim, Dims, DimsHW};
 use num_derive::FromPrimitive;
-use num_traits::Fravailableve;
+use num_traits::FromPrimitive;
 use tensorrt_rs_derive::Layer;
 use tensorrt_sys::{
     pooling_destroy, pooling_get_average_count_excludes_padding, pooling_get_blend_factor,

@@ -1,6 +1,6 @@
 pub mod layer;
 
-use crate::dims::{DimsHW, IsDim};
+use crate::dims::{Dim, DimsHW};
 use crate::engine::DataType;
 use layer::*;
 use std::ffi::{CStr, CString};
@@ -26,13 +26,13 @@ impl Network {
         unsafe { network_get_nb_inputs(self.internal_network) }
     }
 
-    pub fn add_input<T: IsDim>(&self, name: &str, data_type: DataType, dims: T) -> Tensor {
+    pub fn add_input<T: Dim>(&self, name: &str, data_type: DataType, dims: T) -> Tensor {
         let internal_tensor = unsafe {
             network_add_input(
                 self.internal_network,
                 CString::new(name).unwrap().as_ptr(),
                 data_type as c_int,
-                dims.internal_dims(),
+                dims.get_internal_dims(),
             )
         };
         Tensor { internal_tensor }
@@ -158,8 +158,8 @@ impl Tensor {
         }
     }
 
-    pub fn set_dimensions<D: IsDim>(&mut self, dims: D) {
-        unsafe { tensor_set_dimensions(self.internal_tensor, dims.internal_dims()) };
+    pub fn set_dimensions<D: Dim>(&mut self, dims: D) {
+        unsafe { tensor_set_dimensions(self.internal_tensor, dims.get_internal_dims()) };
     }
 }
 

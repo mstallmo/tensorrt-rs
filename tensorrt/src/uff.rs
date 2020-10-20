@@ -1,4 +1,4 @@
-use crate::dims::IsDim;
+use crate::dims::Dim;
 use crate::network::Network;
 use std::error;
 use std::ffi::CString;
@@ -58,14 +58,14 @@ impl UffParser {
     pub fn register_input(
         &self,
         input_name: &str,
-        dims: impl IsDim,
+        dims: impl Dim,
         input_order: UffInputOrder,
     ) -> Result<(), UFFRegistrationError> {
         let res = unsafe {
             uffparser_register_input(
                 self.internal_uffparser,
                 CString::new(input_name).unwrap().as_ptr(),
-                dims.internal_dims(),
+                dims.get_internal_dims(),
                 input_order as i32,
             )
         };

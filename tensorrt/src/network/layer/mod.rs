@@ -2,7 +2,7 @@ pub use activation_layer::{ActivationLayer, ActivationType};
 pub use element_wise_layer::{ElementWiseLayer, ElementWiseOperation};
 pub use gather_layer::GatherLayer;
 pub use identity_layer::IdentityLayer;
-pub use pooling_layer::{PoolingLayer, PoolingType};
+pub use pooling_layer::{PaddingMode, PoolingLayer, PoolingType};
 
 mod activation_layer;
 mod element_wise_layer;

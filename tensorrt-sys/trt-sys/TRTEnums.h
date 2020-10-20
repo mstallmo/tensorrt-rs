@@ -94,6 +94,15 @@ enum class LayerType {
 };
 typedef enum LayerType LayerType_t;
 
+enum class PaddingMode {
+    kEXPLICIT_ROUND_DOWN = 0,
+    kEXPLICIT_ROUND_UP = 1,
+    kSAME_UPPER = 2,
+    kSAME_LOWER = 3,
+    kCAFFE_ROUND_DOWN = 4,
+    kCAFFE_ROUND_UP = 5,
+};
+
 enum class PoolingType {
     kMAX = 0,
     kAVERAGE = 1,

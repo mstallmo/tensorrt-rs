@@ -8,7 +8,6 @@
 #include "TRTBuilder.h"
 #include "../TRTNetworkDefinition/TRTNetworkDefinitionInternal.hpp"
 #include "../TRTLogger/TRTLoggerInternal.hpp"
-#include "../TRTCudaEngine/TRTCudaEngineInternal.hpp"
 #include "../TRTLayer/TRTLayerInternal.hpp"
 #include "../TRTUtils.hpp"
 
@@ -190,11 +189,10 @@ Network_t *create_network_v2(Builder_t *builder, uint32_t flags) {
 }
 #endif
 
-Engine_t *build_cuda_engine(Builder_t *builder, Network_t *network) {
+nvinfer1::ICudaEngine *build_cuda_engine(Builder_t *builder, Network_t *network) {
     auto& b = builder->internal_builder;
 
-    auto engine = b->buildCudaEngine(network->getNetworkDefinition());
-    return create_engine(engine);
+    return b->buildCudaEngine(network->getNetworkDefinition());
 }
 
 void builder_reset(Builder_t* builder, Network_t* network) {

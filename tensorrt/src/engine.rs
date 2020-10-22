@@ -12,7 +12,7 @@ use tensorrt_sys::{
     engine_get_binding_name, engine_get_device_memory_size, engine_get_location,
     engine_get_max_batch_size, engine_get_nb_bindings, engine_get_nb_layers,
     engine_get_workspace_size, engine_is_refittable, engine_serialize, host_memory_get_data,
-    host_memory_get_size,
+    host_memory_get_size, nvinfer1_ICudaEngine,
 };
 
 #[repr(C)]
@@ -33,12 +33,17 @@ pub enum TensorLocation {
 
 #[derive(Debug)]
 pub struct Engine {
-    pub(crate) internal_engine: *mut tensorrt_sys::Engine_t,
+    pub(crate) internal_engine: *mut nvinfer1_ICudaEngine,
 }
 
 impl Engine {
     pub fn get_nb_bindings(&self) -> i32 {
-        unsafe { engine_get_nb_bindings(self.internal_engine) }
+        let res = if !self.internal_engine.is_null() {
+            unsafe { engine_get_nb_bindings(self.internal_engine) }
+        } else {
+            0
+        };
+        res
     }
 
     pub fn get_binding_name(&self, binding_index: i32) -> Option<String> {
@@ -141,7 +146,9 @@ unsafe impl Send for Engine {}
 
 impl Drop for Engine {
     fn drop(&mut self) {
-        unsafe { engine_destroy(self.internal_engine) };
+        if !self.internal_engine.is_null() {
+            unsafe { engine_destroy(self.internal_engine) };
+        }
     }
 }
 

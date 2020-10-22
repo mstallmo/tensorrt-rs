@@ -5,6 +5,7 @@
 #ifndef LIBTRT_TRTBUILDER_H
 #define LIBTRT_TRTBUILDER_H
 
+#include <NvInfer.h>
 #include "../TRTLogger/TRTLogger.h"
 #include "../TRTNetworkDefinition/TRTNetworkDefinition.h"
 #include "../TRTCudaEngine/TRTCudaEngine.h"
@@ -84,11 +85,12 @@ Network_t *create_network(Builder_t* builder);
 Network_t *create_network_v2(Builder_t* builder, uint32_t flags);
 #endif
 
-Engine_t *build_cuda_engine(Builder_t* builder, Network_t* network);
 void builder_reset(Builder_t* builder, Network_t* network);
 
 #ifdef __cplusplus
 };
 #endif
+
+nvinfer1::ICudaEngine *build_cuda_engine(Builder_t *builder, Network_t *network);
 
 #endif //LIBTRT_TRTBUILDER_H

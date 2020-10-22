@@ -5,7 +5,6 @@
 #include "TRTRuntime.h"
 
 #include "../TRTLogger/TRTLoggerInternal.hpp"
-#include "../TRTCudaEngine/TRTCudaEngineInternal.hpp"
 #include "../TRTUtils.hpp"
 
 struct Runtime {
@@ -28,10 +27,8 @@ void destroy_infer_runtime(Runtime_t* runtime) {
     delete runtime;
 }
 
-Engine_t* deserialize_cuda_engine(Runtime_t* runtime, const void* blob, unsigned long long size) {
-    nvinfer1::ICudaEngine* engine = runtime->internal_runtime->deserializeCudaEngine(blob, size, nullptr);
-
-    return create_engine(engine);
+nvinfer1::ICudaEngine *deserialize_cuda_engine(Runtime_t *runtime, const void *blob, unsigned long long size) {
+    return runtime->internal_runtime->deserializeCudaEngine(blob, size, nullptr);
 }
 
 int runtime_get_nb_dla_cores(Runtime_t *runtime) {

@@ -13,8 +13,8 @@
 #include "../TRTEnums.h"
 
 void engine_destroy(nvinfer1::ICudaEngine* engine);
-Context_t* engine_create_execution_context(nvinfer1::ICudaEngine* engine);
-Context_t* engine_create_execution_context_without_device_memory(nvinfer1::ICudaEngine *engine);
+nvinfer1::IExecutionContext* engine_create_execution_context(nvinfer1::ICudaEngine *engine);
+nvinfer1::IExecutionContext* engine_create_execution_context_without_device_memory(nvinfer1::ICudaEngine *engine);
 int engine_get_nb_bindings(nvinfer1::ICudaEngine* engine);
 int engine_get_binding_index(nvinfer1::ICudaEngine *engine, const char* op_name);
 const char* engine_get_binding_name(nvinfer1::ICudaEngine* engine, int binding_index);

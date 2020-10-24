@@ -5,7 +5,6 @@
 #include <cstdlib>
 
 #include "../TRTHostMemory/TRTHostMemoryInternal.hpp"
-#include "../TRTContext/TRTContextInternal.hpp"
 #include "TRTCudaEngine.h"
 
 void engine_destroy(nvinfer1::ICudaEngine* engine) {
@@ -55,14 +54,12 @@ size_t engine_get_workspace_size(nvinfer1::ICudaEngine *engine) {
     return engine->getWorkspaceSize();
 }
 
-Context_t* engine_create_execution_context(nvinfer1::ICudaEngine* engine) {
-    nvinfer1::IExecutionContext *context = engine->createExecutionContext();
-    return create_execution_context(context);
+nvinfer1::IExecutionContext* engine_create_execution_context(nvinfer1::ICudaEngine *engine) {
+    return engine->createExecutionContext();
 }
 
-Context_t* engine_create_execution_context_without_device_memory(nvinfer1::ICudaEngine *engine) {
-    nvinfer1::IExecutionContext *context = engine->createExecutionContextWithoutDeviceMemory();
-    return create_execution_context(context);
+nvinfer1::IExecutionContext* engine_create_execution_context_without_device_memory(nvinfer1::ICudaEngine *engine) {
+    return engine->createExecutionContextWithoutDeviceMemory();
 }
 
 HostMemory_t* engine_serialize(nvinfer1::ICudaEngine* engine) {

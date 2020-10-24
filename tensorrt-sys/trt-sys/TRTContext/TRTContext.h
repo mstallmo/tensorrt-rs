@@ -10,31 +10,22 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#include <NvInfer.h>
 #include "../TRTProfiler/TRTProfiler.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-struct Context;
-typedef struct Context Context_t;
+void destroy_excecution_context(nvinfer1::IExecutionContext* execution_context);
 
-void destroy_excecution_context(Context_t* execution_context);
+void context_set_debug_sync(nvinfer1::IExecutionContext* execution_context, bool sync);
+bool context_get_debug_sync(nvinfer1::IExecutionContext* execution_context);
 
-void context_set_debug_sync(Context_t* execution_context, bool sync);
-bool context_get_debug_sync(Context_t* execution_context);
+void context_set_name(nvinfer1::IExecutionContext* execution_context, const char *name);
+const char* context_get_name(nvinfer1::IExecutionContext *execution_context);
 
-void context_set_name(Context_t* execution_context, const char *name);
-const char* context_get_name(Context_t *execution_context);
+//void context_set_profiler(Context_t execution_context, Profiler_t* profiler);
+//Profiler_t* context_get_profiler(Context_t *execution_context);
 
-void context_set_profiler(Context_t* execution_context, Profiler_t* profiler);
-Profiler_t* context_get_profiler(Context_t *execution_context);
-
-void execute(const Context_t* execution_context, const void** binding_data, const int num_bindings, const size_t* data_sizes);
-
-#ifdef __cplusplus
-};
-#endif
+void execute(nvinfer1::IExecutionContext* execution_context, const void** binding_data, const int num_bindings, const size_t* data_sizes);
 
 
 #endif //LIBTRT_TRTCONTEXT_H

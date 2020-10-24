@@ -5,6 +5,7 @@ use ndarray::Array;
 use ndarray_image;
 use tensorrt_rs::builder::{Builder, NetworkBuildFlags};
 use tensorrt_rs::context::ExecuteInput;
+use tensorrt_rs::data_size::GB;
 use tensorrt_rs::dims::Dims4;
 use tensorrt_rs::engine::Engine;
 use tensorrt_rs::onnx::{OnnxFile, OnnxParser};
@@ -34,8 +35,7 @@ fn create_engine(
 fn main() {
     let logger = Logger::new();
     let file = OnnxFile::new(&PathBuf::from("../assets/efficientnet.onnx")).unwrap();
-    let gb = 1024 * 1024 * 1024;
-    let engine = create_engine(&logger, file, 1, 1 * gb);
+    let engine = create_engine(&logger, file, 1, 1 * GB);
 
     let context = engine.create_execution_context();
 

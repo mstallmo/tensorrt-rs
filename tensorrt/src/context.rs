@@ -118,6 +118,7 @@ impl<'a> Drop for Context<'a> {
 #[cfg(test)]
 mod tests {
     use crate::builder::{Builder, NetworkBuildFlags};
+    use crate::data_size::GB;
     use crate::dims::DimsCHW;
     use crate::engine::Engine;
     use crate::profiler::RustProfiler;
@@ -133,6 +134,7 @@ mod tests {
 
     fn setup_engine_test_uff(logger: &Logger) -> Engine {
         let builder = Builder::new(&logger);
+        builder.set_max_workspace_size(1 * GB);
         let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
         let uff_parser = UffParser::new();

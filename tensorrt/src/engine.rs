@@ -182,6 +182,7 @@ impl Drop for HostMemory {
 mod tests {
     use super::*;
     use crate::builder::{Builder, NetworkBuildFlags};
+    use crate::data_size::GB;
     use crate::dims::DimsCHW;
     use crate::runtime::{Logger, Runtime};
     use crate::uff::{UffFile, UffInputOrder, UffParser};
@@ -197,6 +198,7 @@ mod tests {
 
     fn setup_engine_test_uff(logger: &Logger) -> Engine {
         let builder = Builder::new(&logger);
+        builder.set_max_workspace_size(1 * GB);
         let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
         let uff_parser = UffParser::new();

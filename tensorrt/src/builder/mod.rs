@@ -48,12 +48,13 @@ pub enum EngineCapability {
 }
 
 pub struct Builder<'a> {
-    pub(crate) internal_builder: *mut tensorrt_sys::Builder_t,
+    pub(crate) internal_builder: *mut tensorrt_sys::nvinfer1_IBuilder,
     pub(crate) logger: PhantomData<&'a Logger>,
 }
 
 bitflags! {
     pub struct NetworkBuildFlags: u32 {
+        const DEFAULT = 0b0;
         const EXPLICIT_BATCH = 0b1;
         const EXPLICIT_PRECISION = 0b10;
     }

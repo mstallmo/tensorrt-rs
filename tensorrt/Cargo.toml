@@ -8,7 +8,7 @@ edition = "2018"
 description = "Rust library for using Nvidia's TensorRT deep learning acceleration library"
 
 [features]
-default = ["trt-5"]
+default = ["trt-7"]
 
 trt-5 = ["tensorrt-sys/trt-5"]
 

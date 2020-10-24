@@ -126,7 +126,7 @@ impl Drop for PoolingLayer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::builder::Builder;
+    use crate::builder::{Builder, NetworkBuildFlags};
     use crate::dims::{Dim, DimsCHW, DimsHW};
     use crate::network::Network;
     use crate::runtime::Logger;
@@ -139,7 +139,7 @@ mod tests {
 
     fn create_network(logger: &Logger) -> Network {
         let builder = Builder::new(logger);
-        builder.create_network()
+        builder.create_network_v2(NetworkBuildFlags::EXPLICIT_BATCH)
     }
 
     #[test]

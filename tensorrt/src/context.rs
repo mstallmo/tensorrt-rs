@@ -117,7 +117,7 @@ impl<'a> Drop for Context<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::builder::Builder;
+    use crate::builder::{Builder, NetworkBuildFlags};
     use crate::dims::DimsCHW;
     use crate::engine::Engine;
     use crate::profiler::RustProfiler;
@@ -133,7 +133,7 @@ mod tests {
 
     fn setup_engine_test_uff(logger: &Logger) -> Engine {
         let builder = Builder::new(&logger);
-        let network = builder.create_network();
+        let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
         let uff_parser = UffParser::new();
         let dim = DimsCHW::new(1, 28, 28);

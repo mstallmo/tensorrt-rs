@@ -181,7 +181,7 @@ impl Drop for HostMemory {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::builder::Builder;
+    use crate::builder::{Builder, NetworkBuildFlags};
     use crate::dims::DimsCHW;
     use crate::runtime::{Logger, Runtime};
     use crate::uff::{UffFile, UffInputOrder, UffParser};
@@ -197,7 +197,7 @@ mod tests {
 
     fn setup_engine_test_uff(logger: &Logger) -> Engine {
         let builder = Builder::new(&logger);
-        let network = builder.create_network();
+        let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
         let uff_parser = UffParser::new();
         let dim = DimsCHW::new(1, 28, 28);
@@ -297,7 +297,7 @@ mod tests {
         };
         let engine = setup_engine_test_uff(&logger);
 
-        assert_eq!(engine.get_nb_layers(), 9);
+        assert_eq!(engine.get_nb_layers(), 7);
     }
 
     #[test]

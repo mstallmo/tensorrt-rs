@@ -3,16 +3,17 @@ use imageproc::rect::Rect;
 use ndarray::{Array, Array1, Array3};
 use std::iter::FromIterator;
 use std::path::Path;
-use tensorrt_rs::builder::Builder;
+use tensorrt_rs::builder::{Builder, NetworkBuildFlags};
 use tensorrt_rs::context::ExecuteInput;
 use tensorrt_rs::dims::{Dim, DimsCHW};
 use tensorrt_rs::engine::Engine;
 use tensorrt_rs::runtime::Logger;
 use tensorrt_rs::uff::{UffFile, UffInputOrder, UffParser};
+use tensorrt_sys::Network;
 
 fn create_engine(logger: &Logger, uff_file: &UffFile) -> Engine {
     let builder = Builder::new(&logger);
-    let network = builder.create_network();
+    let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
     let uff_parser = UffParser::new();
     let dim = DimsCHW::new(3, 300, 300);

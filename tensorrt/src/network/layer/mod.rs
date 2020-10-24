@@ -149,7 +149,7 @@ pub struct BaseLayer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::builder::Builder;
+    use crate::builder::{Builder, NetworkBuildFlags};
     use crate::dims::DimsCHW;
     use crate::engine::DataType;
     use crate::network::Network;
@@ -166,12 +166,12 @@ mod tests {
 
     fn create_network(logger: &Logger) -> Network {
         let builder = Builder::new(logger);
-        builder.create_network()
+        builder.create_network_v2(NetworkBuildFlags::DEFAULT)
     }
 
     fn create_network_from_uff(logger: &Logger) -> Network {
         let builder = Builder::new(&logger);
-        let network = builder.create_network();
+        let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
         let uff_parser = UffParser::new();
         let dim = DimsCHW::new(1, 28, 28);

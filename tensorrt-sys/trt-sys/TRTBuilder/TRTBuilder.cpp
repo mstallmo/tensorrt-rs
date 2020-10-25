@@ -7,7 +7,6 @@
 
 #include "TRTBuilder.h"
 #include "../TRTLogger/TRTLoggerInternal.hpp"
-#include "../TRTLayer/TRTLayerInternal.hpp"
 
 void builder_set_max_batch_size(nvinfer1::IBuilder* builder, int32_t batch_size) {
     builder->setMaxBatchSize(batch_size);
@@ -81,16 +80,16 @@ bool builder_get_fp16_mode(nvinfer1::IBuilder* builder) {
     return builder->getFp16Mode();
 }
 
-void builder_set_device_type(nvinfer1::IBuilder* builder, Layer_t* layer, DeviceType_t deviceType) {
-    builder->setDeviceType(layer->internal_layer, static_cast<nvinfer1::DeviceType>(deviceType));
+void builder_set_device_type(nvinfer1::IBuilder* builder, nvinfer1::ILayer* layer, DeviceType_t deviceType) {
+    builder->setDeviceType(layer, static_cast<nvinfer1::DeviceType>(deviceType));
 }
 
-DeviceType_t builder_get_device_type(nvinfer1::IBuilder* builder, Layer_t* layer) {
-    return static_cast<DeviceType_t>(builder->getDeviceType(layer->internal_layer));
+DeviceType_t builder_get_device_type(nvinfer1::IBuilder* builder, nvinfer1::ILayer* layer) {
+    return static_cast<DeviceType_t>(builder->getDeviceType(layer));
 }
 
-bool builder_is_device_type_set(nvinfer1::IBuilder* builder, Layer_t* layer) {
-    return builder->isDeviceTypeSet(layer->internal_layer);
+bool builder_is_device_type_set(nvinfer1::IBuilder* builder, nvinfer1::ILayer* layer) {
+    return builder->isDeviceTypeSet(layer);
 }
 
 void builder_set_default_device_type(nvinfer1::IBuilder* builder, DeviceType_t deviceType) {
@@ -101,12 +100,12 @@ DeviceType_t builder_get_default_device_type(nvinfer1::IBuilder *builder) {
     return static_cast<DeviceType_t>(builder->getDefaultDeviceType());
 }
 
-void builder_reset_device_type(nvinfer1::IBuilder* builder, Layer_t* layer) {
-   builder->resetDeviceType(layer->internal_layer);
+void builder_reset_device_type(nvinfer1::IBuilder* builder, nvinfer1::ILayer* layer) {
+   builder->resetDeviceType(layer);
 }
 
-bool builder_can_run_on_dla(nvinfer1::IBuilder* builder, Layer_t* layer) {
-    return builder->canRunOnDLA(layer->internal_layer);
+bool builder_can_run_on_dla(nvinfer1::IBuilder* builder, nvinfer1::ILayer* layer) {
+    return builder->canRunOnDLA(layer);
 }
 
 int builder_get_max_dla_batch_size(nvinfer1::IBuilder* builder) {

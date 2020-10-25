@@ -3,8 +3,9 @@ use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use tensorrt_rs_derive::Layer;
 use tensorrt_sys::{
-    activation_destroy, activation_get_activation_type, activation_get_alpha, activation_get_beta,
+    activation_get_activation_type, activation_get_alpha, activation_get_beta,
     activation_set_activation_type, activation_set_alpha, activation_set_beta,
+    nvinfer1_IActivationLayer,
 };
 
 #[repr(C)]
@@ -26,7 +27,7 @@ pub enum ActivationType {
 
 #[derive(Layer)]
 pub struct ActivationLayer {
-    pub(crate) internal_layer: *mut tensorrt_sys::Layer_t,
+    pub(crate) internal_layer: *mut nvinfer1_IActivationLayer,
 }
 
 impl ActivationLayer {
@@ -53,12 +54,6 @@ impl ActivationLayer {
 
     pub fn set_beta(&self, beta: f32) {
         unsafe { activation_set_beta(self.internal_layer, beta) }
-    }
-}
-
-impl Drop for ActivationLayer {
-    fn drop(&mut self) {
-        unsafe { activation_destroy(self.internal_layer) }
     }
 }
 

@@ -7,9 +7,6 @@
 
 #include <NvInfer.h>
 #include "../TRTLogger/TRTLogger.h"
-#include "../TRTNetworkDefinition/TRTNetworkDefinition.h"
-#include "../TRTCudaEngine/TRTCudaEngine.h"
-#include "../TRTLayer/TRTLayer.h"
 #include "../TRTEnums.h"
 
 #include <stddef.h>
@@ -36,13 +33,13 @@ void builder_set_int8_mode(nvinfer1::IBuilder* builder, bool mode);
 bool builder_get_int8_mode(nvinfer1::IBuilder* builder);
 void builder_set_fp16_mode(nvinfer1::IBuilder* builder, bool mode);
 bool builder_get_fp16_mode(nvinfer1::IBuilder* builder);
-void builder_set_device_type(nvinfer1::IBuilder* builder, Layer_t* layer, DeviceType_t deviceType);
-DeviceType_t  builder_get_device_type(nvinfer1::IBuilder* builder, Layer_t* layer);
-bool builder_is_device_type_set(nvinfer1::IBuilder* builder, Layer_t* layer);
+void builder_set_device_type(nvinfer1::IBuilder* builder, nvinfer1::ILayer* layer, DeviceType_t deviceType);
+DeviceType_t  builder_get_device_type(nvinfer1::IBuilder* builder, nvinfer1::ILayer* layer);
+bool builder_is_device_type_set(nvinfer1::IBuilder* builder, nvinfer1::ILayer* layer);
 void builder_set_default_device_type(nvinfer1::IBuilder* builder, DeviceType_t deviceType);
 DeviceType_t  builder_get_default_device_type(nvinfer1::IBuilder* builder);
-void builder_reset_device_type(nvinfer1::IBuilder* builder, Layer_t* layer);
-bool builder_can_run_on_dla(nvinfer1::IBuilder* builder, Layer_t* layer);
+void builder_reset_device_type(nvinfer1::IBuilder* builder, nvinfer1::ILayer* layer);
+bool builder_can_run_on_dla(nvinfer1::IBuilder* builder, nvinfer1::ILayer* layer);
 int builder_get_max_dla_batch_size(nvinfer1::IBuilder* builder);
 void builder_allow_gpu_fallback(nvinfer1::IBuilder* builder, bool set_fallback_mode);
 int builder_get_nb_dla_cores(nvinfer1::IBuilder* builder);

@@ -8,18 +8,7 @@
 #include "TRTLayer.h"
 #include "../TRTEnums.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void elementwise_set_operation(Layer_t *element_wise_layer, ElementWiseOperation_t type);
-
-ElementWiseOperation_t elementwise_get_operation(Layer_t *element_wise_layer);
-
-void elementwise_destroy(Layer_t *element_wise_layer);
-
-#ifdef __cplusplus
-};
-#endif
+void elementwise_set_operation(nvinfer1::IElementWiseLayer *element_wise_layer, ElementWiseOperation_t type);
+ElementWiseOperation_t elementwise_get_operation(nvinfer1::IElementWiseLayer *element_wise_layer);
 
 #endif //LIBTRT_TRTELEMENTWISELAYER_H

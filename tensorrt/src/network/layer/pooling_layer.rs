@@ -4,7 +4,7 @@ use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use tensorrt_rs_derive::Layer;
 use tensorrt_sys::{
-    pooling_destroy, pooling_get_average_count_excludes_padding, pooling_get_blend_factor,
+    nvinfer1_IPoolingLayer, pooling_get_average_count_excludes_padding, pooling_get_blend_factor,
     pooling_get_padding, pooling_get_padding_mode, pooling_get_pooling_type,
     pooling_get_post_padding, pooling_get_pre_padding, pooling_get_stride, pooling_get_window_size,
     pooling_set_average_count_excludes_padding, pooling_set_blend_factor, pooling_set_padding,
@@ -33,7 +33,7 @@ pub enum PaddingMode {
 
 #[derive(Layer)]
 pub struct PoolingLayer {
-    pub(crate) internal_layer: *mut tensorrt_sys::Layer_t,
+    pub(crate) internal_layer: *mut nvinfer1_IPoolingLayer,
 }
 
 impl PoolingLayer {
@@ -114,12 +114,6 @@ impl PoolingLayer {
 
     pub fn set_padding_mode(&self, mode: PaddingMode) {
         unsafe { pooling_set_padding_mode(self.internal_layer, mode as i32) }
-    }
-}
-
-impl Drop for PoolingLayer {
-    fn drop(&mut self) {
-        unsafe { pooling_destroy(self.internal_layer) }
     }
 }
 

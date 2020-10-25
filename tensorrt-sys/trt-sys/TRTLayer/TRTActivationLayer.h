@@ -8,26 +8,11 @@
 #include "../TRTEnums.h"
 #include "TRTLayer.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void activation_set_activation_type(Layer_t *layer, ActivationType_t activationType);
-
-ActivationType_t activation_get_activation_type(Layer_t *layer);
-
-void activation_set_alpha(Layer_t *layer, float alpha);
-
-float activation_get_alpha(Layer_t *layer);
-
-void activation_set_beta(Layer_t *layer, float beta);
-
-float activation_get_beta(Layer_t *layer);
-
-void activation_destroy(Layer_t *layer);
-
-#ifdef __cplusplus
-};
-#endif
+void activation_set_activation_type(nvinfer1::IActivationLayer *layer, ActivationType_t activationType);
+ActivationType_t activation_get_activation_type(nvinfer1::IActivationLayer *layer);
+void activation_set_alpha(nvinfer1::IActivationLayer *layer, float alpha);
+float activation_get_alpha(nvinfer1::IActivationLayer *layer);
+void activation_set_beta(nvinfer1::IActivationLayer *layer, float beta);
+float activation_get_beta(nvinfer1::IActivationLayer *layer);
 
 #endif //LIBTRT_TRTACTIVATIONLAYER_H

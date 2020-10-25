@@ -1,12 +1,12 @@
 use super::*;
 use tensorrt_rs_derive::Layer;
 use tensorrt_sys::{
-    gather_layer_destroy, gather_layer_get_gather_axis, gather_layer_set_gather_axis,
+    gather_layer_get_gather_axis, gather_layer_set_gather_axis, nvinfer1_IGatherLayer,
 };
 
 #[derive(Layer)]
 pub struct GatherLayer {
-    pub(crate) internal_layer: *mut tensorrt_sys::Layer_t,
+    pub(crate) internal_layer: *mut nvinfer1_IGatherLayer,
 }
 
 impl GatherLayer {
@@ -16,12 +16,6 @@ impl GatherLayer {
 
     pub fn set_gather_axis(&self, axis: i32) {
         unsafe { gather_layer_set_gather_axis(self.internal_layer, axis) }
-    }
-}
-
-impl Drop for GatherLayer {
-    fn drop(&mut self) {
-        unsafe { gather_layer_destroy(self.internal_layer) }
     }
 }
 

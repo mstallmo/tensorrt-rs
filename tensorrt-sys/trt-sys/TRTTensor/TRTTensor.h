@@ -5,22 +5,10 @@
 #ifndef LIBTRT_TRTTENSOR_H
 #define LIBTRT_TRTTENSOR_H
 
-
+#include <NvInfer.h>
 #include "../TRTDims/TRTDims.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-struct Tensor;
-typedef struct Tensor Tensor_t;
-
-const char* tensor_get_name(Tensor_t*);
-void tensor_set_dimensions(Tensor_t *tensor, Dims_t *dimensions); // only valid for input tensors
-
-void tensor_destroy(Tensor_t *tensor);
-
-#ifdef __cplusplus
-};
-#endif
+const char* tensor_get_name(nvinfer1::ITensor *tensor);
+void tensor_set_dimensions(nvinfer1::ITensor *tensor, Dims_t *dimensions); // only valid for input tensors
 
 #endif //LIBTRT_TRTTENSOR_H

@@ -24,13 +24,13 @@ const char* layer_get_name(Layer_t *layer);
 
 int32_t layer_get_nb_inputs(Layer_t *layer);
 
-Tensor_t* layer_get_input(Layer_t *layer, int32_t index);
+nvinfer1::ITensor* layer_get_input(Layer_t *layer, int32_t index);
 
 int32_t layer_get_nb_outputs(Layer_t *layer);
 
-Tensor_t * layer_get_output(Layer_t *layer, int32_t index);
+nvinfer1::ITensor * layer_get_output(Layer_t *layer, int32_t index);
 
-void layer_set_input(Layer_t *layer, int32_t index, Tensor_t *tensor);
+void layer_set_input(Layer_t *layer, int32_t index, nvinfer1::ITensor *tensor);
 
 void layer_set_precision(Layer_t *layer, DataType_t precision);
 

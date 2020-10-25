@@ -10,15 +10,11 @@ use tensorrt_sys::{
     network_add_identity_layer, network_add_input, network_add_pooling, network_get_input,
     network_get_layer, network_get_nb_inputs, network_get_nb_layers, network_get_nb_outputs,
     network_get_output, network_mark_output, network_remove_tensor, network_unmark_output,
-    tensor_destroy, tensor_get_name, tensor_set_dimensions,
+    nvinfer1_ITensor, tensor_get_name, tensor_set_dimensions,
 };
 
 pub struct Network {
     pub(crate) internal_network: *mut tensorrt_sys::Network_t,
-}
-
-pub struct Tensor {
-    pub(crate) internal_tensor: *mut tensorrt_sys::Tensor_t,
 }
 
 impl Network {
@@ -148,6 +144,10 @@ impl Drop for Network {
     }
 }
 
+pub struct Tensor {
+    pub(crate) internal_tensor: *mut nvinfer1_ITensor,
+}
+
 impl Tensor {
     pub fn get_name(&self) -> String {
         unsafe {
@@ -160,12 +160,6 @@ impl Tensor {
 
     pub fn set_dimensions<D: Dim>(&mut self, dims: D) {
         unsafe { tensor_set_dimensions(self.internal_tensor, dims.get_internal_dims()) };
-    }
-}
-
-impl Drop for Tensor {
-    fn drop(&mut self) {
-        unsafe { tensor_destroy(self.internal_tensor) }
     }
 }
 

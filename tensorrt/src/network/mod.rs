@@ -10,11 +10,11 @@ use tensorrt_sys::{
     network_add_identity_layer, network_add_input, network_add_pooling, network_get_input,
     network_get_layer, network_get_nb_inputs, network_get_nb_layers, network_get_nb_outputs,
     network_get_output, network_mark_output, network_remove_tensor, network_unmark_output,
-    nvinfer1_ITensor, tensor_get_name, tensor_set_dimensions,
+    nvinfer1_INetworkDefinition, nvinfer1_ITensor, tensor_get_name, tensor_set_dimensions,
 };
 
 pub struct Network {
-    pub(crate) internal_network: *mut tensorrt_sys::Network_t,
+    pub(crate) internal_network: *mut nvinfer1_INetworkDefinition,
 }
 
 impl Network {

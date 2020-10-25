@@ -6,7 +6,6 @@
 #include <NvInferPlugin.h>
 
 #include "TRTBuilder.h"
-#include "../TRTNetworkDefinition/TRTNetworkDefinitionInternal.hpp"
 #include "../TRTLogger/TRTLoggerInternal.hpp"
 #include "../TRTLayer/TRTLayerInternal.hpp"
 
@@ -165,19 +164,19 @@ void destroy_builder(nvinfer1::IBuilder* builder) {
 }
 
 #if defined(TRT5)
-Network_t *create_network(nvinfer1::IBuilder *builder) {
-    return new Network(builder->createNetwork());
+nvinfer1::INetworkDefinition *create_network(nvinfer1::IBuilder *builder) {
+    return builder->createNetwork();
 }
 #elif defined(TRT6) || defined(TRT7)
-Network_t *create_network_v2(nvinfer1::IBuilder *builder, uint32_t flags) {
-    return new Network(builder->createNetworkV2(flags));
+nvinfer1::INetworkDefinition *create_network_v2(nvinfer1::IBuilder *builder, uint32_t flags) {
+    return builder->createNetworkV2(flags);
 }
 #endif
 
-nvinfer1::ICudaEngine *build_cuda_engine(nvinfer1::IBuilder *builder, Network_t *network) {
-    return builder->buildCudaEngine(network->getNetworkDefinition());
+nvinfer1::ICudaEngine *build_cuda_engine(nvinfer1::IBuilder *builder, nvinfer1::INetworkDefinition *network) {
+    return builder->buildCudaEngine(*network);
 }
 
-void builder_reset(nvinfer1::IBuilder* builder, Network_t* network) {
-    builder->reset(network->getNetworkDefinition());
+void builder_reset(nvinfer1::IBuilder* builder, nvinfer1::INetworkDefinition* network) {
+    builder->reset(*network);
 }

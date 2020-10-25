@@ -15,7 +15,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-nvinfer1::ICudaEngine *build_cuda_engine(nvinfer1::IBuilder *builder, Network_t *network);
+nvinfer1::ICudaEngine *build_cuda_engine(nvinfer1::IBuilder *builder, nvinfer1::INetworkDefinition *network);
 nvinfer1::IBuilder *create_infer_builder(Logger_t *logger);
 void destroy_builder(nvinfer1::IBuilder* builder);
 void builder_set_max_batch_size(nvinfer1::IBuilder* builder, int32_t batch_size);
@@ -55,10 +55,10 @@ bool builder_get_refittable(nvinfer1::IBuilder* builder);
 void builder_set_engine_capability(nvinfer1::IBuilder* builder, EngineCapabiliy_t engine_capability);
 EngineCapabiliy_t builder_get_engine_capability(nvinfer1::IBuilder* builder);
 #if defined(TRT5)
-Network_t *create_network(nvinfer1::IBuilder* builder);
+nvinfer1::INetworkDefinition *create_network(nvinfer1::IBuilder* builder);
 #elif defined(TRT6) || defined(TRT7)
-Network_t *create_network_v2(nvinfer1::IBuilder* builder, uint32_t flags);
+nvinfer1::INetworkDefinition *create_network_v2(nvinfer1::IBuilder* builder, uint32_t flags);
 #endif
 
-void builder_reset(nvinfer1::IBuilder* builder, Network_t* network);
+void builder_reset(nvinfer1::IBuilder* builder, nvinfer1::INetworkDefinition* network);
 #endif //LIBTRT_TRTBUILDER_H

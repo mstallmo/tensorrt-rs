@@ -5,6 +5,7 @@
 #ifndef LIBTRT_TRTUFFPARSER_H
 #define LIBTRT_TRTUFFPARSER_H
 
+#include <NvInfer.h>
 #include <stdbool.h>
 
 #include "../TRTDims/TRTDims.h"
@@ -23,7 +24,7 @@ void uffparser_destroy_uff_parser(UffParser_t* uff_parser);
 bool uffparser_register_input(const UffParser_t* uff_parser, const char* input_name, const Dims_t* dims, int input_order);
 bool uffparser_register_output(const UffParser_t* uff_parser, const char* output_name);
 
-bool uffparser_parse(const UffParser_t* uff_parser, const char* file, const Network_t *network);
+bool uffparser_parse(const UffParser_t* uff_parser, const char* file, nvinfer1::INetworkDefinition *network);
 
 #ifdef __cplusplus
 };

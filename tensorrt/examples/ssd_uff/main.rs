@@ -9,7 +9,6 @@ use tensorrt_rs::dims::{Dim, DimsCHW};
 use tensorrt_rs::engine::Engine;
 use tensorrt_rs::runtime::Logger;
 use tensorrt_rs::uff::{UffFile, UffInputOrder, UffParser};
-use tensorrt_sys::Network;
 
 fn create_engine(logger: &Logger, uff_file: &UffFile) -> Engine {
     let builder = Builder::new(&logger);

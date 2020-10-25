@@ -7,7 +7,6 @@
 #include "NvUffParser.h"
 
 #include "TRTUffParser.h"
-#include "../TRTNetworkDefinition/TRTNetworkDefinitionInternal.hpp"
 #include "../TRTDims/TRTDimsInternal.hpp"
 #include "../TRTUtils.hpp"
 
@@ -44,11 +43,9 @@ bool uffparser_register_output(const UffParser_t *uff_parser, const char *output
     return uff_parser->internal_uffParser->registerOutput(output_name);
 }
 
-bool uffparser_parse(const UffParser_t *uff_parser, const char *file, const Network_t *network) {
+bool uffparser_parse(const UffParser_t *uff_parser, const char *file, nvinfer1::INetworkDefinition *network) {
     if (uff_parser == nullptr || file == nullptr || network == nullptr)
         return false;
 
-    auto &networkDefinition = network->getNetworkDefinition();
-
-    return uff_parser->internal_uffParser->parse(file, networkDefinition, nvinfer1::DataType::kFLOAT);
+    return uff_parser->internal_uffParser->parse(file, *network, nvinfer1::DataType::kFLOAT);
 }

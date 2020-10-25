@@ -153,7 +153,7 @@ impl Drop for Engine {
 }
 
 pub struct HostMemory {
-    pub(crate) memory: *mut tensorrt_sys::HostMemory_t,
+    pub(crate) memory: *mut tensorrt_sys::nvinfer1_IHostMemory,
 }
 
 impl HostMemory {

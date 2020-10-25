@@ -24,7 +24,7 @@ DataType_t engine_get_binding_data_type(nvinfer1::ICudaEngine *engine, int bindi
 int engine_get_max_batch_size(nvinfer1::ICudaEngine *engine);
 int engine_get_nb_layers(nvinfer1::ICudaEngine *engine);
 size_t engine_get_workspace_size(nvinfer1::ICudaEngine *engine);
-HostMemory_t* engine_serialize(nvinfer1::ICudaEngine* engine);
+nvinfer1::IHostMemory* engine_serialize(nvinfer1::ICudaEngine* engine);
 TensorLocation_t engine_get_location(nvinfer1::ICudaEngine *engine, int binding_index);
 size_t engine_get_device_memory_size(nvinfer1::ICudaEngine *engine);
 bool engine_is_refittable(nvinfer1::ICudaEngine *engine);

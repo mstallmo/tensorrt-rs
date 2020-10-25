@@ -4,7 +4,6 @@
 #include <cstring>
 #include <cstdlib>
 
-#include "../TRTHostMemory/TRTHostMemoryInternal.hpp"
 #include "TRTCudaEngine.h"
 
 void engine_destroy(nvinfer1::ICudaEngine* engine) {
@@ -62,8 +61,8 @@ nvinfer1::IExecutionContext* engine_create_execution_context_without_device_memo
     return engine->createExecutionContextWithoutDeviceMemory();
 }
 
-HostMemory_t* engine_serialize(nvinfer1::ICudaEngine* engine) {
-    return create_host_memory(engine->serialize());
+nvinfer1::IHostMemory* engine_serialize(nvinfer1::ICudaEngine* engine) {
+    return engine->serialize();
 }
 
 TensorLocation_t  engine_get_location(nvinfer1::ICudaEngine *engine, int binding_index) {

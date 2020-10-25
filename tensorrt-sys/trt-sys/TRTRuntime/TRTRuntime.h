@@ -9,24 +9,11 @@
 #include "../TRTLogger/TRTLogger.h"
 #include "../TRTCudaEngine/TRTCudaEngine.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct Runtime;
-typedef struct Runtime Runtime_t;
-
-Runtime_t *create_infer_runtime(Logger_t *logger);
-void destroy_infer_runtime(Runtime_t *runtime);
-
-int runtime_get_nb_dla_cores(Runtime_t *runtime);
-int runtime_get_dla_core(Runtime_t *runtime);
-void runtime_set_dla_core(Runtime_t *runtime, int dla_core);
-
-#ifdef __cplusplus
-};
-#endif
-
-nvinfer1::ICudaEngine *deserialize_cuda_engine(Runtime_t *runtime, const void *blob, unsigned long long size);
+nvinfer1::IRuntime *create_infer_runtime(Logger_t *logger);
+void destroy_infer_runtime(nvinfer1::IRuntime *runtime);
+nvinfer1::ICudaEngine *deserialize_cuda_engine(nvinfer1::IRuntime *runtime, const void *blob, unsigned long long size);
+int runtime_get_nb_dla_cores(nvinfer1::IRuntime *runtime);
+int runtime_get_dla_core(nvinfer1::IRuntime *runtime);
+void runtime_set_dla_core(nvinfer1::IRuntime *runtime, int dla_core);
 
 #endif //TENSRORT_SYS_TRTRUNTIME_H

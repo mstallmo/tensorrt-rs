@@ -4,8 +4,8 @@ use crate::engine::Engine;
 use bitflags::_core::ffi::c_void;
 use tensorrt_sys::{
     create_infer_runtime, create_logger, delete_logger, deserialize_cuda_engine,
-    destroy_infer_runtime, runtime_get_dla_core, runtime_get_nb_dla_cores, runtime_set_dla_core,
-    set_logger_severity,
+    destroy_infer_runtime, nvinfer1_IRuntime, runtime_get_dla_core, runtime_get_nb_dla_cores,
+    runtime_set_dla_core, set_logger_severity,
 };
 
 #[repr(C)]
@@ -47,7 +47,7 @@ impl Drop for Logger {
 
 #[derive(Clone)]
 pub struct Runtime<'a> {
-    pub(crate) internal_runtime: *mut tensorrt_sys::Runtime_t,
+    pub(crate) internal_runtime: *mut nvinfer1_IRuntime,
     pub(crate) logger: PhantomData<&'a Logger>,
 }
 

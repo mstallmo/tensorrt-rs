@@ -2,7 +2,6 @@
 // Created by mason on 8/26/19.
 //
 #include <cstring>
-#include <cstdlib>
 
 #include "TRTCudaEngine.h"
 
@@ -26,15 +25,8 @@ bool engine_binding_is_input(nvinfer1::ICudaEngine *engine, int binding_index) {
     return engine->bindingIsInput(binding_index);
 }
 
-Dims_t* engine_get_binding_dimensions(nvinfer1::ICudaEngine *engine, int binding_index) {
-
-    nvinfer1::Dims nvdims = engine->getBindingDimensions(binding_index);
-    auto dims = static_cast<Dims_t *>(malloc(sizeof(Dims_t)));
-    dims->nbDims = nvdims.nbDims;
-    memcpy(dims->d, nvdims.d, nvinfer1::Dims::MAX_DIMS * sizeof(int));
-    memcpy(dims->type, nvdims.type, nvinfer1::Dims::MAX_DIMS * sizeof(int));
-
-    return dims;
+nvinfer1::Dims engine_get_binding_dimensions(nvinfer1::ICudaEngine *engine, int binding_index) {
+    return engine->getBindingDimensions(binding_index);
 }
 
 DataType_t engine_get_binding_data_type(nvinfer1::ICudaEngine *engine, int binding_index) {

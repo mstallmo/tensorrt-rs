@@ -2,7 +2,6 @@
 #define LIBTRT_TRTONNXPARSER_H
 
 #include <NvInfer.h>
-#include "../TRTDims/TRTDims.h"
 #include "../TRTNetworkDefinition/TRTNetworkDefinition.h"
 #include "../TRTLogger/TRTLogger.h"
 

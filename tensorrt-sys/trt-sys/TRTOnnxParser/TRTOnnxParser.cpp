@@ -4,7 +4,6 @@
 #include "NvOnnxParser.h"
 
 #include "TRTOnnxParser.h"
-#include "../TRTDims/TRTDimsInternal.hpp"
 #include "../TRTLogger/TRTLoggerInternal.hpp"
 #include "../TRTUtils.hpp"
 

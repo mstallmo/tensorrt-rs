@@ -48,29 +48,29 @@ impl PoolingLayer {
 
     pub fn get_window_size(&self) -> DimsHW {
         let raw = unsafe { pooling_get_window_size(self.internal_layer) };
-        DimsHW { internal_dims: raw }
+        DimsHW(raw)
     }
 
     pub fn set_window_size(&self, dims: DimsHW) {
-        unsafe { pooling_set_window_size(self.internal_layer, dims.internal_dims) }
+        unsafe { pooling_set_window_size(self.internal_layer, dims.0) }
     }
 
     pub fn get_stride(&self) -> DimsHW {
         let raw = unsafe { pooling_get_stride(self.internal_layer) };
-        DimsHW { internal_dims: raw }
+        DimsHW(raw)
     }
 
     pub fn set_stride(&self, dims: DimsHW) {
-        unsafe { pooling_set_stride(self.internal_layer, dims.internal_dims) }
+        unsafe { pooling_set_stride(self.internal_layer, dims.0) }
     }
 
     pub fn get_padding(&self) -> DimsHW {
         let raw = unsafe { pooling_get_padding(self.internal_layer) };
-        DimsHW { internal_dims: raw }
+        DimsHW(raw)
     }
 
     pub fn set_padding(&self, padding: DimsHW) {
-        unsafe { pooling_set_padding(self.internal_layer, padding.internal_dims) }
+        unsafe { pooling_set_padding(self.internal_layer, padding.0) }
     }
 
     pub fn get_blend_factor(&self) -> f32 {
@@ -91,7 +91,7 @@ impl PoolingLayer {
 
     pub fn get_pre_padding(&self) -> Dims {
         let raw = unsafe { pooling_get_pre_padding(self.internal_layer) };
-        Dims { internal_dims: raw }
+        Dims(raw)
     }
 
     pub fn set_pre_padding<T: Dim>(&self, padding: T) {
@@ -100,7 +100,7 @@ impl PoolingLayer {
 
     pub fn get_post_padding(&self) -> Dims {
         let raw = unsafe { pooling_get_post_padding(self.internal_layer) };
-        Dims { internal_dims: raw }
+        Dims(raw)
     }
 
     pub fn set_post_padding<T: Dim>(&self, padding: T) {

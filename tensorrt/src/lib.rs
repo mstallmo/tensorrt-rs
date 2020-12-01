@@ -1,6 +1,9 @@
 #[macro_use]
 extern crate bitflags;
 
+pub use image;
+pub use ndarray;
+
 pub mod builder;
 pub mod context;
 pub mod data_size;

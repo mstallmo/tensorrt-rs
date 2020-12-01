@@ -83,9 +83,7 @@ impl Engine {
         let raw_dims =
             unsafe { engine_get_binding_dimensions(self.internal_engine, binding_index) };
 
-        Dims {
-            internal_dims: raw_dims,
-        }
+        Dims(raw_dims)
     }
 
     pub fn get_binding_data_type(&self, binding_index: i32) -> DataType {
@@ -110,7 +108,6 @@ impl Engine {
         let execution_context = unsafe { engine_create_execution_context(self.internal_engine) };
         Context {
             internal_context: execution_context,
-            _engine: &self,
         }
     }
 
@@ -119,7 +116,6 @@ impl Engine {
             unsafe { engine_create_execution_context_without_device_memory(self.internal_engine) };
         Context {
             internal_context: execution_context,
-            _engine: &self,
         }
     }
 
@@ -143,6 +139,7 @@ impl Engine {
 }
 
 unsafe impl Send for Engine {}
+unsafe impl Sync for Engine {}
 
 impl Drop for Engine {
     fn drop(&mut self) {

@@ -8,11 +8,8 @@
 #include <stdint.h>
 #include <NvInfer.h>
 
-#include "../TRTLayer/TRTLayer.h"
-#include "../TRTTensor/TRTTensor.h"
-
 void destroy_network(nvinfer1::INetworkDefinition *network);
-nvinfer1::ITensor *network_add_input(nvinfer1::INetworkDefinition *network, const char *name, DataType_t dataType, Dims_t *dims);
+nvinfer1::ITensor *network_add_input(nvinfer1::INetworkDefinition *network, const char *name, nvinfer1::DataType dataType, nvinfer1::Dims dims);
 nvinfer1::ITensor *network_get_input(nvinfer1::INetworkDefinition *network, int32_t idx);
 int network_get_nb_layers(nvinfer1::INetworkDefinition *network);
 nvinfer1::ILayer *network_get_layer(nvinfer1::INetworkDefinition *network, int index);
@@ -23,9 +20,9 @@ void network_remove_tensor(nvinfer1::INetworkDefinition *network, nvinfer1::ITen
 void network_mark_output(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *tensor);
 void network_unmark_output(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *tensor);
 nvinfer1::IIdentityLayer *network_add_identity_layer(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *inputTensor);
-nvinfer1::IElementWiseLayer *network_add_element_wise(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *input1, nvinfer1::ITensor *input2, ElementWiseOperation_t op);
+nvinfer1::IElementWiseLayer *network_add_element_wise(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *input1, nvinfer1::ITensor *input2, nvinfer1::ElementWiseOperation op);
 nvinfer1::IGatherLayer *network_add_gather(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *data, nvinfer1::ITensor *indices, int32_t axis);
-nvinfer1::IActivationLayer *network_add_activation(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *input, ActivationType_t type);
-nvinfer1::IPoolingLayer *network_add_pooling(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *input, PoolingType poolingType, Dims_t *dims);
+nvinfer1::IActivationLayer *network_add_activation(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *input, nvinfer1::ActivationType type);
+nvinfer1::IPoolingLayer *network_add_pooling(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *input, nvinfer1::PoolingType poolingType, nvinfer1::DimsHW dims);
 
 #endif //LIBTRT_TRTNETWORKDEFINITION_H

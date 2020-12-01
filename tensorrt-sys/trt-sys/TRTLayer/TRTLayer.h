@@ -7,7 +7,6 @@
 
 #include <NvInfer.h>
 #include <stdint.h>
-#include "../TRTTensor/TRTTensor.h"
 #include "../TRTEnums.h"
 
 LayerType_t layer_get_type(nvinfer1::ILayer *layer);

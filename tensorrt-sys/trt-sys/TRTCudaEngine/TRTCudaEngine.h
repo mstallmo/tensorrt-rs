@@ -19,7 +19,7 @@ int engine_get_nb_bindings(nvinfer1::ICudaEngine* engine);
 int engine_get_binding_index(nvinfer1::ICudaEngine *engine, const char* op_name);
 const char* engine_get_binding_name(nvinfer1::ICudaEngine* engine, int binding_index);
 bool engine_binding_is_input(nvinfer1::ICudaEngine *engine, int binding_index);
-Dims_t* engine_get_binding_dimensions(nvinfer1::ICudaEngine *engine, int binding_index);
+nvinfer1::Dims engine_get_binding_dimensions(nvinfer1::ICudaEngine *engine, int binding_index);
 DataType_t engine_get_binding_data_type(nvinfer1::ICudaEngine *engine, int binding_index);
 int engine_get_max_batch_size(nvinfer1::ICudaEngine *engine);
 int engine_get_nb_layers(nvinfer1::ICudaEngine *engine);

@@ -7,7 +7,6 @@
 #include "NvUffParser.h"
 
 #include "TRTUffParser.h"
-#include "../TRTDims/TRTDimsInternal.hpp"
 #include "../TRTUtils.hpp"
 
 struct UffParser {
@@ -28,12 +27,12 @@ void uffparser_destroy_uff_parser(UffParser_t *uff_parser) {
     delete uff_parser;
 }
 
-bool uffparser_register_input(const UffParser_t *uff_parser, const char *input_name, const Dims_t* dims, int input_order) {
-    if (uff_parser == nullptr || input_name == nullptr || dims == nullptr)
+bool uffparser_register_input(const UffParser_t *uff_parser, const char *input_name, const nvinfer1::Dims dims, int input_order) {
+    if (uff_parser == nullptr || input_name == nullptr)
         return false;
 
     auto inputOrder = static_cast<nvuffparser::UffInputOrder>(input_order);
-    return uff_parser->internal_uffParser->registerInput(input_name, dims_get(dims), inputOrder);
+    return uff_parser->internal_uffParser->registerInput(input_name, dims, inputOrder);
 }
 
 bool uffparser_register_output(const UffParser_t *uff_parser, const char *output_name) {

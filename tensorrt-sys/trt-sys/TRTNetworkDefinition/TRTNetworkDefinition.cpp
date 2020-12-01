@@ -1,17 +1,16 @@
 //
 // Created by mason on 11/27/19.
 //
-#include <NvInfer.h>
-
-#include "../TRTDims/TRTDimsInternal.hpp"
+#include "TRTNetworkDefinition.h"
 
 void destroy_network(nvinfer1::INetworkDefinition *network) {
     network->destroy();
 }
 
 nvinfer1::ITensor *
-network_add_input(nvinfer1::INetworkDefinition *network, const char *name, DataType_t type, Dims_t *dims) {
-    return network->addInput(name, static_cast<nvinfer1::DataType>(type), dims_get(dims));
+network_add_input(nvinfer1::INetworkDefinition *network, const char *name, nvinfer1::DataType type,
+                  nvinfer1::Dims dims) {
+    return network->addInput(name, type, dims);
 }
 
 nvinfer1::ITensor *network_get_input(nvinfer1::INetworkDefinition *network, int32_t idx) {
@@ -57,9 +56,8 @@ void network_unmark_output(nvinfer1::INetworkDefinition *network, nvinfer1::ITen
 
 nvinfer1::IElementWiseLayer *
 network_add_element_wise(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *input1, nvinfer1::ITensor *input2,
-                         ElementWiseOperation_t op) {
-    return network->addElementWise(*input1, *input2,
-                                   static_cast<nvinfer1::ElementWiseOperation>(op));
+                         nvinfer1::ElementWiseOperation op) {
+    return network->addElementWise(*input1, *input2, op);
 }
 
 nvinfer1::IGatherLayer *
@@ -69,15 +67,12 @@ network_add_gather(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *dat
 }
 
 nvinfer1::IActivationLayer *
-network_add_activation(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *input, ActivationType_t type) {
-    return network->addActivation(*input,
-                                  static_cast<nvinfer1::ActivationType>(type));
+network_add_activation(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *input, nvinfer1::ActivationType type) {
+    return network->addActivation(*input, type);
 }
 
 nvinfer1::IPoolingLayer *
-network_add_pooling(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *input, PoolingType poolingType,
-                    Dims_t *dims) {
-    return network->addPooling(*input,
-                               static_cast<nvinfer1::PoolingType>(poolingType),
-                               dimsHW_get(dims));
+network_add_pooling(nvinfer1::INetworkDefinition *network, nvinfer1::ITensor *input, nvinfer1::PoolingType poolingType,
+                    nvinfer1::DimsHW dims) {
+    return network->addPooling(*input, poolingType, dims);
 }

@@ -9,6 +9,6 @@
 #include "../TRTDims/TRTDims.h"
 
 const char* tensor_get_name(nvinfer1::ITensor *tensor);
-void tensor_set_dimensions(nvinfer1::ITensor *tensor, Dims_t *dimensions); // only valid for input tensors
+void tensor_set_dimensions(nvinfer1::ITensor *tensor, nvinfer1::Dims dimensions); // only valid for input tensors
 
 #endif //LIBTRT_TRTTENSOR_H

@@ -38,6 +38,7 @@ impl Logger {
 }
 
 unsafe impl Send for Logger {}
+unsafe impl Sync for Logger {}
 
 impl Drop for Logger {
     fn drop(&mut self) {

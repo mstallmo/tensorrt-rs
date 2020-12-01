@@ -131,7 +131,7 @@ impl Network {
                 self.internal_network,
                 input.internal_tensor,
                 pooling_type as c_int,
-                window_size.internal_dims,
+                window_size.0,
             )
         };
         PoolingLayer { internal_layer }

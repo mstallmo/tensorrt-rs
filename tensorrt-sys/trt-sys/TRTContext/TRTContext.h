@@ -25,7 +25,7 @@ const char* context_get_name(nvinfer1::IExecutionContext *execution_context);
 //void context_set_profiler(Context_t execution_context, Profiler_t* profiler);
 //Profiler_t* context_get_profiler(Context_t *execution_context);
 
-void execute(nvinfer1::IExecutionContext* execution_context, const void** binding_data, const int num_bindings, const size_t* data_sizes);
+void execute(nvinfer1::IExecutionContext* execution_context, void** buffers, int batch_size);
 
 
 #endif //LIBTRT_TRTCONTEXT_H

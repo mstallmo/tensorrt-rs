@@ -5,6 +5,7 @@ use std::iter::FromIterator;
 use std::path::Path;
 use tensorrt_rs::builder::{Builder, NetworkBuildFlags};
 use tensorrt_rs::context::ExecuteInput;
+use tensorrt_rs::data_size::GB;
 use tensorrt_rs::dims::{Dim, DimsCHW};
 use tensorrt_rs::engine::Engine;
 use tensorrt_rs::runtime::Logger;
@@ -12,6 +13,7 @@ use tensorrt_rs::uff::{UffFile, UffInputOrder, UffParser};
 
 fn create_engine(logger: &Logger, uff_file: &UffFile) -> Engine {
     let builder = Builder::new(&logger);
+    builder.set_max_workspace_size(1 * GB);
     let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
     let uff_parser = UffParser::new();
@@ -38,7 +40,7 @@ fn process_input(image: &RgbImage) -> Array1<f32> {
     Array::from_iter(base_array.iter().cloned())
 }
 
-fn infer(engine: &Engine, input: &Array1<f32>) -> (ndarray::Array1<f32>, ndarray::Array1<i32>) {
+fn infer(engine: &Engine, input: &mut Array1<f32>) -> (ndarray::Array1<f32>, ndarray::Array1<i32>) {
     let context = engine.create_execution_context();
 
     let binding_dim = engine.get_binding_dimensions(1);
@@ -55,8 +57,8 @@ fn infer(engine: &Engine, input: &Array1<f32>) -> (ndarray::Array1<f32>, ndarray
         ExecuteInput::Float(&mut top_detections),
         ExecuteInput::Integer(&mut keep_count),
     ];
-    let execute_input = ExecuteInput::Float(&input);
-    context.execute(execute_input, outputs, 3);
+    let execute_input = ExecuteInput::Float(input);
+    context.execute(execute_input, outputs);
 
     (top_detections, keep_count)
 }
@@ -97,9 +99,9 @@ fn main() {
     let engine = create_engine(&logger, &uff_file);
 
     let mut input_image = image::open("../assets/images/dog.ppm").unwrap().into_rgb();
-    let input_buffer = process_input(&input_image);
+    let mut input_buffer = process_input(&input_image);
 
-    let (top_detections, keep_count) = infer(&engine, &input_buffer);
+    let (top_detections, keep_count) = infer(&engine, &mut input_buffer);
     verify_output(&mut input_image, &top_detections, &keep_count);
 
     println!("Done!");

@@ -29,6 +29,8 @@ imageproc = "0.21.0"
 bitflags = "1.2"
 num-traits = "0.2.12"
 num-derive = "0.3.2"
+cuda-runtime-sys = "0.3.0-alpha.1"
+anyhow = "1.0.35"
 
 [dev-dependencies]
 lazy_static = "1.4"

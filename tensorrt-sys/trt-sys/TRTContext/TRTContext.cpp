@@ -59,20 +59,6 @@ const char *context_get_name(nvinfer1::IExecutionContext *execution_context) {
 //    return concreteProfiler->getInternalProfiler();
 //}
 
-void execute(nvinfer1::IExecutionContext *execution_context, const void **binding_data, const int num_bindings,
-             const size_t *data_sizes) {
-
-    int nbBindings = execution_context->getEngine().getNbBindings();
-    void *buffers[nbBindings];
-    for (int i = 0; i < nbBindings; ++i) {
-        cudaMalloc(&buffers[i], data_sizes[i]);
-    }
-
-    cudaMemcpy(buffers[0], binding_data[0], data_sizes[0], cudaMemcpyHostToDevice);
-    execution_context->execute(1, &buffers[0]);
-
-    for (int i = 1; i < num_bindings; ++i) {
-        cudaMemcpy((void *)binding_data[i], buffers[i], data_sizes[i], cudaMemcpyDeviceToHost);
-        cudaFree(buffers[i]);
-    }
+void execute(nvinfer1::IExecutionContext *execution_context, void **buffers, int batch_size) {
+    execution_context->execute(batch_size, &buffers[0]);
 }

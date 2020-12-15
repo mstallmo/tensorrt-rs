@@ -4,6 +4,7 @@ use std::iter::FromIterator;
 use std::path::Path;
 use tensorrt_rs::builder::{Builder, NetworkBuildFlags};
 use tensorrt_rs::context::ExecuteInput;
+use tensorrt_rs::data_size::GB;
 use tensorrt_rs::dims::DimsCHW;
 use tensorrt_rs::engine::Engine;
 use tensorrt_rs::runtime::Logger;
@@ -11,6 +12,7 @@ use tensorrt_rs::uff::{UffFile, UffInputOrder, UffParser};
 
 fn create_engine(logger: &Logger, uff_file: UffFile) -> Engine {
     let builder = Builder::new(&logger);
+    builder.set_max_workspace_size(1 * GB);
     let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
     let uff_parser = UffParser::new();
@@ -40,11 +42,11 @@ fn main() {
     // Convert image to ndarray
     let array: ndarray_image::NdGray = ndarray_image::NdImage(&input_image).into();
     println!("NdArray len: {}", array.len());
-    let pre_processed = Array::from_iter(array.iter().map(|&x| 1.0 - (x as f32) / 255.0));
+    let mut pre_processed = Array::from_iter(array.iter().map(|&x| 1.0 - (x as f32) / 255.0));
 
     // Run inference
     let mut output = ndarray::Array1::<f32>::zeros(10);
     let outputs = vec![ExecuteInput::Float(&mut output)];
-    context.execute(ExecuteInput::Float(&pre_processed), outputs, 2);
+    context.execute(ExecuteInput::Float(&mut pre_processed), outputs);
     println!("output: {}", output);
 }

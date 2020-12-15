@@ -1,8 +1,7 @@
-use std::iter::FromIterator;
-use std::path::PathBuf;
-
 use ndarray::Array;
 use ndarray_image;
+use std::iter::FromIterator;
+use std::path::PathBuf;
 use tensorrt_rs::builder::{Builder, NetworkBuildFlags};
 use tensorrt_rs::context::ExecuteInput;
 use tensorrt_rs::data_size::GB;
@@ -18,6 +17,7 @@ fn create_engine(
     workspace_size: usize,
 ) -> Engine {
     let builder = Builder::new(&logger);
+    builder.set_max_workspace_size(1 * GB);
     let network = builder.create_network_v2(NetworkBuildFlags::EXPLICIT_BATCH);
     let verbosity = 7;
 
@@ -49,11 +49,11 @@ fn main() {
     let array: ndarray_image::NdColor = ndarray_image::NdImage(&input_image).into();
     println!("NdArray len: {}", array.len());
 
-    let pre_processed = Array::from_iter(array.iter().map(|&x| 1.0 - (x as f32) / 255.0));
+    let mut pre_processed = Array::from_iter(array.iter().map(|&x| 1.0 - (x as f32) / 255.0));
 
     // Run inference
     let mut output = ndarray::Array1::<f32>::zeros(1000);
     let outputs = vec![ExecuteInput::Float(&mut output)];
-    context.execute(ExecuteInput::Float(&pre_processed), outputs, 2);
+    context.execute(ExecuteInput::Float(&mut pre_processed), outputs);
     println!("output: {}", output);
 }

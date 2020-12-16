@@ -51,10 +51,10 @@ void builder_set_refittable(nvinfer1::IBuilder* builder, bool can_refit);
 bool builder_get_refittable(nvinfer1::IBuilder* builder);
 void builder_set_engine_capability(nvinfer1::IBuilder* builder, EngineCapabiliy_t engine_capability);
 EngineCapabiliy_t builder_get_engine_capability(nvinfer1::IBuilder* builder);
-#if defined(TRT5)
-nvinfer1::INetworkDefinition *create_network(nvinfer1::IBuilder* builder);
-#elif defined(TRT6) || defined(TRT7)
+#if defined(TRT6) || defined(TRT7)
 nvinfer1::INetworkDefinition *create_network_v2(nvinfer1::IBuilder* builder, uint32_t flags);
+#else
+nvinfer1::INetworkDefinition *create_network(nvinfer1::IBuilder* builder);
 #endif
 
 void builder_reset(nvinfer1::IBuilder* builder, nvinfer1::INetworkDefinition* network);

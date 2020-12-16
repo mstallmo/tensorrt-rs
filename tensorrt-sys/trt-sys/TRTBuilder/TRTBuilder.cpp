@@ -162,13 +162,13 @@ void destroy_builder(nvinfer1::IBuilder* builder) {
     builder->destroy();
 }
 
-#if defined(TRT5)
-nvinfer1::INetworkDefinition *create_network(nvinfer1::IBuilder *builder) {
-    return builder->createNetwork();
-}
-#elif defined(TRT6) || defined(TRT7)
+#if defined(TRT6) || defined(TRT7)
 nvinfer1::INetworkDefinition *create_network_v2(nvinfer1::IBuilder *builder, uint32_t flags) {
     return builder->createNetworkV2(flags);
+}
+#else
+nvinfer1::INetworkDefinition *create_network(nvinfer1::IBuilder *builder) {
+    return builder->createNetwork();
 }
 #endif
 

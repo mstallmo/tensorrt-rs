@@ -1,16 +1,16 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 jobs:
-#  build:
-#    docker:
-#      - image: mstallmo/tensorrt-rs:0.4
-#    steps:
-#      - checkout
-#      - run: cd tensorrt && cargo build --release --no-default-features --features "trt-5"
-#      - persist_to_workspace:
-#          root: /root
-#          paths:
-#            - project
+  build-trt5:
+    docker:
+      - image: mstallmo/tensorrt-rs:0.4
+    steps:
+      - checkout
+      - run: cd tensorrt && cargo build --release --no-default-features --features "trt-5"
+      - persist_to_workspace:
+          root: /root
+          paths:
+            - project
   build-trt7:
     docker:
       - image: mstallmo/tensorrt-rs:0.5
@@ -32,6 +32,7 @@ jobs:
 workflows:
   build-docker:
     jobs:
+      - build-trt5
       - build-trt7
       - test-tensorrt-sys:
           requires:

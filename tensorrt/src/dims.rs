@@ -1,7 +1,5 @@
 use std::error;
 use std::fmt::Formatter;
-use std::os::raw::c_int;
-use tensorrt_rs_derive::Dim;
 use tensorrt_sys::{
     create_dims, create_dims2, create_dims3, create_dims4, create_dimsCHW, create_dimsHW,
     create_dimsNCHW, nvinfer1_Dims, nvinfer1_Dims2, nvinfer1_Dims3, nvinfer1_Dims4,

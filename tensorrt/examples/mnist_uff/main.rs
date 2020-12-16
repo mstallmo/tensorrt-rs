@@ -47,6 +47,8 @@ fn main() {
     // Run inference
     let mut output = ndarray::Array1::<f32>::zeros(10);
     let outputs = vec![ExecuteInput::Float(&mut output)];
-    context.execute(ExecuteInput::Float(&mut pre_processed), outputs);
+    context
+        .execute(ExecuteInput::Float(&mut pre_processed), outputs)
+        .unwrap();
     println!("output: {}", output);
 }

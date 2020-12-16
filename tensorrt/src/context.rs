@@ -12,8 +12,7 @@ use std::ptr;
 use std::vec::Vec;
 use tensorrt_sys::{
     context_get_debug_sync, context_get_name, context_set_debug_sync, context_set_name,
-    destroy_excecution_context, execute, host_memory_get_size, nvinfer1_IExecutionContext,
-    Profiler_t,
+    destroy_excecution_context, execute, nvinfer1_IExecutionContext, Profiler_t,
 };
 
 pub enum ExecuteInput<'a, D: Dimension> {
@@ -51,19 +50,6 @@ impl DeviceBuffer {
 
     pub fn as_mut_ptr(&self) -> *mut c_void {
         self.device_ptr
-    }
-
-    pub fn copy_from_host<T: Num, D: Dimension>(
-        &self,
-        other: &ndarray::Array<T, D>,
-    ) -> Result<(), Error> {
-        check_cuda!(cudaMemcpy(
-            self.device_ptr,
-            other.as_ptr() as *const c_void,
-            other.len() * size_of::<T>(),
-            cudaMemcpyKind::cudaMemcpyHostToDevice,
-        ));
-        Ok(())
     }
 
     pub fn copy_to_host<T: Num, D: Dimension>(
@@ -169,10 +155,10 @@ impl Context {
             let data = &mut output_data[idx];
             match data {
                 ExecuteInput::Integer(val) => {
-                    output.copy_to_host(val);
+                    output.copy_to_host(val)?;
                 }
                 ExecuteInput::Float(val) => {
-                    output.copy_to_host(val);
+                    output.copy_to_host(val)?;
                 }
             }
         }

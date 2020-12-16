@@ -58,7 +58,7 @@ fn infer(engine: &Engine, input: &mut Array1<f32>) -> (ndarray::Array1<f32>, nda
         ExecuteInput::Integer(&mut keep_count),
     ];
     let execute_input = ExecuteInput::Float(input);
-    context.execute(execute_input, outputs);
+    context.execute(execute_input, outputs).unwrap();
 
     (top_detections, keep_count)
 }

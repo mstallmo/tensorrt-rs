@@ -1,10 +1,10 @@
-use std::iter::FromIterator;
-use std::path::PathBuf;
-
 use ndarray::Array;
 use ndarray_image;
+use std::iter::FromIterator;
+use std::path::PathBuf;
 use tensorrt_rs::builder::{Builder, NetworkBuildFlags};
 use tensorrt_rs::context::ExecuteInput;
+use tensorrt_rs::data_size::GB;
 use tensorrt_rs::dims::Dims4;
 use tensorrt_rs::engine::Engine;
 use tensorrt_rs::onnx::{OnnxFile, OnnxParser};
@@ -17,6 +17,7 @@ fn create_engine(
     workspace_size: usize,
 ) -> Engine {
     let builder = Builder::new(&logger);
+    builder.set_max_workspace_size(1 * GB);
     let network = builder.create_network_v2(NetworkBuildFlags::EXPLICIT_BATCH);
     let verbosity = 7;
 
@@ -34,8 +35,7 @@ fn create_engine(
 fn main() {
     let logger = Logger::new();
     let file = OnnxFile::new(&PathBuf::from("../assets/efficientnet.onnx")).unwrap();
-    let gb = 1024 * 1024 * 1024;
-    let engine = create_engine(&logger, file, 1, 1 * gb);
+    let engine = create_engine(&logger, file, 1, 1 * GB);
 
     let context = engine.create_execution_context();
 
@@ -49,11 +49,13 @@ fn main() {
     let array: ndarray_image::NdColor = ndarray_image::NdImage(&input_image).into();
     println!("NdArray len: {}", array.len());
 
-    let pre_processed = Array::from_iter(array.iter().map(|&x| 1.0 - (x as f32) / 255.0));
+    let mut pre_processed = Array::from_iter(array.iter().map(|&x| 1.0 - (x as f32) / 255.0));
 
     // Run inference
     let mut output = ndarray::Array1::<f32>::zeros(1000);
     let outputs = vec![ExecuteInput::Float(&mut output)];
-    context.execute(ExecuteInput::Float(&pre_processed), outputs, 2);
+    context
+        .execute(ExecuteInput::Float(&mut pre_processed), outputs)
+        .unwrap();
     println!("output: {}", output);
 }

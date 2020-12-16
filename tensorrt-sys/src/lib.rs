@@ -3,8 +3,3 @@
 #![allow(non_snake_case)]
 
 include!("bindings.rs");
-
-// #[cfg(test)]
-// mod tests {
-//     use crate::get_tensorrt_version;
-// }

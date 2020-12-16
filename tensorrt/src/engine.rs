@@ -12,7 +12,7 @@ use tensorrt_sys::{
     engine_get_binding_name, engine_get_device_memory_size, engine_get_location,
     engine_get_max_batch_size, engine_get_nb_bindings, engine_get_nb_layers,
     engine_get_workspace_size, engine_is_refittable, engine_serialize, host_memory_get_data,
-    host_memory_get_size,
+    host_memory_get_size, nvinfer1_ICudaEngine,
 };
 
 #[repr(C)]
@@ -33,12 +33,17 @@ pub enum TensorLocation {
 
 #[derive(Debug)]
 pub struct Engine {
-    pub(crate) internal_engine: *mut tensorrt_sys::Engine_t,
+    pub(crate) internal_engine: *mut nvinfer1_ICudaEngine,
 }
 
 impl Engine {
     pub fn get_nb_bindings(&self) -> i32 {
-        unsafe { engine_get_nb_bindings(self.internal_engine) }
+        let res = if !self.internal_engine.is_null() {
+            unsafe { engine_get_nb_bindings(self.internal_engine) }
+        } else {
+            0
+        };
+        res
     }
 
     pub fn get_binding_name(&self, binding_index: i32) -> Option<String> {
@@ -78,9 +83,7 @@ impl Engine {
         let raw_dims =
             unsafe { engine_get_binding_dimensions(self.internal_engine, binding_index) };
 
-        Dims {
-            internal_dims: raw_dims,
-        }
+        Dims(raw_dims)
     }
 
     pub fn get_binding_data_type(&self, binding_index: i32) -> DataType {
@@ -105,7 +108,6 @@ impl Engine {
         let execution_context = unsafe { engine_create_execution_context(self.internal_engine) };
         Context {
             internal_context: execution_context,
-            _engine: &self,
         }
     }
 
@@ -114,7 +116,6 @@ impl Engine {
             unsafe { engine_create_execution_context_without_device_memory(self.internal_engine) };
         Context {
             internal_context: execution_context,
-            _engine: &self,
         }
     }
 
@@ -138,15 +139,18 @@ impl Engine {
 }
 
 unsafe impl Send for Engine {}
+unsafe impl Sync for Engine {}
 
 impl Drop for Engine {
     fn drop(&mut self) {
-        unsafe { engine_destroy(self.internal_engine) };
+        if !self.internal_engine.is_null() {
+            unsafe { engine_destroy(self.internal_engine) };
+        }
     }
 }
 
 pub struct HostMemory {
-    pub(crate) memory: *mut tensorrt_sys::HostMemory_t,
+    pub(crate) memory: *mut tensorrt_sys::nvinfer1_IHostMemory,
 }
 
 impl HostMemory {
@@ -174,7 +178,8 @@ impl Drop for HostMemory {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::builder::Builder;
+    use crate::builder::{Builder, NetworkBuildFlags};
+    use crate::data_size::GB;
     use crate::dims::DimsCHW;
     use crate::runtime::{Logger, Runtime};
     use crate::uff::{UffFile, UffInputOrder, UffParser};
@@ -190,7 +195,8 @@ mod tests {
 
     fn setup_engine_test_uff(logger: &Logger) -> Engine {
         let builder = Builder::new(&logger);
-        let network = builder.create_network();
+        builder.set_max_workspace_size(1 * GB);
+        let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
         let uff_parser = UffParser::new();
         let dim = DimsCHW::new(1, 28, 28);
@@ -290,7 +296,7 @@ mod tests {
         };
         let engine = setup_engine_test_uff(&logger);
 
-        assert_eq!(engine.get_nb_layers(), 9);
+        assert_eq!(engine.get_nb_layers(), 7);
     }
 
     #[test]

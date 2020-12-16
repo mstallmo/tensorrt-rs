@@ -2,7 +2,9 @@ use super::*;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use tensorrt_rs_derive::Layer;
-use tensorrt_sys::{elementwise_destroy, elementwise_get_operation, elementwise_set_operation};
+use tensorrt_sys::{
+    elementwise_get_operation, elementwise_set_operation, nvinfer1_IElementWiseLayer,
+};
 
 #[repr(C)]
 #[derive(Debug, FromPrimitive, Eq, PartialEq)]
@@ -18,7 +20,7 @@ pub enum ElementWiseOperation {
 
 #[derive(Layer)]
 pub struct ElementWiseLayer {
-    pub(crate) internal_layer: *mut tensorrt_sys::Layer_t,
+    pub(crate) internal_layer: *mut nvinfer1_IElementWiseLayer,
 }
 
 impl ElementWiseLayer {
@@ -32,16 +34,10 @@ impl ElementWiseLayer {
     }
 }
 
-impl Drop for ElementWiseLayer {
-    fn drop(&mut self) {
-        unsafe { elementwise_destroy(self.internal_layer) }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::builder::Builder;
+    use crate::builder::{Builder, NetworkBuildFlags};
     use crate::dims::DimsHW;
     use crate::network::Network;
     use crate::runtime::Logger;
@@ -54,7 +50,7 @@ mod tests {
 
     fn create_network(logger: &Logger) -> Network {
         let builder = Builder::new(logger);
-        builder.create_network()
+        builder.create_network_v2(NetworkBuildFlags::EXPLICIT_BATCH)
     }
 
     #[test]

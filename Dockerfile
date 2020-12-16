@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/tensorrt:19.06-py3
+FROM nvcr.io/nvidia/tensorrt:20.11-py3
 
 RUN apt-get update
 RUN apt install -y software-properties-common

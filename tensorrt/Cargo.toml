@@ -8,7 +8,7 @@ edition = "2018"
 description = "Rust library for using Nvidia's TensorRT deep learning acceleration library"
 
 [features]
-default = ["trt-5"]
+default = ["trt-7"]
 
 trt-5 = ["tensorrt-sys/trt-5"]
 
@@ -29,6 +29,8 @@ imageproc = "0.21.0"
 bitflags = "1.2"
 num-traits = "0.2.12"
 num-derive = "0.3.2"
+cuda-runtime-sys = "0.3.0-alpha.1"
+anyhow = "1.0.35"
 
 [dev-dependencies]
 lazy_static = "1.4"

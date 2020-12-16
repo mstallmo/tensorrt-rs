@@ -13,8 +13,8 @@ fn impl_layer_derive(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
         impl private::LayerPrivate for #name {
-            fn get_internal_layer(&self) -> *mut tensorrt_sys::Layer_t {
-                self.internal_layer
+            fn get_internal_layer(&self) -> *mut tensorrt_sys::nvinfer1_ILayer {
+                self.internal_layer as *mut tensorrt_sys::nvinfer1_ILayer
             }
         }
 

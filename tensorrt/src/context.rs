@@ -1,5 +1,5 @@
 use crate::check_cuda;
-use crate::profiler::{IProfiler, ProfilerBinding};
+use crate::profiler::{IProfiler, Profiler};
 use anyhow::Error;
 use cuda_runtime_sys::{cudaFree, cudaMalloc, cudaMemcpy, cudaMemcpyKind};
 use ndarray;
@@ -12,7 +12,7 @@ use std::ptr;
 use std::vec::Vec;
 use tensorrt_sys::{
     context_get_debug_sync, context_get_name, context_set_debug_sync, context_set_name,
-    destroy_excecution_context, execute, nvinfer1_IExecutionContext, Profiler_t,
+    context_set_profiler, destroy_excecution_context, execute, nvinfer1_IExecutionContext,
 };
 
 pub enum ExecuteInput<'a, D: Dimension> {
@@ -106,12 +106,10 @@ impl Context {
         context_name.to_str().unwrap().to_string()
     }
 
-    // pub fn set_profiler<T: IProfiler>(&self, profiler: &mut T) {
-    //     let profiler_ptr =
-    //         Box::into_raw(Box::new(ProfilerBinding::new(profiler))) as *mut Profiler_t;
-    //     unsafe { context_set_profiler(self.internal_context, profiler_ptr) }
-    // }
-    //
+    pub fn set_profiler<P: IProfiler>(&self, profiler: &Profiler<P>) {
+        unsafe { context_set_profiler(self.internal_context, profiler.internal_profiler) }
+    }
+
     // pub fn get_profiler<T: IProfiler>(&self) -> &T {
     //     unsafe {
     //         let profiler_ptr =

@@ -4,7 +4,7 @@
 #include <cuda_runtime.h>
 #include "NvInfer.h"
 #include "TRTContext.h"
-//#include "../TRTProfiler/TRTProfilerInternal.hpp"
+#include "../TRTProfiler/TRTProfilerInternal.hpp"
 //#include "../TRTUtils.hpp"
 
 //struct Context {
@@ -48,12 +48,10 @@ const char *context_get_name(nvinfer1::IExecutionContext *execution_context) {
     return execution_context->getName();
 }
 
-//void context_set_profiler(Context_t *context, Profiler_t *profiler) {
-//    auto concreteProfiler = new ConcreteProfiler(profiler);
-//    context->_concreteProfiler = concreteProfiler;
-//    context->internal_context->setProfiler(concreteProfiler);
-//}
-//
+void context_set_profiler(nvinfer1::IExecutionContext *context, CppProfiler* profiler) {
+    context->setProfiler(profiler);
+}
+
 //Profiler_t* context_get_profiler(Context_t *context) {
 //    auto concreteProfiler = dynamic_cast<ConcreteProfiler *>(context->internal_context->getProfiler());
 //    return concreteProfiler->getInternalProfiler();

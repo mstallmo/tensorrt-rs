@@ -22,7 +22,7 @@ bool context_get_debug_sync(nvinfer1::IExecutionContext* execution_context);
 void context_set_name(nvinfer1::IExecutionContext* execution_context, const char *name);
 const char* context_get_name(nvinfer1::IExecutionContext *execution_context);
 
-//void context_set_profiler(Context_t execution_context, Profiler_t* profiler);
+void context_set_profiler(nvinfer1::IExecutionContext* execution_context, CppProfiler* profiler);
 //Profiler_t* context_get_profiler(Context_t *execution_context);
 
 void execute(nvinfer1::IExecutionContext* execution_context, void** buffers, int batch_size);

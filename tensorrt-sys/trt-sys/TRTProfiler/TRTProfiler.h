@@ -5,15 +5,13 @@
 #ifndef LIBTRT_TRTPROFILER_H
 #define LIBTRT_TRTPROFILER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct Profiler;
 typedef struct Profiler Profiler_t;
+class CppProfiler;
 
-#ifdef __cplusplus
-};
-#endif
+CppProfiler* create_profiler(Profiler_t * rust_profiler);
+void destroy_profiler(CppProfiler* profiler);
+
 
 #endif //LIBTRT_TRTPROFILER_H

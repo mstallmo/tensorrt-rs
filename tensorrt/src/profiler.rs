@@ -1,13 +1,58 @@
+use crate::binding_func;
 use std::ffi::CStr;
 use std::os::raw::c_char;
-use tensorrt_sys::Profiler_t;
+use tensorrt_sys::{create_profiler, destroy_profiler, CppProfiler, Profiler_t};
 
 pub trait IProfiler {
     fn report_layer_time(&self, layer_name: *const c_char, ms: f32);
 }
 
+pub struct Profiler<P: IProfiler> {
+    pub(crate) internal_profiler: *mut CppProfiler,
+    _supplied_profiler: P,
+}
+
+impl<P: IProfiler> Profiler<P> {
+    pub fn new(mut rust_profiler: P) -> Self {
+        let profiler_ptr =
+            Box::into_raw(Box::new(ProfilerBinding::new(&mut rust_profiler))) as *mut Profiler_t;
+        let internal_profiler = unsafe { create_profiler(profiler_ptr) };
+
+        Profiler {
+            internal_profiler,
+            _supplied_profiler: rust_profiler,
+        }
+    }
+}
+
+impl<P: IProfiler> Drop for Profiler<P> {
+    fn drop(&mut self) {
+        unsafe {
+            destroy_profiler(self.internal_profiler);
+        }
+    }
+}
+
+pub struct DefaultProfiler {}
+
+impl DefaultProfiler {
+    pub fn new() -> Self {
+        DefaultProfiler {}
+    }
+}
+
+impl IProfiler for DefaultProfiler {
+    fn report_layer_time(&self, layer_name: *const c_char, ms: f32) {
+        println!(
+            "{} took {} ms",
+            unsafe { CStr::from_ptr(layer_name) }.to_str().unwrap(),
+            ms
+        );
+    }
+}
+
 #[repr(C)]
-pub(crate) struct ProfilerBinding<T>
+struct ProfilerBinding<T>
 where
     T: IProfiler,
 {
@@ -21,16 +66,7 @@ where
     T: IProfiler,
 {
     pub fn new(profiler: &mut T) -> Self {
-        unsafe extern "C" fn report_layer_time<T>(
-            context: *mut T,
-            layer_name: *const c_char,
-            ms: f32,
-        ) where
-            T: IProfiler,
-        {
-            let profiler_ref: &mut T = &mut *context;
-            profiler_ref.report_layer_time(layer_name, ms);
-        }
+        binding_func!(report_layer_time<IProfiler>(layer_name: *const c_char, ms: f32));
 
         //This is a little un-orthodox but having this extern function allows us to
         //cleanup the memory that we lose when passing the ProfilerBinding as a raw pointer to
@@ -47,23 +83,5 @@ where
             destroy,
             context,
         }
-    }
-}
-
-pub struct RustProfiler {}
-
-impl RustProfiler {
-    pub fn new() -> Self {
-        RustProfiler {}
-    }
-}
-
-impl IProfiler for RustProfiler {
-    fn report_layer_time(&self, layer_name: *const c_char, ms: f32) {
-        println!(
-            "{} took {} ms",
-            unsafe { CStr::from_ptr(layer_name) }.to_str().unwrap(),
-            ms
-        );
     }
 }

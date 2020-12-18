@@ -7,6 +7,7 @@ use tensorrt_rs::context::ExecuteInput;
 use tensorrt_rs::data_size::GB;
 use tensorrt_rs::dims::DimsCHW;
 use tensorrt_rs::engine::Engine;
+use tensorrt_rs::profiler::{DefaultProfiler, Profiler};
 use tensorrt_rs::runtime::Logger;
 use tensorrt_rs::uff::{UffFile, UffInputOrder, UffParser};
 
@@ -32,8 +33,11 @@ fn main() {
     let uff_file = UffFile::new(Path::new("../assets/lenet5.uff")).unwrap();
     let engine = create_engine(&logger, uff_file);
 
+    let profiler = Profiler::new(DefaultProfiler::new());
+
     // Create execution context
     let context = engine.create_execution_context();
+    context.set_profiler(&profiler);
 
     // Load image from disk
     let input_image = image::open("../assets/images/0.pgm").unwrap().into_luma();

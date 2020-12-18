@@ -10,23 +10,20 @@
 
 struct Profiler {
     void (*reportLayerTime)(void *context, const char *layerName, float ms);
-    void (*destroy)(void *self, void* context);
-    void* context;
+
+    void (*destroy)(void *self, void *context);
+
+    void *context;
 };
 
-class ConcreteProfiler : public nvinfer1::IProfiler {
+class CppProfiler : public nvinfer1::IProfiler {
 public:
-    explicit ConcreteProfiler(Profiler_t *_profiler) : profiler(_profiler) {}
+    explicit CppProfiler(Profiler_t *_profiler) : profiler(_profiler) {}
+    ~CppProfiler();
 
-    void reportLayerTime(const char* layerName, float ms) override {
-        (*profiler->reportLayerTime)(profiler->context, layerName, ms);
-    }
+    void reportLayerTime(const char *layerName, float ms) override;
 
-    void destroy() {
-        (*profiler->destroy)(profiler, profiler->context);
-    }
-
-    Profiler_t* getInternalProfiler() {
+    Profiler_t *getInternalProfiler() {
         return profiler;
     }
 

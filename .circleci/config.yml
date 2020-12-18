@@ -16,7 +16,7 @@ jobs:
       - image: mstallmo/tensorrt-rs:0.5
     steps:
       - checkout
-      - run: cargo build --release
+      - run: cd tensorrt && cargo build --release
       - persist_to_workspace:
           root: /root
           paths:

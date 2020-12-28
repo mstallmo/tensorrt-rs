@@ -7,6 +7,9 @@ if(DEFINED TRT7)
 elseif(DEFINED TRT6)
     message(STATUS "TRT6 is defined")
     add_compile_definitions(TRT6)
+elseif(DEFINED TRT5)
+    message(STATUS "Falling back to TRT5")
+    add_compile_definitions(TRT5)
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
@@ -26,6 +29,7 @@ file(GLOB source_files
         "TRTHostMemory/*.cpp"
         "TRTLayer/*.cpp"
         "TRTTensor/*.cpp"
+        "TRTProfiler/*.cpp"
 )
 
 add_library(trt-sys STATIC ${source_files})

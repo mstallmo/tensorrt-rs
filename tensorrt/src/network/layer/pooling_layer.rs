@@ -4,7 +4,7 @@ use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use tensorrt_rs_derive::Layer;
 use tensorrt_sys::{
-    pooling_destroy, pooling_get_average_count_excludes_padding, pooling_get_blend_factor,
+    nvinfer1_IPoolingLayer, pooling_get_average_count_excludes_padding, pooling_get_blend_factor,
     pooling_get_padding, pooling_get_padding_mode, pooling_get_pooling_type,
     pooling_get_post_padding, pooling_get_pre_padding, pooling_get_stride, pooling_get_window_size,
     pooling_set_average_count_excludes_padding, pooling_set_blend_factor, pooling_set_padding,
@@ -33,7 +33,7 @@ pub enum PaddingMode {
 
 #[derive(Layer)]
 pub struct PoolingLayer {
-    pub(crate) internal_layer: *mut tensorrt_sys::Layer_t,
+    pub(crate) internal_layer: *mut nvinfer1_IPoolingLayer,
 }
 
 impl PoolingLayer {
@@ -48,29 +48,29 @@ impl PoolingLayer {
 
     pub fn get_window_size(&self) -> DimsHW {
         let raw = unsafe { pooling_get_window_size(self.internal_layer) };
-        DimsHW { internal_dims: raw }
+        DimsHW(raw)
     }
 
     pub fn set_window_size(&self, dims: DimsHW) {
-        unsafe { pooling_set_window_size(self.internal_layer, dims.internal_dims) }
+        unsafe { pooling_set_window_size(self.internal_layer, dims.0) }
     }
 
     pub fn get_stride(&self) -> DimsHW {
         let raw = unsafe { pooling_get_stride(self.internal_layer) };
-        DimsHW { internal_dims: raw }
+        DimsHW(raw)
     }
 
     pub fn set_stride(&self, dims: DimsHW) {
-        unsafe { pooling_set_stride(self.internal_layer, dims.internal_dims) }
+        unsafe { pooling_set_stride(self.internal_layer, dims.0) }
     }
 
     pub fn get_padding(&self) -> DimsHW {
         let raw = unsafe { pooling_get_padding(self.internal_layer) };
-        DimsHW { internal_dims: raw }
+        DimsHW(raw)
     }
 
     pub fn set_padding(&self, padding: DimsHW) {
-        unsafe { pooling_set_padding(self.internal_layer, padding.internal_dims) }
+        unsafe { pooling_set_padding(self.internal_layer, padding.0) }
     }
 
     pub fn get_blend_factor(&self) -> f32 {
@@ -91,7 +91,7 @@ impl PoolingLayer {
 
     pub fn get_pre_padding(&self) -> Dims {
         let raw = unsafe { pooling_get_pre_padding(self.internal_layer) };
-        Dims { internal_dims: raw }
+        Dims(raw)
     }
 
     pub fn set_pre_padding<T: Dim>(&self, padding: T) {
@@ -100,7 +100,7 @@ impl PoolingLayer {
 
     pub fn get_post_padding(&self) -> Dims {
         let raw = unsafe { pooling_get_post_padding(self.internal_layer) };
-        Dims { internal_dims: raw }
+        Dims(raw)
     }
 
     pub fn set_post_padding<T: Dim>(&self, padding: T) {
@@ -117,16 +117,10 @@ impl PoolingLayer {
     }
 }
 
-impl Drop for PoolingLayer {
-    fn drop(&mut self) {
-        unsafe { pooling_destroy(self.internal_layer) }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::builder::Builder;
+    use crate::builder::{Builder, NetworkBuildFlags};
     use crate::dims::{Dim, DimsCHW, DimsHW};
     use crate::network::Network;
     use crate::runtime::Logger;
@@ -139,7 +133,7 @@ mod tests {
 
     fn create_network(logger: &Logger) -> Network {
         let builder = Builder::new(logger);
-        builder.create_network()
+        builder.create_network_v2(NetworkBuildFlags::EXPLICIT_BATCH)
     }
 
     #[test]

@@ -10,15 +10,11 @@ use tensorrt_sys::{
     network_add_identity_layer, network_add_input, network_add_pooling, network_get_input,
     network_get_layer, network_get_nb_inputs, network_get_nb_layers, network_get_nb_outputs,
     network_get_output, network_mark_output, network_remove_tensor, network_unmark_output,
-    tensor_destroy, tensor_get_name, tensor_set_dimensions,
+    nvinfer1_INetworkDefinition, nvinfer1_ITensor, tensor_get_name, tensor_set_dimensions,
 };
 
 pub struct Network {
-    pub(crate) internal_network: *mut tensorrt_sys::Network_t,
-}
-
-pub struct Tensor {
-    pub(crate) internal_tensor: *mut tensorrt_sys::Tensor_t,
+    pub(crate) internal_network: *mut nvinfer1_INetworkDefinition,
 }
 
 impl Network {
@@ -135,7 +131,7 @@ impl Network {
                 self.internal_network,
                 input.internal_tensor,
                 pooling_type as c_int,
-                window_size.internal_dims,
+                window_size.0,
             )
         };
         PoolingLayer { internal_layer }
@@ -146,6 +142,10 @@ impl Drop for Network {
     fn drop(&mut self) {
         unsafe { destroy_network(self.internal_network) };
     }
+}
+
+pub struct Tensor {
+    pub(crate) internal_tensor: *mut nvinfer1_ITensor,
 }
 
 impl Tensor {
@@ -163,16 +163,10 @@ impl Tensor {
     }
 }
 
-impl Drop for Tensor {
-    fn drop(&mut self) {
-        unsafe { tensor_destroy(self.internal_tensor) }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::builder::Builder;
+    use crate::builder::{Builder, NetworkBuildFlags};
     use crate::dims::{DimsCHW, DimsHW};
     use crate::runtime::Logger;
     use crate::uff::{UffFile, UffInputOrder, UffParser};
@@ -187,12 +181,12 @@ mod tests {
 
     fn create_network(logger: &Logger) -> Network {
         let builder = Builder::new(logger);
-        builder.create_network()
+        builder.create_network_v2(NetworkBuildFlags::DEFAULT)
     }
 
     fn create_network_from_uff(logger: &Logger) -> Network {
         let builder = Builder::new(&logger);
-        let network = builder.create_network();
+        let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
         let uff_parser = UffParser::new();
         let dim = DimsCHW::new(1, 28, 28);

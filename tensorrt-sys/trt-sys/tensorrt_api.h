@@ -4,6 +4,7 @@
 
 #ifndef TENSRORT_SYS_TENSORRT_API_H
 #define TENSRORT_SYS_TENSORRT_API_H
+#include <NvInfer.h>
 
 #include "TRTEnums.h"
 #include "TRTLogger/TRTLogger.h"

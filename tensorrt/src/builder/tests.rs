@@ -12,7 +12,7 @@ lazy_static! {
 
 fn create_network(logger: &Logger) -> (Network, Builder) {
     let builder = Builder::new(&logger);
-    let network = builder.create_network();
+    let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
     let uff_parser = UffParser::new();
     let dim = DimsCHW::new(1, 28, 28);
@@ -21,6 +21,10 @@ fn create_network(logger: &Logger) -> (Network, Builder) {
         .register_input("in", dim, UffInputOrder::Nchw)
         .unwrap();
     uff_parser.register_output("out").unwrap();
+    println!(
+        "current dir: {}",
+        std::env::current_dir().unwrap().display()
+    );
     let uff_file = UffFile::new(Path::new("../assets/lenet5.uff")).unwrap();
     uff_parser.parse(&uff_file, &network).unwrap();
 
@@ -325,7 +329,7 @@ fn reset_builder() {
     assert_eq!(builder.get_half2_mode(), false);
     builder.set_half2_mode(true);
 
-    let network = builder.create_network();
+    let network = builder.create_network_v2(NetworkBuildFlags::EXPLICIT_BATCH);
     assert_eq!(builder.get_half2_mode(), true);
 
     builder.reset(network);

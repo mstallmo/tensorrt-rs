@@ -37,6 +37,8 @@ fn main() -> Result<(), ()> {
 
     #[cfg(feature = "trt-5")]
     {
+        println!("Setting Config to TRT5");
+        cfg.define("TRT5", "");
         let bindings = builder()
             .clang_args(&["-x", "c++"])
             .header("trt-sys/tensorrt_api.h")
@@ -48,6 +50,7 @@ fn main() -> Result<(), ()> {
 
     #[cfg(feature = "trt-6")]
     {
+        println!("Setting Config to TRT6");
         cfg.define("TRT6", "");
         let bindings = builder()
             .clang_arg("-DTRT6")
@@ -61,6 +64,7 @@ fn main() -> Result<(), ()> {
 
     #[cfg(feature = "trt-7")]
     {
+        println!("Setting Config to TRT7");
         cfg.define("TRT7", "");
         let bindings = builder()
             .clang_arg("-DTRT7")

@@ -1,5 +1,5 @@
 use std::path::Path;
-use tensorrt_rs::builder::Builder;
+use tensorrt_rs::builder::{Builder, NetworkBuildFlags};
 use tensorrt_rs::dims::DimsCHW;
 use tensorrt_rs::engine::Engine;
 use tensorrt_rs::runtime::Logger;
@@ -7,7 +7,7 @@ use tensorrt_rs::uff::{UffFile, UffInputOrder, UffParser};
 
 fn create_engine(logger: &Logger, uff_file: UffFile) -> Engine {
     let builder = Builder::new(&logger);
-    let network = builder.create_network();
+    let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
     let uff_parser = UffParser::new();
     let dim = DimsCHW::new(1, 28, 28);

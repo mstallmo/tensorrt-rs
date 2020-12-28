@@ -5,23 +5,12 @@
 #ifndef LIBTRT_TRTHOSTMEMORY_H
 #define LIBTRT_TRTHOSTMEMORY_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <NvInfer.h>
 
-struct HostMemory;
-typedef struct HostMemory HostMemory_t;
+void destroy_host_memory(nvinfer1::IHostMemory* host_memory);
 
-void destroy_host_memory(HostMemory_t* host_memory);
-
-void* host_memory_get_data(HostMemory_t* host_memory);
-size_t host_memory_get_size(HostMemory_t* host_memory);
-
-#ifdef __cplusplus
-};
-#endif
-
-
+void* host_memory_get_data(nvinfer1::IHostMemory* host_memory);
+size_t host_memory_get_size(nvinfer1::IHostMemory* host_memory);
 
 
 #endif //LIBTRT_TRTHOSTMEMORY_H

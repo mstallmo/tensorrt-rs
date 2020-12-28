@@ -21,7 +21,7 @@ use tensorrt_sys::{
     layer_get_input, layer_get_name, layer_get_nb_inputs, layer_get_nb_outputs, layer_get_output,
     layer_get_output_type, layer_get_precision, layer_get_type, layer_output_type_is_set,
     layer_precision_is_set, layer_reset_output_type, layer_reset_precision, layer_set_input,
-    layer_set_name, layer_set_output_type, layer_set_precision,
+    layer_set_name, layer_set_output_type, layer_set_precision, nvinfer1_ILayer,
 };
 
 #[repr(C)]
@@ -136,20 +136,22 @@ pub trait Layer: private::LayerPrivate {
 }
 
 mod private {
+    use tensorrt_sys::nvinfer1_ILayer;
+
     pub trait LayerPrivate {
-        fn get_internal_layer(&self) -> *mut tensorrt_sys::Layer_t;
+        fn get_internal_layer(&self) -> *mut nvinfer1_ILayer;
     }
 }
 
 #[derive(Layer)]
 pub struct BaseLayer {
-    pub(crate) internal_layer: *mut tensorrt_sys::Layer_t,
+    pub(crate) internal_layer: *mut nvinfer1_ILayer,
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::builder::Builder;
+    use crate::builder::{Builder, NetworkBuildFlags};
     use crate::dims::DimsCHW;
     use crate::engine::DataType;
     use crate::network::Network;
@@ -166,12 +168,12 @@ mod tests {
 
     fn create_network(logger: &Logger) -> Network {
         let builder = Builder::new(logger);
-        builder.create_network()
+        builder.create_network_v2(NetworkBuildFlags::DEFAULT)
     }
 
     fn create_network_from_uff(logger: &Logger) -> Network {
         let builder = Builder::new(&logger);
-        let network = builder.create_network();
+        let network = builder.create_network_v2(NetworkBuildFlags::DEFAULT);
 
         let uff_parser = UffParser::new();
         let dim = DimsCHW::new(1, 28, 28);

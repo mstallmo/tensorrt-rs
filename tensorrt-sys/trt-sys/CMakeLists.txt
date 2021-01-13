@@ -14,7 +14,11 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS "-fPIC -O3 -Wall -Wextra -Werror -Wno-unknown-pragmas -Wno-deprecated -Wno-deprecated-declarations")
+if(WIN32)
+    set(CMAKE_CXX_FLAGS "-O3")
+elseif(LINUX)
+    set(CMAKE_CXX_FLAGS "-fPIC -O3 -Wall -Wextra -Werror -Wno-unknown-pragmas -Wno-deprecated -Wno-deprecated-declarations")
+endif()
 
 file(GLOB source_files
         "TRTLogger/*.cpp"

@@ -35,6 +35,15 @@ fn tensorrt_configuration() {
 fn main() -> Result<(), ()> {
     let mut cfg = Config::new("trt-sys");
 
+    let trt_include = match option_env!("TRT_INSTALL_DIR") {
+        Some(trt_include_dir) => {
+            format!("{}/include", trt_include_dir)
+        }
+        None => {
+            format!(".")
+        }
+    };
+
     #[cfg(feature = "trt-5")]
     {
         println!("Setting Config to TRT5");
@@ -69,6 +78,7 @@ fn main() -> Result<(), ()> {
         let bindings = builder()
             .clang_arg("-DTRT7")
             .clang_args(&["-x", "c++"])
+            .clang_args(&["-I", trt_include])
             .header("trt-sys/tensorrt_api.h")
             .size_t_is_usize(true)
             .generate()?;

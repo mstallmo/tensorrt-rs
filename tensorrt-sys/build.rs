@@ -80,12 +80,16 @@ fn main() -> Result<(), ()> {
             None => ".".to_string(),
         };
         println!("Setting Config to TRT7");
+        println!("include dir: {}", trt_include);
+        println!("test");
         cfg.define("TRT7", "");
         let bindings = builder()
             .clang_arg("-DTRT7")
             .clang_args(&["-x", "c++"])
-            .clang_args(&["-I", &trt_include[..]])
             .header("trt-sys/tensorrt_api.h")
+            .clang_arg("-v")
+            .clang_arg("-I \"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2\\include\"")
+//            .clang_arg("-I \"C:\\Program Files\\Azure Kinect SDK v1.3.0\\sdk\\include\"")
             .size_t_is_usize(true)
             .generate()?;
 

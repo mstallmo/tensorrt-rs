@@ -35,66 +35,68 @@ fn tensorrt_configuration() {
 fn main() -> Result<(), ()> {
     let mut cfg = Config::new("trt-sys");
 
-    #[cfg(feature = "trt-5")]
-    {
-        let trt_include = match option_env!("TRT_INSTALL_DIR") {
-            Some(trt_include_dir) => format!("{}/include", trt_include_dir),
-            None => ".".to_string(),
-        };
+    // #[cfg(feature = "trt-5")]
+    // {
+    //     let trt_include = match option_env!("TRT_INSTALL_DIR") {
+    //         Some(trt_include_dir) => format!("{}/include", trt_include_dir),
+    //         None => ".".to_string(),
+    //     };
 
-        println!("Setting Config to TRT5");
-        cfg.define("TRT5", "");
-        let bindings = builder()
-            .clang_args(&["-x", "c++"])
-            .clang_args(&["-I", &trt_include[..]])
-            .header("trt-sys/tensorrt_api.h")
-            .size_t_is_usize(true)
-            .generate()?;
-        println!("{:?}", bindings);
-        bindings.write_to_file("src/bindings.rs").unwrap();
-    }
+    //     println!("Setting Config to TRT5");
+    //     cfg.define("TRT5", "");
+    //     let bindings = builder()
+    //         .clang_args(&["-x", "c++"])
+    //         .clang_args(&["-I", &trt_include[..]])
+    //         .header("trt-sys/tensorrt_api.h")
+    //         .size_t_is_usize(true)
+    //         .generate()?;
+    //     println!("{:?}", bindings);
+    //     bindings.write_to_file("src/bindings.rs").unwrap();
+    // }
 
-    #[cfg(feature = "trt-6")]
-    {
-        let trt_include = match option_env!("TRT_INSTALL_DIR") {
-            Some(trt_include_dir) => format!("{}/include", trt_include_dir),
-            None => ".".to_string(),
-        };
-        println!("Setting Config to TRT6");
-        cfg.define("TRT6", "");
-        let bindings = builder()
-            .clang_arg("-DTRT6")
-            .clang_args(&["-x", "c++"])
-            .clang_args(&["-I", &trt_include[..]])
-            .header("trt-sys/tensorrt_api.h")
-            .size_t_is_usize(true)
-            .generate()?;
+    // #[cfg(feature = "trt-6")]
+    // {
+    //     let trt_include = match option_env!("TRT_INSTALL_DIR") {
+    //         Some(trt_include_dir) => format!("{}/include", trt_include_dir),
+    //         None => ".".to_string(),
+    //     };
+    //     println!("Setting Config to TRT6");
+    //     cfg.define("TRT6", "");
+    //     let bindings = builder()
+    //         .clang_arg("-DTRT6")
+    //         .clang_args(&["-x", "c++"])
+    //         .clang_args(&["-I", &trt_include[..]])
+    //         .header("trt-sys/tensorrt_api.h")
+    //         .size_t_is_usize(true)
+    //         .generate()?;
 
-        bindings.write_to_file("src/bindings.rs").unwrap();
-    }
+    //     bindings.write_to_file("src/bindings.rs").unwrap();
+    // }
 
-    #[cfg(feature = "trt-7")]
-    {
-        let trt_include = match option_env!("TRT_INSTALL_DIR") {
-            Some(trt_include_dir) => format!("{}/include", trt_include_dir),
-            None => ".".to_string(),
-        };
-        println!("Setting Config to TRT7");
-        println!("include dir: {}", trt_include);
-        println!("test");
-        cfg.define("TRT7", "");
-        let bindings = builder()
-            .clang_arg("-DTRT7")
-            .clang_args(&["-x", "c++"])
-            .header("trt-sys/tensorrt_api.h")
-            .clang_arg("-v")
-            .clang_arg("-I \"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2\\include\"")
-//            .clang_arg("-I \"C:\\Program Files\\Azure Kinect SDK v1.3.0\\sdk\\include\"")
-            .size_t_is_usize(true)
-            .generate()?;
+    // #[cfg(feature = "trt-7")]
+    // {
+    // let trt_include = match option_env!("TRT_INSTALL_DIR") {
+    //     Some(trt_include_dir) => format!("{}", trt_include_dir),
+    //     None => ".".to_string(),
+    // };
+    println!("Setting Config to TRT7");
+    println!("hello");
+    cfg.define("TRT7", "");
+    let bindings = builder()
+        .clang_arg("-DTRT7")
+        .clang_args(&["-x", "c++"])
+        .header("trt-sys/tensorrt_api.h")
+        .clang_args(&[
+            "-I",
+            "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.2/include",
+        ])
+        .size_t_is_usize(true)
+        .generate()?;
 
-        bindings.write_to_file("src/bindings.rs").unwrap();
-    }
+    //    println!("{:?}", bindings);
+
+    bindings.write_to_file("src/bindings.rs").unwrap();
+    //   }
 
     let dst = cfg.build();
     println!("cargo:rustc-link-search=native={}", dst.display());

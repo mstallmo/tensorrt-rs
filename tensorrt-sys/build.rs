@@ -52,7 +52,6 @@ fn main() -> Result<(), ()> {
             .header("trt-sys/tensorrt_api.h")
             .size_t_is_usize(true)
             .generate()?;
-        println!("{:?}", bindings);
         bindings.write_to_file("src/bindings.rs").unwrap();
     }
 

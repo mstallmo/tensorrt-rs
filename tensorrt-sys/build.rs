@@ -88,7 +88,7 @@ fn main() -> Result<(), ()> {
     let dst = cfg.build();
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=static=trt-sys");
-    //println!("cargo:rustc-link-lib=dylib=stdc++");
+    println!("cargo:rustc-link-lib=dylib=stdc++");
 
     tensorrt_configuration();
     cuda_configuration();

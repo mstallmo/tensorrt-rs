@@ -184,7 +184,7 @@ mod tests {
     use crate::data_size::GB;
     use crate::dims::DimsCHW;
     use crate::engine::Engine;
-    use crate::profiler::RustProfiler;
+    //    use crate::profiler::RustProfiler;
     use crate::runtime::Logger;
     use crate::uff::{UffFile, UffInputOrder, UffParser};
     use lazy_static::lazy_static;

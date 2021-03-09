@@ -55,7 +55,7 @@ fn main() {
     let mut output = ndarray::Array1::<f32>::zeros(1000);
     let outputs = vec![ExecuteInput::Float(&mut output)];
     context
-        .execute(ExecuteInput::Float(&mut pre_processed), outputs)
+        .execute(ExecuteInput::Float(&mut pre_processed), outputs, None)
         .unwrap();
     println!("output: {}", output);
 }

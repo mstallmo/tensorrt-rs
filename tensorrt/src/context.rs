@@ -122,6 +122,7 @@ impl Context {
         &self,
         input_data: ExecuteInput<D1>,
         mut output_data: Vec<ExecuteInput<D2>>,
+        batch_size: Option<i32>,
     ) -> Result<(), Error> {
         let mut buffers = Vec::<DeviceBuffer>::with_capacity(output_data.len() + 1);
         let dev_buffer = match input_data {
@@ -146,7 +147,11 @@ impl Context {
             .collect::<Vec<*mut c_void>>();
 
         unsafe {
-            execute(self.internal_context, bindings.as_mut_ptr(), 1);
+            execute(
+                self.internal_context,
+                bindings.as_mut_ptr(),
+                batch_size.unwrap_or(1),
+            );
         }
 
         for (idx, output) in buffers.iter().skip(1).enumerate() {
@@ -179,7 +184,7 @@ mod tests {
     use crate::data_size::GB;
     use crate::dims::DimsCHW;
     use crate::engine::Engine;
-    use crate::profiler::RustProfiler;
+    //    use crate::profiler::RustProfiler;
     use crate::runtime::Logger;
     use crate::uff::{UffFile, UffInputOrder, UffParser};
     use lazy_static::lazy_static;

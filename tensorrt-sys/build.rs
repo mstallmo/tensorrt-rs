@@ -24,6 +24,13 @@ fn tensorrt_configuration() {
     println!("cargo:rustc-link-lib=dylib=nvinfer_plugin");
 }
 
+fn tensorrt_include_path() -> String {
+    match option_env!("TRT_INSTALL_DIR") {
+        Some(trt_include_dir) => format!("{}/include", trt_include_dir),
+        None => ".".to_string(),
+    }
+}
+
 // Not sure if I love this solution but I think it's relatively robust enough for now on Unix systems.
 // Still have to thoroughly test what happens with a TRT library installed that's not done by the
 // dpkg. It's possible that we'll just have to fall back to only supporting one system library and assuming that
@@ -41,10 +48,10 @@ fn main() -> Result<(), ()> {
         cfg.define("TRT5", "");
         let bindings = builder()
             .clang_args(&["-x", "c++"])
+            .clang_args(&["-I", &tensorrt_include_path()[..]])
             .header("trt-sys/tensorrt_api.h")
             .size_t_is_usize(true)
             .generate()?;
-
         bindings.write_to_file("src/bindings.rs").unwrap();
     }
 
@@ -55,6 +62,7 @@ fn main() -> Result<(), ()> {
         let bindings = builder()
             .clang_arg("-DTRT6")
             .clang_args(&["-x", "c++"])
+            .clang_args(&["-I", &tensorrt_include_path()[..]])
             .header("trt-sys/tensorrt_api.h")
             .size_t_is_usize(true)
             .generate()?;
@@ -69,6 +77,7 @@ fn main() -> Result<(), ()> {
         let bindings = builder()
             .clang_arg("-DTRT7")
             .clang_args(&["-x", "c++"])
+            .clang_args(&["-I", &tensorrt_include_path()[..]])
             .header("trt-sys/tensorrt_api.h")
             .size_t_is_usize(true)
             .generate()?;
@@ -79,6 +88,8 @@ fn main() -> Result<(), ()> {
     let dst = cfg.build();
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=static=trt-sys");
+
+    #[cfg(target_os = "linux")]
     println!("cargo:rustc-link-lib=dylib=stdc++");
 
     tensorrt_configuration();

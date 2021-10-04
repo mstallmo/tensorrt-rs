@@ -23,10 +23,10 @@ tensorrt-sys = { path = "../tensorrt-sys" }
 #tensorrt-sys = { git = "https://github.com/mstallmo/tensorrt-rs", branch = "develop" }
 tensorrt_rs_derive = { path = "../tensorrt_rs_derive" }
 #tensorrt_rs_derive = { git = "https://github.com/mstallmo/tensorrt-rs", branch = "develop" }
-ndarray = "0.14.0"
+ndarray = "0.15.3"
 ndarray-image = "0.3.0"
 image = "0.23"
-imageproc = "0.21.0"
+imageproc = "0.22.0"
 bitflags = "1.2"
 num-traits = "0.2.12"
 num-derive = "0.3.2"
